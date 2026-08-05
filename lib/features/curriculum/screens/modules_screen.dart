@@ -7,6 +7,7 @@ import '../../../core/constants/string_constants.dart';
 import '../../../core/di/injection.dart';
 import '../../../domain/models/curriculum/lesson_module.dart';
 import '../../../domain/models/curriculum/phase.dart';
+import '../../ai_tutor/widgets/ai_tutor_fab.dart';
 import '../bloc/curriculum_bloc.dart';
 
 class ModulesScreen extends StatelessWidget {
@@ -208,6 +209,7 @@ class _ModulesView extends StatelessWidget {
               }),
             ],
           ),
+          floatingActionButton: const AiTutorFab(),
         );
       },
     );

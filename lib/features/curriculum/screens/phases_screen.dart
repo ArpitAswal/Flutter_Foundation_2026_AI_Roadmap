@@ -7,6 +7,7 @@ import '../../../core/constants/asset_constants.dart';
 import '../../../core/constants/string_constants.dart';
 import '../../../core/di/injection.dart';
 import '../../../domain/models/curriculum/phase.dart';
+import '../../ai_tutor/widgets/ai_tutor_fab.dart';
 import '../bloc/curriculum_bloc.dart';
 
 class PhasesScreen extends StatelessWidget {
@@ -46,18 +47,7 @@ class _PhasesView extends StatelessWidget {
             color: colorScheme.primary,
             fontWeight: FontWeight.bold,
           ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            padding: const EdgeInsets.only(right: 24),
-            icon: Icon(
-              Icons.query_stats_rounded,
-              color: colorScheme.onSurfaceVariant,
-            ),
-            onPressed: () {},
-          ),
-        ],
+        )
       ),
       body: BlocBuilder<CurriculumBloc, CurriculumState>(
         builder: (context, state) {
@@ -76,6 +66,7 @@ class _PhasesView extends StatelessWidget {
           return const SizedBox.shrink();
         },
       ),
+      floatingActionButton: const AiTutorFab(),
     );
   }
 }

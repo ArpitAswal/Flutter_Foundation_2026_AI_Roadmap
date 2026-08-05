@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_foundation/core/constants/string_constants.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
-import '../../../shared/widgets/accordion_widget.dart';
+import '../../../shared/widgets/expandable_widget.dart';
 import '../../../shared/widgets/code_block_widget.dart';
+import '../../../shared/widgets/code_element_builder.dart';
+import '../../ai_tutor/widgets/ai_tutor_fab.dart';
 import '../bloc/lesson_bloc.dart';
 
 /// Renders the full content of a single lesson day.
@@ -17,9 +20,9 @@ import '../bloc/lesson_bloc.dart';
 /// 2. Theory — Markdown rendered body
 /// 3. Code Instruction — [CodeBlockWidget] (if present)
 /// 4. Deep Dives section header (if any accordion content exists)
-/// 5. Comparisons — [AccordionWidget]
-/// 6. Optimization — [AccordionWidget]
-/// 7. Interview Questions — [AccordionWidget]
+/// 5. Comparisons — [ExpandableWidget]
+/// 6. Optimization — [ExpandableWidget]
+/// 7. Interview Questions — [ExpandableWidget]
 /// 8. Mark as Complete button
 class LessonScreen extends StatelessWidget {
   final int phaseId;
@@ -37,20 +40,16 @@ class LessonScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<LessonBloc>()
-        ..add(LessonLoadRequested(
-          phase: phaseId,
-          module: moduleId,
-          day: day,
-        )),
-      child: _LessonView(moduleId: moduleId),
+        ..add(LessonLoadRequested(phase: phaseId, module: moduleId, day: day)),
+      child: _LessonView(dayID: day),
     );
   }
 }
 
 class _LessonView extends StatelessWidget {
-  final int moduleId;
+  final int dayID;
 
-  const _LessonView({required this.moduleId});
+  const _LessonView({required this.dayID});
 
   @override
   Widget build(BuildContext context) {
@@ -60,11 +59,14 @@ class _LessonView extends StatelessWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'MODULE $moduleId',
+          '${StringConstants.dayPrefix} $dayID',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.bold,
             letterSpacing: 1.6,
@@ -92,6 +94,14 @@ class _LessonView extends StatelessWidget {
             );
           }
           return const SizedBox.shrink();
+        },
+      ),
+      floatingActionButton: BlocBuilder<LessonBloc, LessonState>(
+        builder: (context, state) {
+          if (state is LessonLoaded) {
+            return AiTutorFab(contextLesson: state.lesson);
+          }
+          return const AiTutorFab();
         },
       ),
     );
@@ -131,59 +141,71 @@ class _LessonContent extends StatelessWidget {
         ],
 
         // ── Theory (Markdown) ─────────────────────────────────────────────
-        MarkdownBody(
-          data: content.theory,
-          styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-            p: theme.textTheme.bodyMedium?.copyWith(height: 1.7),
-            h1: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-            h2: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            h3: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-            code: theme.textTheme.bodySmall?.copyWith(
-              fontFamily: 'monospace',
-              backgroundColor: colorScheme.surfaceContainerHighest,
+        if (content.theory.isNotEmpty)
+          MarkdownBody(
+            data: content.theory,
+            styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+              p: theme.textTheme.bodyMedium?.copyWith(height: 1.7),
+              h1Padding: const EdgeInsets.only(top: 16),
+              h1: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: colorScheme.primary,
+              ),
+              h2Padding: const EdgeInsets.only(top: 16),
+              h2: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colorScheme.primary,
+              ),
+              h3Padding: const EdgeInsets.only(top: 16),
+              h3: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colorScheme.primary,
+              ),
+              blockSpacing: 12,
+              a: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.primary,
+                decoration: TextDecoration.underline,
+              ),
             ),
+            builders: {'pre': CodeElementBuilder(context)},
           ),
-        ),
 
-        // ── Code Instruction ─────────────────────────────────────────────────
-        if (content.codeInstruction != null &&
-            content.codeInstruction!.isNotEmpty) ...[
-          const SizedBox(height: 24),
-          CodeBlockWidget(
-            code: content.codeInstruction!,
-            fileName: 'main.dart',
-          ),
-        ],
-
-        // ── Deep Dives ───────────────────────────────────────────────────────
-        if (content.hasDeepDives) ...[
+        // ── Additional Sections (Accordions) ─────────────────────────────────
+        if (content.comparisons != null ||
+            content.implementation != null ||
+            content.hasDeepDives) ...[
           const SizedBox(height: 32),
-          const Divider(),
-          const SizedBox(height: 16),
-          Text(
-            'DEEP DIVES',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.8,
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (content.comparisons != null &&
-              content.comparisons!.isNotEmpty)
-            AccordionWidget(
+
+          if (content.comparisons != null && content.comparisons!.isNotEmpty)
+            ExpandableWidget(
               title: 'Comparisons',
               markdownContent: content.comparisons!,
             ),
-          if (content.optimization != null &&
-              content.optimization!.isNotEmpty)
-            AccordionWidget(
+          if (content.implementation != null &&
+              content.implementation!.isNotEmpty)
+            ExpandableWidget(
+              title: 'Implementation',
+              markdownContent: content.implementation!,
+            ),
+          if (content.architecture != null && content.architecture!.isNotEmpty)
+            ExpandableWidget(
+              title: 'Architecture',
+              markdownContent: content.architecture!,
+            ),
+          if (content.optimization != null && content.optimization!.isNotEmpty)
+            ExpandableWidget(
               title: 'Optimization',
               markdownContent: content.optimization!,
             ),
+          if (content.commonMistakes != null &&
+              content.commonMistakes!.isNotEmpty)
+            ExpandableWidget(
+              title: 'Common Mistakes',
+              markdownContent: content.commonMistakes!,
+            ),
           if (content.interviewQuestions != null &&
               content.interviewQuestions!.isNotEmpty)
-            AccordionWidget(
+            ExpandableWidget(
               title: 'Interview Prep: Key Questions',
               markdownContent: content.interviewQuestions!,
             ),
@@ -209,14 +231,18 @@ class _PrerequisitesCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withAlpha(80),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: colorScheme.primaryContainer),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline_rounded, size: 18, color: colorScheme.primary),
+          Icon(
+            Icons.info_outline_rounded,
+            size: 18,
+            color: colorScheme.primary,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -263,10 +289,12 @@ class _MarkCompleteButton extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              isComplete ? colorScheme.surfaceContainerHighest : colorScheme.primary,
-          foregroundColor:
-              isComplete ? colorScheme.onSurfaceVariant : colorScheme.onPrimary,
+          backgroundColor: isComplete
+              ? colorScheme.surfaceContainerHighest
+              : colorScheme.primary,
+          foregroundColor: isComplete
+              ? colorScheme.onSurfaceVariant
+              : colorScheme.onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

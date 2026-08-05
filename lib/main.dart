@@ -8,7 +8,6 @@ import 'core/constants/app_constants.dart';
 import 'core/di/injection.dart';
 import 'core/router/app_router.dart';
 import 'data/local/adapters/hive_adapters.dart';
-import 'data/local/models/lesson_record.dart';
 import 'data/local/models/user_progress_record.dart';
 
 void main() async {
@@ -25,7 +24,6 @@ void main() async {
   registerHiveAdapters();
 
   // Open all Hive boxes used by the application
-  await Hive.openBox<LessonRecord>(AppConstants.lessonsBox);
   await Hive.openBox<UserProgressRecord>(AppConstants.progressBox);
 
   // 3. Configure Dependency Injection (get_it + injectable)

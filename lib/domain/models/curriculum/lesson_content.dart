@@ -6,17 +6,21 @@ import 'package:equatable/equatable.dart';
 class LessonContent extends Equatable {
   final String prerequisites;
   final String theory;
-  final String? codeInstruction;
+  final String? implementation;
+  final String? architecture;
   final String? comparisons;
   final String? optimization;
+  final String? commonMistakes;
   final String? interviewQuestions;
 
   const LessonContent({
     required this.prerequisites,
     required this.theory,
-    this.codeInstruction,
+    this.implementation,
+    this.architecture,
     this.comparisons,
     this.optimization,
+    this.commonMistakes,
     this.interviewQuestions,
   });
 
@@ -24,26 +28,32 @@ class LessonContent extends Equatable {
     return LessonContent(
       prerequisites: json['prerequisites'] as String? ?? '',
       theory: json['theory'] as String? ?? '',
-      codeInstruction: json['code_instruction'] as String?,
+      implementation: json['implementation'] as String?,
+      architecture: json['architecture'] as String?,
       comparisons: json['comparisons'] as String?,
       optimization: json['optimization'] as String?,
+      commonMistakes: json['common_mistakes'] as String?,
       interviewQuestions: json['interview_questions'] as String?,
     );
   }
 
   /// Returns true if there is any "Deep Dives" section content to display.
   bool get hasDeepDives =>
+      (architecture != null && architecture!.isNotEmpty) ||
       (comparisons != null && comparisons!.isNotEmpty) ||
       (optimization != null && optimization!.isNotEmpty) ||
+      (commonMistakes != null && commonMistakes!.isNotEmpty) ||
       (interviewQuestions != null && interviewQuestions!.isNotEmpty);
 
   @override
   List<Object?> get props => [
-        prerequisites,
-        theory,
-        codeInstruction,
-        comparisons,
-        optimization,
-        interviewQuestions,
-      ];
+    prerequisites,
+    theory,
+    implementation,
+    architecture,
+    comparisons,
+    optimization,
+    commonMistakes,
+    interviewQuestions,
+  ];
 }

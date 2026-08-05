@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/models/gemini_model.dart';
-import '../../../domain/models/lesson.dart';
+import '../../../domain/models/curriculum/lesson_day.dart';
 
 /// Base class for all events related to the AI Tutor feature.
 sealed class AiTutorEvent extends Equatable {
@@ -14,20 +14,20 @@ sealed class AiTutorEvent extends Equatable {
 /// Dispatched when the user submits a question to the AI Tutor.
 final class AiTutorMessageSent extends AiTutorEvent {
   /// The raw question typed by the user.
-  final String userMessage;
+  final String message;
 
   /// The lesson context the user is currently studying.
-  final Lesson currentLesson;
+  final LessonDay currentLesson;
 
   /// The Gemini model selected by the user for this query (defaults to GeminiModel.flash).
   final GeminiModel model;
 
   const AiTutorMessageSent({
-    required this.userMessage,
+    required this.message,
     required this.currentLesson,
     this.model = GeminiModel.flash,
   });
 
   @override
-  List<Object?> get props => [userMessage, currentLesson, model];
+  List<Object?> get props => [message, currentLesson, model];
 }

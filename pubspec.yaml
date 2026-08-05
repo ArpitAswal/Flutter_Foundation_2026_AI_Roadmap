@@ -174,7 +174,19 @@ dependencies:
   # isar_flutter_libs: Bundles Isar native binaries for Flutter.
   # Role: CURRICULUM ONLY — required companion to the isar package on device.
   isar_flutter_libs: ^3.1.0+1
+  # ── [APP INFRASTRUCTURE] UI Styling & Syntax Highlighting ─────────────────
+  # google_fonts: Access to the Google Fonts catalog natively.
+  # Role: Used for application-wide typography without downloading TTF files.
   google_fonts: ^8.2.1
+
+  # flutter_highlighter: Code syntax highlighting widget.
+  # Role: Used in CodeBlockWidget to highlight Dart code beautifully in the UI.
+  flutter_highlighter: ^0.1.1
+
+  # markdown: Core Dart markdown parser.
+  # Role: Required by flutter_markdown_plus and our CodeElementBuilder to parse
+  #       the raw Markdown into elements (like <pre> and <code>) before rendering.
+  markdown: ^7.3.1
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DEV DEPENDENCIES
