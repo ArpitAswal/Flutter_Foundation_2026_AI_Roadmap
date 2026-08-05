@@ -1,13 +1,18 @@
 import 'package:injectable/injectable.dart';
 
-import '../repositories/lesson_repository.dart';
+import '../../data/local/sources/progress_local_data_source.dart';
 
-/// Marks a lesson as completed by its ID.
+/// Use case for marking a lesson as complete in local Hive storage.
+///
+/// Idempotent — safe to call multiple times for the same lesson.
 @injectable
 class MarkLessonCompleteUseCase {
-  final LessonRepository _repository;
+  final ProgressLocalDataSource _dataSource;
 
-  const MarkLessonCompleteUseCase(this._repository);
+  const MarkLessonCompleteUseCase(this._dataSource);
 
-  Future<void> execute(String lessonId) => _repository.markLessonComplete(lessonId);
+  /// Marks the lesson identified by [lessonId] (format: "p{phase}_m{module}_d{day}") as complete.
+  Future<void> call(String lessonId) {
+    return _dataSource.markLessonComplete(lessonId);
+  }
 }

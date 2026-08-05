@@ -43,6 +43,11 @@ dependencies:
   # Provides iOS-style Cupertino icons for the icon font.
   cupertino_icons: ^1.0.8
 
+  # ── [APP INFRASTRUCTURE] UI Rendering ─────────────────────────────────────
+  # flutter_markdown_plus: Successor to flutter_markdown (official replacement).
+  # Role: Renders lesson theory, comparisons, and interview questions from JSON.
+  flutter_markdown_plus: ^1.0.12
+
   # ── [APP INFRASTRUCTURE] Navigation ───────────────────────────────────────
   # go_router: Declarative URL-based routing solution.
   # Role: PRIMARY navigation for the entire application.
@@ -169,6 +174,7 @@ dependencies:
   # isar_flutter_libs: Bundles Isar native binaries for Flutter.
   # Role: CURRICULUM ONLY — required companion to the isar package on device.
   isar_flutter_libs: ^3.1.0+1
+  google_fonts: ^8.2.1
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DEV DEPENDENCIES
@@ -218,3 +224,5 @@ flutter:
   # WARNING: .env must be added to .gitignore — never commit API keys.
   assets:
     - assets/.env
+    - assets/curriculum/
+    - assets/images/
