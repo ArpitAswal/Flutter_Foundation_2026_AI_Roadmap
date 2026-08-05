@@ -1,0 +1,220 @@
+name: flutter_foundation
+description: "Flutter AI Tutor — A production-grade interactive Flutter learning platform."
+# Prevents accidental publication to pub.dev. Remove if you wish to publish.
+publish_to: 'none'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Version
+# ─────────────────────────────────────────────────────────────────────────────
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the build number may be overridden in flutter build by
+# specifying --build-name and --build-number, respectively.
+#
+# Android: build-name → versionName | build-number → versionCode
+# iOS:     build-name → CFBundleShortVersionString | build-number → CFBundleVersion
+# Windows: build-name → major.minor.patch of product version | build-number → build suffix
+# ─────────────────────────────────────────────────────────────────────────────
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.0
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DEPENDENCIES
+# ─────────────────────────────────────────────────────────────────────────────
+# This project uses TWO categories of packages:
+#
+#  [APP INFRASTRUCTURE]  — Packages that power the running application.
+#                          These are the production-chosen technology stack.
+#
+#  [CURRICULUM]          — Packages taught as learning topics in the roadmap.
+#                          These are included so learners can run lesson
+#                          examples but are NOT used for app infrastructure.
+#
+# To upgrade to latest versions: flutter pub upgrade --major-versions
+# To check for outdated packages: flutter pub outdated
+# ─────────────────────────────────────────────────────────────────────────────
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ── Core Flutter UI ────────────────────────────────────────────────────────
+  # Provides iOS-style Cupertino icons for the icon font.
+  cupertino_icons: ^1.0.8
+
+  # ── [APP INFRASTRUCTURE] Navigation ───────────────────────────────────────
+  # go_router: Declarative URL-based routing solution.
+  # Role: PRIMARY navigation for the entire application.
+  # Used in: app router configuration, deep linking, named routes.
+  go_router: ^17.1.0
+
+  # ── [APP INFRASTRUCTURE] State Management ─────────────────────────────────
+  # flutter_bloc: BLoC (Business Logic Component) pattern implementation.
+  # Role: PRIMARY state management for the entire application.
+  # Used in: all feature Blocs and Cubits (AI Tutor, Roadmap, Progress, etc.)
+  flutter_bloc: ^9.1.0
+
+  # equatable: Value-based equality comparison for Dart objects.
+  # Role: Enables Bloc states and events to be compared by value, preventing
+  #       unnecessary UI rebuilds when state data hasn't changed.
+  # Used in: all Bloc Event and State classes.
+  equatable: ^2.0.7
+
+  # ── [APP INFRASTRUCTURE] Dependency Injection ─────────────────────────────
+  # get_it: Service locator for dependency injection.
+  # Role: Registers and resolves all app-level singletons and factories.
+  # Used in: injection.dart to wire repositories, data sources, and use cases.
+  get_it: ^8.0.2
+
+  # injectable: Annotation-based dependency injection on top of get_it.
+  # Role: Generates the DI registration boilerplate via build_runner,
+  #       keeping injection.dart concise and maintainable.
+  # Used in: all injectable classes annotated with @singleton, @lazySingleton,
+  #           @injectable (factory).
+  injectable: ^2.5.0
+
+  # ── [APP INFRASTRUCTURE] Local Database ───────────────────────────────────
+  # hive: Lightweight, fast NoSQL key-value / box database for Flutter/Dart.
+  # Role: PRIMARY local database for all app data — lesson records,
+  #       user progress, and AI tutor settings (selected model, etc.).
+  # Uses @HiveType / @HiveField annotations + code-generated TypeAdapters.
+  hive: ^2.2.3
+
+  # hive_flutter: Flutter-specific helpers for Hive (Hive.initFlutter, etc.)
+  # Role: Initialises Hive with the correct platform path on all devices.
+  # Used in: main.dart bootstrap sequence.
+  hive_flutter: ^1.1.0
+
+  # ── [APP INFRASTRUCTURE] Networking ───────────────────────────────────────
+  # dio: Advanced HTTP client with interceptors, timeout, and retry support.
+  # Role: Used for all remote API calls beyond the Gemini SDK.
+  # Used in: remote data sources, interceptors for logging and auth.
+  dio: ^5.9.2
+
+  # ── [APP INFRASTRUCTURE] AI Integration ───────────────────────────────────
+  # google_generative_ai: Official Dart SDK for the Gemini API.
+  # Role: Powers the AI Tutor feature — sends user questions with injected
+  #       lesson context (current lesson + historical lessons from Hive)
+  #       to the Gemini model and streams the response back to the UI.
+  # Note: The AI understands TWO contexts:
+  #   • META-CONTEXT  → how this app is built (Bloc, Hive, GoRouter)
+  #   • LESSON-CONTEXT → what the user is currently learning (e.g., Hive)
+  # Used in: gemini_remote_data_source.dart, ask_ai_tutor_use_case.dart
+  google_generative_ai: ^0.4.6
+
+  # flutter_dotenv: Loads environment variables from a .env file at runtime.
+  # Role: Securely provides the GEMINI_API_KEY without hardcoding it in source.
+  # .env file is git-ignored; bundled as a Flutter asset (assets/.env).
+  # Used in: main.dart (dotenv.load) and gemini_remote_data_source.dart.
+  flutter_dotenv: ^5.2.1
+
+  # ── [APP INFRASTRUCTURE] Secure Storage ───────────────────────────────────
+  # flutter_secure_storage: Encrypted key-value storage backed by Keychain/Keystore.
+  # Role: Stores sensitive user credentials (API tokens, auth secrets) that
+  #       must NOT be stored in plain Hive boxes or SharedPreferences.
+  flutter_secure_storage: ^10.2.0
+
+  # ── [APP INFRASTRUCTURE] Utilities ────────────────────────────────────────
+  # path_provider: Resolves platform-specific file system paths.
+  # Role: Used by Hive.initFlutter() to locate the app's documents directory.
+  path_provider: ^2.1.5
+
+  # path: Utilities for joining, splitting, and normalizing file system paths.
+  # Role: Used alongside path_provider when constructing file paths.
+  path: ^1.9.1
+
+  # ── [CURRICULUM] Networking — taught in roadmap lessons ───────────────────
+  # http: Simple HTTP client from the Dart/Flutter team.
+  # Role: CURRICULUM ONLY — taught in networking lessons as the entry-level
+  #       HTTP package before Dio is introduced.
+  # NOT used for app infrastructure networking.
+  http: ^1.6.0
+
+  # graphql_flutter: GraphQL client for Flutter.
+  # Role: CURRICULUM ONLY — taught in advanced networking lessons.
+  # NOT used for app infrastructure.
+  graphql_flutter: ^5.3.0
+
+  # ── [CURRICULUM] Local Storage — taught in roadmap lessons ────────────────
+  # shared_preferences: Simple key-value persistence using platform storage.
+  # Role: CURRICULUM ONLY — taught as the first local storage lesson,
+  #       demonstrating simple persistence before Hive is introduced.
+  # NOT used for app infrastructure (Hive is used instead).
+  shared_preferences: ^2.5.5
+
+  # sqflite: SQLite plugin for Flutter.
+  # Role: CURRICULUM ONLY — taught in the local database lessons for
+  #       understanding raw SQL and relational data in Flutter.
+  # NOT used for app infrastructure.
+  sqflite: ^2.4.2+1
+
+  # sqlite3_flutter_libs: Bundles the SQLite3 native library.
+  # Role: CURRICULUM ONLY — required companion to sqflite for bundling
+  #       the native SQLite library on Android/iOS/Desktop.
+  sqlite3_flutter_libs: ^0.5.4
+
+  # drift: Type-safe SQLite ORM / reactive database library for Dart.
+  # Role: CURRICULUM ONLY — taught as an advanced local database lesson
+  #       after sqflite, demonstrating the ORM pattern and reactive queries.
+  # NOT used for app infrastructure.
+  drift: ^2.15.0
+
+  # isar: Fast, cross-platform NoSQL database with type-safe queries.
+  # Role: CURRICULUM ONLY — taught as an alternative to Hive when complex
+  #       querying and indexing are required. Students compare Hive vs Isar.
+  # NOT used for app infrastructure (Hive is the primary database).
+  isar: ^3.1.0+1
+
+  # isar_flutter_libs: Bundles Isar native binaries for Flutter.
+  # Role: CURRICULUM ONLY — required companion to the isar package on device.
+  isar_flutter_libs: ^3.1.0+1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DEV DEPENDENCIES
+# ─────────────────────────────────────────────────────────────────────────────
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # flutter_lints: Recommended lint rules for Flutter projects.
+  # Activated in analysis_options.yaml at the project root.
+  flutter_lints: ^6.0.0
+
+  # build_runner: Dart code generation tool.
+  # Used to generate: Hive TypeAdapters (hive_generator),
+  #                   DI configuration (injectable_generator),
+  #                   Drift DAOs (drift_dev), Isar collections (isar_generator)
+  # Run: dart run build_runner build --delete-conflicting-outputs
+  build_runner: ^2.4.13
+
+  # hive_generator: Generates TypeAdapter classes for @HiveType annotated models.
+  # Works with build_runner to produce *.g.dart adapter files.
+  # Used in: all Hive data model files (lesson_record.dart, settings_record.dart, etc.)
+  hive_generator: ^2.0.1
+
+  # injectable_generator: Generates get_it registration code from @injectable annotations.
+  # Works with build_runner to produce injection.config.dart.
+  # NOTE: Pinned to ^2.4.2 — cannot be raised to >=2.7.0 while isar_generator ^3.1.0+1
+  #       is present (curriculum package), due to conflicting dart_style / source_gen constraints.
+  injectable_generator: ^2.4.2
+
+  # drift_dev: Code generator for the Drift ORM (CURRICULUM use only).
+  # Generates DAO and table query classes from Drift table definitions.
+  drift_dev: ^2.15.0
+
+  # isar_generator: Generates Isar collection code (CURRICULUM use only).
+  # Generates *.g.dart files for @Collection annotated Isar classes.
+  isar_generator: ^3.1.0+1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FLUTTER SECTION
+# ─────────────────────────────────────────────────────────────────────────────
+flutter:
+  uses-material-design: true
+
+  # Assets bundled with the application.
+  # .env is listed here so flutter_dotenv can load it at runtime.
+  # WARNING: .env must be added to .gitignore — never commit API keys.
+  assets:
+    - assets/.env

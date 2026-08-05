@@ -1,0 +1,9 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        generate_for:
+          - lib/curriculum/local_storage/drift/**.dart
+      isar_generator:
+        generate_for:
+          - lib/curriculum/local_storage/isar/**.dart
