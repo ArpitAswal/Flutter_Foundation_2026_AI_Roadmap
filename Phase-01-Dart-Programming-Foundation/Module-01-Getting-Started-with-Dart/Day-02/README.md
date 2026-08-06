@@ -104,23 +104,3 @@ Typical interview discussions include:
 - Type System
 
 Refer to the official Dart documentation for the latest language updates and best practices.
-
----
-
-# 📚 Official References
-
-### Flutter
-
-https://docs.flutter.dev/
-
-### Dart
-
-https://dart.dev/
-
-### Flutter SDK
-
-https://docs.flutter.dev/get-started/install
-
-### Dart Language Tour
-
-https://dart.dev/language

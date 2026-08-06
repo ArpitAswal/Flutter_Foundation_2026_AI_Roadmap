@@ -48,6 +48,9 @@ dependencies:
   # Role: Renders lesson theory, comparisons, and interview questions from JSON.
   flutter_markdown_plus: ^1.0.12
 
+  # flutter_spinkit: Collection of smooth loading indicators.
+  flutter_spinkit: ^5.2.1
+
   # ── [APP INFRASTRUCTURE] Navigation ───────────────────────────────────────
   # go_router: Declarative URL-based routing solution.
   # Role: PRIMARY navigation for the entire application.
@@ -237,4 +240,5 @@ flutter:
   assets:
     - assets/.env
     - assets/curriculum/
+    - assets/curriculum/phase1/module1/
     - assets/images/

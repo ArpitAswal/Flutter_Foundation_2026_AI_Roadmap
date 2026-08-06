@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/constants/string_constants.dart';
 import '../../../core/di/injection.dart';
 import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
@@ -16,14 +18,16 @@ import '../bloc/lesson_bloc.dart';
 /// Renders the full content of a single lesson day.
 ///
 /// Content sections rendered in order:
-/// 1. Prerequisites — info card
+/// 1. Prerequisites & Tags — info card and bubbles
 /// 2. Theory — Markdown rendered body
 /// 3. Code Instruction — [CodeBlockWidget] (if present)
-/// 4. Deep Dives section header (if any accordion content exists)
+/// 4. Architecture — [ExpandableWidget] (if present)
 /// 5. Comparisons — [ExpandableWidget]
 /// 6. Optimization — [ExpandableWidget]
-/// 7. Interview Questions — [ExpandableWidget]
-/// 8. Mark as Complete button
+/// 7. Common Mistakes — [ExpandableWidget]
+/// 8. Interview Questions — [ExpandableWidget]
+/// 9. Mark as Complete button
+
 class LessonScreen extends StatelessWidget {
   final int phaseId;
   final int moduleId;
@@ -41,15 +45,21 @@ class LessonScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => getIt<LessonBloc>()
         ..add(LessonLoadRequested(phase: phaseId, module: moduleId, day: day)),
-      child: _LessonView(dayID: day),
+      child: _LessonView(phaseId: phaseId, moduleId: moduleId, dayID: day),
     );
   }
 }
 
 class _LessonView extends StatelessWidget {
+  final int phaseId;
+  final int moduleId;
   final int dayID;
 
-  const _LessonView({required this.dayID});
+  const _LessonView({
+    required this.phaseId,
+    required this.moduleId,
+    required this.dayID,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,14 +67,13 @@ class _LessonView extends StatelessWidget {
       body: BlocBuilder<LessonBloc, LessonState>(
         builder: (context, state) {
           if (state is LessonLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const _LessonLoadingView();
           }
           if (state is LessonError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Text(state.message),
-              ),
+            return _LessonErrorView(
+              phaseId: phaseId,
+              moduleId: moduleId,
+              day: dayID,
             );
           }
           if (state is LessonLoaded) {
@@ -92,7 +101,152 @@ class _LessonView extends StatelessWidget {
   }
 }
 
-class _LessonContent extends StatelessWidget {
+class _LessonLoadingView extends StatelessWidget {
+  const _LessonLoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SpinKitThreeBounce(color: colorScheme.primary, size: 36.0),
+          const SizedBox(height: 20),
+          Text(
+            StringConstants.preparingLesson,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LessonErrorView extends StatelessWidget {
+  final int phaseId;
+  final int moduleId;
+  final int day;
+
+  const _LessonErrorView({
+    required this.phaseId,
+    required this.moduleId,
+    required this.day,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final size = MediaQuery.sizeOf(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Error Illustration Icon Container
+            Container(
+              width: size.width * 0.3,
+              height: size.width * 0.3,
+              decoration: BoxDecoration(
+                color: colorScheme.errorContainer.withValues(alpha: 0.4),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.auto_stories_outlined,
+                size: size.width * 0.2,
+                color: colorScheme.error,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Title
+            Text(
+              StringConstants.lessonUnavailable,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Apology Message
+            Text(
+              StringConstants.lessonErrorApology,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.6,
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Navigation and Retry Actions
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/roadmap/phases');
+                    }
+                  },
+                  icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                  label: const Text(StringConstants.goBack),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    context.read<LessonBloc>().add(
+                      LessonLoadRequested(
+                        phase: phaseId,
+                        module: moduleId,
+                        day: day,
+                        again: true,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.refresh_rounded, size: 18),
+                  label: const Text(StringConstants.tryAgain),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LessonContent extends StatefulWidget {
   final LessonDay lesson;
   final LessonContent content;
   final bool isComplete;
@@ -104,39 +258,91 @@ class _LessonContent extends StatelessWidget {
   });
 
   @override
+  State<_LessonContent> createState() => _LessonContentState();
+}
+
+class _LessonContentState extends State<_LessonContent> {
+  String? _expandedTitle;
+  bool _isTransitioning = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Delay rendering heavy Markdown content until route transition finishes
+    // to prevent screen freeze/stutter during navigation.
+    Future.delayed(const Duration(milliseconds: 350), () {
+      if (mounted) {
+        setState(() {
+          _isTransitioning = false;
+        });
+      }
+    });
+  }
+
+  void _handleExpansion(String title, bool isExpanded) {
+    setState(() {
+      if (isExpanded) {
+        _expandedTitle = title;
+      } else if (_expandedTitle == title) {
+        _expandedTitle = null;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    /*
-    IconButton(
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          onPressed: () => context.pop(),
-        ),
-     */
+
+    if (_isTransitioning) {
+      return const _LessonLoadingView();
+    }
+
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
         children: [
           // ── Lesson Title ────────────────────────────────────────────────────
           Text(
-            lesson.title,
+            widget.lesson.title,
             style: theme.textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurface,
               fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
             ),
           ),
-          const SizedBox(height: 16),
-      
+          const SizedBox(height: 8),
+
+          // ── Last Updated Date Metadata ─────────────────────────────────────
+          if (widget.content.lastUpdated != null &&
+              widget.content.lastUpdated!.isNotEmpty) ...[
+            Row(
+              children: [
+                Icon(
+                  Icons.history_rounded,
+                  size: 14,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '${StringConstants.lastUpdated} ${widget.content.lastUpdated}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ] else
+            const SizedBox(height: 16),
+
           // ── Tags ─────────────────────────────────────────────────────────────
-          if (lesson.tags.isNotEmpty) ...[
+          if (widget.lesson.tags.isNotEmpty) ...[
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: lesson.tags.map((tag) {
+              children: widget.lesson.tags.map((tag) {
                 return Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -158,17 +364,17 @@ class _LessonContent extends StatelessWidget {
             ),
             const SizedBox(height: 24),
           ],
-      
+
           // ── Prerequisites ────────────────────────────────────────────────────
-          if (content.prerequisites.isNotEmpty) ...[
-            _PrerequisitesCard(prerequisites: content.prerequisites),
+          if (widget.content.prerequisites.isNotEmpty) ...[
+            _PrerequisitesCard(prerequisites: widget.content.prerequisites),
             const SizedBox(height: 20),
           ],
-      
+
           // ── Theory (Markdown) ─────────────────────────────────────────────
-          if (content.theory.isNotEmpty)
+          if (widget.content.theory.isNotEmpty)
             MarkdownBody(
-              data: content.theory,
+              data: widget.content.theory,
               styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
                 p: theme.textTheme.bodyMedium?.copyWith(height: 1.7),
                 h1Padding: const EdgeInsets.only(top: 16),
@@ -205,51 +411,70 @@ class _LessonContent extends StatelessWidget {
               ),
               builders: {'pre': CodeElementBuilder(context)},
             ),
-      
+
           // ── Additional Sections (Accordions) ─────────────────────────────────
-          if (content.comparisons != null ||
-              content.implementation != null ||
-              content.hasDeepDives) ...[
+          if (widget.content.hasDeepDives) ...[
             const SizedBox(height: 32),
-      
-            if (content.comparisons != null && content.comparisons!.isNotEmpty)
-              ExpandableWidget(
-                title: 'Comparisons',
-                markdownContent: content.comparisons!,
-              ),
-            if (content.implementation != null &&
-                content.implementation!.isNotEmpty)
+
+            if (widget.content.implementation != null &&
+                widget.content.implementation!.isNotEmpty)
               ExpandableWidget(
                 title: 'Implementation',
-                markdownContent: content.implementation!,
+                markdownContent: widget.content.implementation!,
+                isExpanded: _expandedTitle == 'Implementation',
+                onExpansionChanged: (exp) =>
+                    _handleExpansion('Implementation', exp),
               ),
-            if (content.architecture != null && content.architecture!.isNotEmpty)
+            if (widget.content.architecture != null &&
+                widget.content.architecture!.isNotEmpty)
               ExpandableWidget(
                 title: 'Architecture',
-                markdownContent: content.architecture!,
+                markdownContent: widget.content.architecture!,
+                isExpanded: _expandedTitle == 'Architecture',
+                onExpansionChanged: (exp) =>
+                    _handleExpansion('Architecture', exp),
               ),
-            if (content.optimization != null && content.optimization!.isNotEmpty)
+            if (widget.content.comparisons != null &&
+                widget.content.comparisons!.isNotEmpty)
+              ExpandableWidget(
+                title: 'Comparisons',
+                markdownContent: widget.content.comparisons!,
+                isExpanded: _expandedTitle == 'Comparisons',
+                onExpansionChanged: (exp) =>
+                    _handleExpansion('Comparisons', exp),
+              ),
+            if (widget.content.optimization != null &&
+                widget.content.optimization!.isNotEmpty)
               ExpandableWidget(
                 title: 'Optimization',
-                markdownContent: content.optimization!,
+                markdownContent: widget.content.optimization!,
+                isExpanded: _expandedTitle == 'Optimization',
+                onExpansionChanged: (exp) =>
+                    _handleExpansion('Optimization', exp),
               ),
-            if (content.commonMistakes != null &&
-                content.commonMistakes!.isNotEmpty)
+            if (widget.content.commonMistakes != null &&
+                widget.content.commonMistakes!.isNotEmpty)
               ExpandableWidget(
                 title: 'Common Mistakes',
-                markdownContent: content.commonMistakes!,
+                markdownContent: widget.content.commonMistakes!,
+                isExpanded: _expandedTitle == 'Common Mistakes',
+                onExpansionChanged: (exp) =>
+                    _handleExpansion('Common Mistakes', exp),
               ),
-            if (content.interviewQuestions != null &&
-                content.interviewQuestions!.isNotEmpty)
+            if (widget.content.interviewQuestions != null &&
+                widget.content.interviewQuestions!.isNotEmpty)
               ExpandableWidget(
                 title: 'Interview Prep: Key Questions',
-                markdownContent: content.interviewQuestions!,
+                markdownContent: widget.content.interviewQuestions!,
+                isExpanded: _expandedTitle == 'Interview Prep: Key Questions',
+                onExpansionChanged: (exp) =>
+                    _handleExpansion('Interview Prep: Key Questions', exp),
               ),
           ],
-      
+
           // ── Mark as Complete ─────────────────────────────────────────────────
           const SizedBox(height: 36),
-          _MarkCompleteButton(isComplete: isComplete),
+          _MarkCompleteButton(isComplete: widget.isComplete),
         ],
       ),
     );
@@ -294,7 +519,7 @@ class _PrerequisitesCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Prerequisites',
+                StringConstants.prerequisites,
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: colorScheme.tertiary,
                   fontWeight: FontWeight.bold,

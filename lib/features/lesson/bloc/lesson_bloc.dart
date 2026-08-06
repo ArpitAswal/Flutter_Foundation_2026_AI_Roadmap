@@ -41,19 +41,20 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
   ) async {
     emit(LessonLoading());
     try {
-      // 1. Load skeleton to get the contentPath.
-      final lesson = await _getLessonDay(
-        phase: event.phase,
-        module: event.module,
-        day: event.day,
-      );
+      // Fetch skeleton and content while ensuring a minimum 500ms delay for smooth UI feedback.
+      final results = await Future.wait([
+        _getLessonDay(phase: event.phase, module: event.module, day: event.day),
+        Future.delayed(Duration(milliseconds: (event.again) ? 1000 : 100)),
+      ]);
 
-      // 2. Lazily load full content from the individual day asset file.
+      final lesson = results[0] as LessonDay;
       final content = await _getDayContent(lesson.contentPath);
 
       final completedIds = _getCompletedIds();
       final isComplete = completedIds.contains(lesson.lessonId);
-      emit(LessonLoaded(lesson: lesson, content: content, isComplete: isComplete));
+      emit(
+        LessonLoaded(lesson: lesson, content: content, isComplete: isComplete),
+      );
     } catch (e) {
       emit(LessonError('Failed to load lesson: ${e.toString()}'));
     }

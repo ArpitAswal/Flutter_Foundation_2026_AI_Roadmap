@@ -19,15 +19,41 @@ import 'code_element_builder.dart';
 ///   markdownContent: '## Bloc\n\nBetter for complex state...',
 /// )
 /// ```
-class ExpandableWidget extends StatelessWidget {
+class ExpandableWidget extends StatefulWidget {
   final String title;
   final String markdownContent;
+  final bool isExpanded;
+  final ValueChanged<bool>? onExpansionChanged;
 
   const ExpandableWidget({
     super.key,
     required this.title,
     required this.markdownContent,
+    this.isExpanded = false,
+    this.onExpansionChanged,
   });
+
+  @override
+  State<ExpandableWidget> createState() => _ExpandableWidgetState();
+}
+
+class _ExpandableWidgetState extends State<ExpandableWidget> {
+  final ExpansibleController _controller = ExpansibleController();
+  bool _isProgrammaticUpdate = false;
+
+  @override
+  void didUpdateWidget(covariant ExpandableWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isExpanded != oldWidget.isExpanded) {
+      _isProgrammaticUpdate = true;
+      if (widget.isExpanded) {
+        if (!_controller.isExpanded) _controller.expand();
+      } else {
+        if (_controller.isExpanded) _controller.collapse();
+      }
+      _isProgrammaticUpdate = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +68,18 @@ class ExpandableWidget extends StatelessWidget {
         // Remove default ExpansionTile dividers
         data: theme.copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
+          controller: _controller,
+          initiallyExpanded: widget.isExpanded,
+          onExpansionChanged: (expanded) {
+            if (!_isProgrammaticUpdate) {
+              widget.onExpansionChanged?.call(expanded);
+            }
+          },
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
           title: Text(
-            title,
+            widget.title,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
             ),
@@ -55,7 +88,7 @@ class ExpandableWidget extends StatelessWidget {
             const Divider(height: 1),
             const SizedBox(height: 12),
             MarkdownBody(
-              data: markdownContent,
+              data: widget.markdownContent,
               styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
                 p: theme.textTheme.bodyMedium?.copyWith(height: 1.6),
                 h1Padding: const EdgeInsets.only(top: 16),

@@ -68,6 +68,9 @@ void main() async {
         if (await dayFile.exists()) {
           final dayData = json.decode(await dayFile.readAsString());
           
+          if (dayData['last_updated'] != null) {
+            dayReadme += '*Last Updated: ${dayData['last_updated']}*\n\n';
+          }
           if (dayData['prerequisites'] != null) {
             dayReadme += '## Prerequisites\n${dayData['prerequisites']}\n\n';
           }

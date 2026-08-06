@@ -7,11 +7,13 @@ class LessonLoadRequested extends LessonEvent {
   final int phase;
   final int module;
   final int day;
+  final bool again;
 
   LessonLoadRequested({
     required this.phase,
     required this.module,
     required this.day,
+    this.again = false
   });
 }
 

@@ -29,6 +29,24 @@
               "tags": ["Dart", "Variables", "Data Types", "Null Safety"],
               "content_path": "assets/curriculum/phase1/module1/day2.json",
               "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 3,
+              "title": "Operators, Expressions & Control Flow",
+              "description": "Learn how Dart performs calculations, comparisons, decision making, and repetition using operators and control flow statements.",
+              "tags": [
+                "Dart",
+                "Operators",
+                "Expressions",
+                "Control Flow",
+                "if",
+                "switch",
+                "Loops"
+              ],
+              "content_path": "assets/curriculum/phase1/module1/day3.json",
+              "custom_route": null
             }
           ]
         }

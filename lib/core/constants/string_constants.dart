@@ -25,4 +25,15 @@ class StringConstants {
   static const String daysSubtitle =
       'Complete every lesson to strengthen your understanding before moving forward.';
   static const String dayPrefix = 'DAY';
+
+  // Lesson Screen
+  static const String preparingLesson = 'Preparing your lesson...';
+  static const String lessonUnavailable = 'Lesson Unavailable';
+  static const String lessonErrorApology =
+      'We apologise for your experience. Please read and learn other days\' lessons in the remaining time.';
+  static const String goBack = 'Go Back';
+  static const String tryAgain = 'Try Again';
+  static const String relatedTags = 'Related Tags';
+  static const String prerequisites = 'Prerequisites';
+  static const String lastUpdated = 'Last updated:';
 }
