@@ -19,10 +19,7 @@ class DaysScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<CurriculumBloc>()..add(CurriculumLoadRequested()),
-      child: _DaysView(phaseId: phaseId, moduleId: moduleId),
-    );
+    return _DaysView(phaseId: phaseId, moduleId: moduleId);
   }
 }
 

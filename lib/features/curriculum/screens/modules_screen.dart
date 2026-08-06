@@ -17,10 +17,7 @@ class ModulesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<CurriculumBloc>()..add(CurriculumLoadRequested()),
-      child: _ModulesView(phaseId: phaseId),
-    );
+    return _ModulesView(phaseId: phaseId);
   }
 }
 
@@ -62,14 +59,24 @@ class _ModulesView extends StatelessWidget {
     return true;
   }
 
+  int _completedDaysInModule(
+    Phase phase,
+    LessonModule module,
+    Set<String> completedIds,
+  ) {
+    int count = 0;
+    for (var day = 1; day <= module.totalDays; day++) {
+      if (completedIds.contains('p${phase.id}_m${module.id}_d$day')) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   int _completedDaysInPhase(Phase phase, Set<String> completedIds) {
     int count = 0;
     for (final module in phase.modules) {
-      for (var day = 1; day <= module.totalDays; day++) {
-        if (completedIds.contains('p${phase.id}_m${module.id}_d$day')) {
-          count++;
-        }
-      }
+      count += _completedDaysInModule(phase, module, completedIds);
     }
     return count;
   }
@@ -107,9 +114,7 @@ class _ModulesView extends StatelessWidget {
               ),
               onPressed: () => context.pop(),
             ),
-            title: Text(
-              phase.title
-            ),
+            title: Text(phase.title),
             centerTitle: true,
           ),
           body: ListView(
@@ -190,6 +195,12 @@ class _ModulesView extends StatelessWidget {
                 );
                 final isCurrent = !isLocked && !isCompleted;
 
+                final completedDaysInModule = _completedDaysInModule(
+                  phase,
+                  module,
+                  state.completedLessonIds,
+                );
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: _ModuleCard(
@@ -198,6 +209,7 @@ class _ModulesView extends StatelessWidget {
                     isLocked: isLocked,
                     isCompleted: isCompleted,
                     isCurrent: isCurrent,
+                    completedDays: completedDaysInModule,
                   ),
                 );
               }),
@@ -216,6 +228,7 @@ class _ModuleCard extends StatelessWidget {
   final bool isLocked;
   final bool isCompleted;
   final bool isCurrent;
+  final int completedDays;
 
   const _ModuleCard({
     required this.phaseId,
@@ -223,6 +236,7 @@ class _ModuleCard extends StatelessWidget {
     required this.isLocked,
     required this.isCompleted,
     required this.isCurrent,
+    required this.completedDays,
   });
 
   @override
@@ -342,26 +356,78 @@ class _ModuleCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(24),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    icon,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        icon,
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Icon(
+                            isLocked
+                                ? Icons.lock_rounded
+                                : Icons.chevron_right_rounded,
+                            color: isCurrent
+                                ? colorScheme.primary
+                                : (isLocked
+                                      ? colorScheme.onSurfaceVariant.withAlpha(
+                                          128,
+                                        )
+                                      : colorScheme.onSurfaceVariant),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            isCurrent
-                                ? '${StringConstants.modulePrefix} ${module.id} • ${StringConstants.currentLabel}'
-                                : '${StringConstants.modulePrefix} ${module.id}',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: isCurrent
-                                  ? colorScheme.secondaryContainer
-                                  : (isLocked
-                                        ? colorScheme.onSurfaceVariant
-                                        : colorScheme.primary),
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.2,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                isCurrent
+                                    ? '${StringConstants.modulePrefix} ${module.id} • ${StringConstants.currentLabel}'
+                                    : '${StringConstants.modulePrefix} ${module.id}',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: isCurrent
+                                      ? colorScheme.secondaryContainer
+                                      : (isLocked
+                                            ? colorScheme.onSurfaceVariant
+                                            : colorScheme.primary),
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              if (!isLocked)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isCurrent
+                                        ? colorScheme.secondaryContainer
+                                              .withAlpha(25)
+                                        : colorScheme.surfaceContainerHighest,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    '$completedDays/${module.totalDays}',
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: isCurrent
+                                          ? colorScheme.secondaryContainer
+                                          : colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -380,24 +446,70 @@ class _ModuleCard extends StatelessWidget {
                               color: colorScheme.onSurfaceVariant,
                             ),
                           ),
+                          if (!isLocked && isCurrent) ...[
+                            const SizedBox(height: 16),
+                            _ProgressBar(
+                              fraction: module.totalDays == 0
+                                  ? 0.0
+                                  : completedDays / module.totalDays,
+                              isCurrent: isCurrent,
+                            ),
+                          ],
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(
-                      isLocked
-                          ? Icons.lock_rounded
-                          : Icons.chevron_right_rounded,
-                      color: isCurrent
-                          ? colorScheme.primary
-                          : (isLocked
-                                ? colorScheme.onSurfaceVariant.withAlpha(128)
-                                : colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressBar extends StatelessWidget {
+  final double fraction;
+  final bool isCurrent;
+
+  const _ProgressBar({required this.fraction, required this.isCurrent});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      height: 6,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: FractionallySizedBox(
+        alignment: Alignment.centerLeft,
+        widthFactor: fraction,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            gradient: isCurrent
+                ? LinearGradient(
+                    colors: [
+                      colorScheme.primary,
+                      colorScheme.secondaryContainer,
+                    ],
+                  )
+                : null,
+            color: isCurrent ? null : colorScheme.primary,
+            boxShadow: isCurrent
+                ? [
+                    BoxShadow(
+                      color: colorScheme.primary.withAlpha(128),
+                      blurRadius: 10,
+                    ),
+                  ]
+                : null,
           ),
         ),
       ),

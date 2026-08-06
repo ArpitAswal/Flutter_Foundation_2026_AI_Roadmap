@@ -14,6 +14,7 @@ import '../../../shared/widgets/code_block_widget.dart';
 import '../../../shared/widgets/code_element_builder.dart';
 import '../../ai_tutor/widgets/ai_tutor_fab.dart';
 import '../bloc/lesson_bloc.dart';
+import '../../curriculum/bloc/curriculum_bloc.dart';
 
 /// Renders the full content of a single lesson day.
 ///
@@ -582,6 +583,7 @@ class _MarkCompleteButton extends StatelessWidget {
             ? null
             : () {
                 context.read<LessonBloc>().add(LessonMarkCompleteRequested());
+                context.read<CurriculumBloc>().add(CurriculumLoadRequested());
                 // Navigate back after marking complete so the parent refreshes
                 Future.delayed(const Duration(milliseconds: 300), () {
                   if (context.mounted) context.pop();

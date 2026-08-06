@@ -15,10 +15,7 @@ class PhasesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<CurriculumBloc>()..add(CurriculumLoadRequested()),
-      child: const _PhasesView(),
-    );
+    return const _PhasesView();
   }
 }
 
