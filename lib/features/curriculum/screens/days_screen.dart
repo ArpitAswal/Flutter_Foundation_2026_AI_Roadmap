@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/string_constants.dart';
-import '../../../core/di/injection.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
 import '../../../domain/models/curriculum/lesson_module.dart';
 import '../../../domain/models/curriculum/phase.dart';
@@ -102,7 +101,7 @@ class _DaysView extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               // Timeline
               Stack(
                 children: [
@@ -185,44 +184,69 @@ class _DayCardNode extends StatelessWidget {
     Widget node;
     if (isCompleted) {
       node = Container(
-        width: 42,
-        height: 42,
+        width: 36,
+        height: 36,
         decoration: BoxDecoration(
           color: colorScheme.primary,
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.surface, width: 4),
+          border: Border.all(color: colorScheme.onPrimary, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.primary.withValues(alpha: 0.4),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Icon(
-          Icons.check_outlined,
+          Icons.check_rounded,
           color: colorScheme.onPrimary,
-          size: 20,
+          size: 18,
         ),
       );
     } else if (isCurrent) {
       node = Container(
-        width: 42,
-        height: 42,
+        width: 36,
+        height: 36,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.secondaryContainer,
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.secondaryContainer, width: 3),
+          border: Border.all(color: colorScheme.onPrimary, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.secondaryContainer.withValues(alpha: 0.4),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Icon(
           Icons.play_arrow_outlined,
-          color: colorScheme.secondaryContainer,
-          size: 20,
+          color: colorScheme.onPrimary,
+          size: 18,
         ),
       );
     } else {
       node = Container(
-        width: 42,
-        height: 42,
+        width: 36,
+        height: 36,
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.surface, width: 4),
+          border: Border.all(color: colorScheme.outlineVariant, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.surfaceContainerHighest,
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
-        child: Icon(Icons.lock_outline, color: colorScheme.outline, size: 16),
+        child: Icon(
+          Icons.lock_outline,
+          color: colorScheme.outline.withValues(alpha: 0.5),
+          size: 16,
+        ),
       );
     }
 
@@ -243,7 +267,7 @@ class _DayCardNode extends StatelessWidget {
         ? BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant.withAlpha(76)),
+            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withAlpha(8),
@@ -354,14 +378,36 @@ class _DayCardNode extends StatelessWidget {
                           ],
                         ),
                       ),
+                      if (isCompleted)
+                        Positioned(
+                          left: 0,
+                          top: 0,
+                          bottom: 0,
+                          width: 4,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(12),
+                                bottomLeft: Radius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
                       if (isCurrent)
                         Positioned(
                           left: 0,
                           top: 0,
                           bottom: 0,
+                          width: 4,
                           child: Container(
-                            width: 4,
-                            color: colorScheme.secondaryContainer,
+                            decoration: BoxDecoration(
+                              color: colorScheme.secondaryContainer,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(12),
+                                bottomLeft: Radius.circular(12),
+                              ),
+                            ),
                           ),
                         ),
                     ],

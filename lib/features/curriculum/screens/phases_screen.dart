@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/asset_constants.dart';
 import '../../../core/constants/string_constants.dart';
-import '../../../core/di/injection.dart';
 import '../../../domain/models/curriculum/phase.dart';
 import '../../ai_tutor/widgets/ai_tutor_fab.dart';
 import '../bloc/curriculum_bloc.dart';
@@ -202,12 +201,12 @@ class _PhaseCardNode extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.primary,
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.surface, width: 4),
+          border: Border.all(color: colorScheme.onPrimary, width: 3),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.primary.withAlpha(76),
+              color: colorScheme.primary.withValues(alpha: 0.4),
               blurRadius: 20,
-              offset: const Offset(0, 4),
+              offset: Offset(0, 4),
             ),
           ],
         ),
@@ -222,19 +221,20 @@ class _PhaseCardNode extends StatelessWidget {
         width: 60,
         height: 60,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.secondaryContainer,
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.secondaryContainer, width: 3),
+          border: Border.all(color: colorScheme.onPrimary, width: 3),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
-              blurRadius: 15,
+              color: colorScheme.secondaryContainer.withValues(alpha: 0.4),
+              blurRadius: 20,
+              offset: Offset(0, 4),
             ),
           ],
         ),
         child: Icon(
-          Icons.school_outlined,
-          color: colorScheme.secondaryContainer,
+          Icons.play_arrow_outlined,
+          color: colorScheme.onPrimary,
           size: 28,
         ),
       );
@@ -245,9 +245,20 @@ class _PhaseCardNode extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.surface, width: 4),
+          border: Border.all(color: colorScheme.outlineVariant, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.surfaceContainerHighest,
+              blurRadius: 20,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
-        child: Icon(Icons.lock_rounded, color: colorScheme.outline, size: 28),
+        child: Icon(
+          Icons.lock_outline,
+          color: colorScheme.outline.withValues(alpha: 0.5),
+          size: 28,
+        ),
       );
     }
 
@@ -256,10 +267,10 @@ class _PhaseCardNode extends StatelessWidget {
         ? BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.primary),
+            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withAlpha(25),
+                color: colorScheme.secondaryContainer.withAlpha(25),
                 blurRadius: 25,
                 offset: const Offset(0, 10),
               ),
@@ -269,7 +280,7 @@ class _PhaseCardNode extends StatelessWidget {
         ? BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant.withAlpha(76)),
+            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withAlpha(8),
@@ -291,129 +302,175 @@ class _PhaseCardNode extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: Opacity(
-            opacity: isLocked ? 0.7 : 1.0,
+            opacity: isLocked ? 0.5 : 1.0,
             child: Container(
-              padding: const EdgeInsets.all(24),
               decoration: cardDecoration,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${StringConstants.phasePrefix} ${phase.id}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: isCurrent
-                              ? colorScheme.secondaryContainer
-                              : isLocked
-                              ? colorScheme.outline
-                              : colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                      if (!isLocked)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${StringConstants.phasePrefix} ${phase.id}',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: isCurrent
+                                      ? colorScheme.secondaryContainer
+                                      : isLocked
+                                      ? colorScheme.outline
+                                      : colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                              if (!isLocked)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isCurrent
+                                        ? colorScheme.secondaryContainer
+                                              .withAlpha(25)
+                                        : colorScheme.surfaceContainerHighest,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    '$completedDays/${phase.totalDays}',
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: isCurrent
+                                          ? colorScheme.secondaryContainer
+                                          : colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                          decoration: BoxDecoration(
-                            color: isCurrent
-                                ? colorScheme.secondaryContainer.withAlpha(25)
-                                : colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            '$completedDays/${phase.totalDays}',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: isCurrent
-                                  ? colorScheme.secondaryContainer
-                                  : colorScheme.onSurfaceVariant,
+                          const SizedBox(height: 8),
+                          Text(
+                            phase.title,
+                            style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
+                              color: isLocked
+                                  ? colorScheme.onSurfaceVariant
+                                  : colorScheme.onSurface,
+                              fontFamily:
+                                  GoogleFonts.hankenGrotesk().fontFamily,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            isLocked
+                                ? 'Unlock by completing Phase ${phase.id - 1}. ${phase.description}'
+                                : phase.description,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: isLocked
+                                  ? colorScheme.outline
+                                  : colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          if (!isLocked) ...[
+                            const SizedBox(height: 24),
+                            _ProgressBar(
+                              fraction: phase.totalDays == 0
+                                  ? 0.0
+                                  : completedDays / phase.totalDays,
+                              isCurrent: isCurrent,
+                            ),
+                          ],
+                          if (isCurrent) ...[
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () => context.goNamed(
+                                'modules',
+                                pathParameters: {'phaseId': '${phase.id}'},
+                              ),
+                              icon: const Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 18,
+                              ),
+                              label: const Text(
+                                StringConstants.continueLearning,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colorScheme.primary,
+                                foregroundColor: colorScheme.onPrimary,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ],
+                          if (isCompleted) ...[
+                            const SizedBox(height: 16),
+                            OutlinedButton(
+                              onPressed: () => context.goNamed(
+                                'modules',
+                                pathParameters: {'phaseId': '${phase.id}'},
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: colorScheme.primary,
+                                side: BorderSide(color: colorScheme.primary),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                StringConstants.reviewPhase,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (isCompleted)
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    phase.title,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: isLocked
-                          ? colorScheme.onSurfaceVariant
-                          : colorScheme.onSurface,
-                      fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    isLocked
-                        ? 'Unlock by completing Phase ${phase.id - 1}. ${phase.description}'
-                        : phase.description,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isLocked
-                          ? colorScheme.outline
-                          : colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  if (!isLocked) ...[
-                    const SizedBox(height: 24),
-                    _ProgressBar(
-                      fraction: phase.totalDays == 0
-                          ? 0.0
-                          : completedDays / phase.totalDays,
-                      isCurrent: isCurrent,
-                    ),
-                  ],
-                  if (isCurrent) ...[
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () => context.goNamed(
-                        'modules',
-                        pathParameters: {'phaseId': '${phase.id}'},
                       ),
-                      icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                      label: const Text(
-                        StringConstants.continueLearning,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.primary,
-                        foregroundColor: colorScheme.onPrimary,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    if (isCurrent)
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: colorScheme.secondaryContainer,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
                   ],
-                  if (isCompleted) ...[
-                    const SizedBox(height: 16),
-                    OutlinedButton(
-                      onPressed: () => context.goNamed(
-                        'modules',
-                        pathParameters: {'phaseId': '${phase.id}'},
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: colorScheme.primary,
-                        side: BorderSide(color: colorScheme.primary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        StringConstants.reviewPhase,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ],
+                ),
               ),
             ),
           ),

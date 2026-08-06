@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/string_constants.dart';
-import '../../../core/di/injection.dart';
 import '../../../domain/models/curriculum/lesson_module.dart';
 import '../../../domain/models/curriculum/phase.dart';
 import '../../ai_tutor/widgets/ai_tutor_fab.dart';
@@ -250,10 +249,22 @@ class _ModuleCard extends StatelessWidget {
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: colorScheme.primary.withAlpha(25),
+          color: colorScheme.primary,
           shape: BoxShape.circle,
+          border: Border.all(color: colorScheme.onPrimary, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.primary.withValues(alpha: 0.4),
+              blurRadius: 16,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
-        child: Icon(Icons.check_circle_rounded, color: colorScheme.primary),
+        child: Icon(
+          Icons.check_rounded,
+          color: colorScheme.onPrimary,
+          size: 21,
+        ),
       );
     } else if (isCurrent) {
       icon = Container(
@@ -262,26 +273,41 @@ class _ModuleCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.secondaryContainer,
           shape: BoxShape.circle,
+          border: Border.all(color: colorScheme.onPrimary, width: 3),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.secondaryContainer.withAlpha(100),
-              blurRadius: 15,
+              color: colorScheme.secondaryContainer.withValues(alpha: 0.4),
+              blurRadius: 16,
+              offset: Offset(0, 4),
             ),
           ],
         ),
-        child: Icon(Icons.data_object_rounded, color: colorScheme.onSecondary),
+        child: Icon(
+          Icons.play_arrow_outlined,
+          color: colorScheme.onPrimary,
+          size: 21,
+        ),
       );
     } else {
       icon = Container(
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHigh,
+          color: colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
+          border: Border.all(color: colorScheme.outlineVariant, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.surfaceContainerHighest,
+              blurRadius: 16,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Icon(
-          Icons.account_tree_rounded,
-          color: colorScheme.onSurfaceVariant,
+          Icons.lock_outline,
+          color: colorScheme.outline.withValues(alpha: 0.5),
+          size: 18,
         ),
       );
     }
@@ -290,12 +316,12 @@ class _ModuleCard extends StatelessWidget {
         ? BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.primary, width: 2),
+            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withAlpha(25),
-                blurRadius: 25,
-                offset: const Offset(0, 10),
+                color: colorScheme.secondaryContainer.withAlpha(25),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
               ),
             ],
           )
@@ -303,7 +329,7 @@ class _ModuleCard extends StatelessWidget {
         ? BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant.withAlpha(76)),
+            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withAlpha(8),
@@ -332,136 +358,155 @@ class _ModuleCard extends StatelessWidget {
             },
       borderRadius: BorderRadius.circular(12),
       child: Opacity(
-        opacity: isLocked ? 0.75 : 1.0,
+        opacity: isLocked ? 0.5 : 1.0,
         child: Container(
           decoration: cardDecoration,
-          child: Stack(
-            children: [
-              if (isCompleted)
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: 4,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        bottomLeft: Radius.circular(12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          icon,
+                          const SizedBox(height: 16),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: isLocked
+                                ? SizedBox.shrink()
+                                : Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: isCurrent
+                                        ? colorScheme.primary
+                                        : (isLocked
+                                              ? colorScheme.onSurfaceVariant
+                                                    .withAlpha(128)
+                                              : colorScheme.onSurfaceVariant),
+                                  ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  isCurrent
+                                      ? '${StringConstants.modulePrefix} ${module.id} • ${StringConstants.currentLabel}'
+                                      : '${StringConstants.modulePrefix} ${module.id}',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: isCurrent
+                                        ? colorScheme.secondaryContainer
+                                        : (isLocked
+                                              ? colorScheme.onSurfaceVariant
+                                              : colorScheme.primary),
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                                if (!isLocked)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isCurrent
+                                          ? colorScheme.secondaryContainer
+                                                .withAlpha(25)
+                                          : colorScheme.surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Text(
+                                      '$completedDays/${module.totalDays}',
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: isCurrent
+                                                ? colorScheme.secondaryContainer
+                                                : colorScheme.onSurfaceVariant,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              module.title,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                                fontFamily:
+                                    GoogleFonts.hankenGrotesk().fontFamily,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              module.subtitle,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            if (!isLocked && isCurrent) ...[
+                              const SizedBox(height: 16),
+                              _ProgressBar(
+                                fraction: module.totalDays == 0
+                                    ? 0.0
+                                    : completedDays / module.totalDays,
+                                isCurrent: isCurrent,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isCompleted)
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        icon,
-                        const SizedBox(height: 16),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Icon(
-                            isLocked
-                                ? Icons.lock_rounded
-                                : Icons.chevron_right_rounded,
-                            color: isCurrent
-                                ? colorScheme.primary
-                                : (isLocked
-                                      ? colorScheme.onSurfaceVariant.withAlpha(
-                                          128,
-                                        )
-                                      : colorScheme.onSurfaceVariant),
-                          ),
+                if (isCurrent)
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.secondaryContainer,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
                         ),
-                      ],
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                isCurrent
-                                    ? '${StringConstants.modulePrefix} ${module.id} • ${StringConstants.currentLabel}'
-                                    : '${StringConstants.modulePrefix} ${module.id}',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: isCurrent
-                                      ? colorScheme.secondaryContainer
-                                      : (isLocked
-                                            ? colorScheme.onSurfaceVariant
-                                            : colorScheme.primary),
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.2,
-                                ),
-                              ),
-                              if (!isLocked)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isCurrent
-                                        ? colorScheme.secondaryContainer
-                                              .withAlpha(25)
-                                        : colorScheme.surfaceContainerHighest,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Text(
-                                    '$completedDays/${module.totalDays}',
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: isCurrent
-                                          ? colorScheme.secondaryContainer
-                                          : colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            module.title,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                              fontFamily:
-                                  GoogleFonts.hankenGrotesk().fontFamily,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            module.subtitle,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          if (!isLocked && isCurrent) ...[
-                            const SizedBox(height: 16),
-                            _ProgressBar(
-                              fraction: module.totalDays == 0
-                                  ? 0.0
-                                  : completedDays / module.totalDays,
-                              isCurrent: isCurrent,
-                            ),
-                          ],
-                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+              ],
+            ),
           ),
         ),
       ),
