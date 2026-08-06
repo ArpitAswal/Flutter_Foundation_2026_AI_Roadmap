@@ -69,8 +69,8 @@ class ExpandableWidget extends StatelessWidget {
                   color: theme.colorScheme.primary,
                 ),
                 h3Padding: const EdgeInsets.only(top: 16),
-                h3: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
+                h3: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
                   color: theme.colorScheme.primary,
                 ),
                 blockSpacing: 12,

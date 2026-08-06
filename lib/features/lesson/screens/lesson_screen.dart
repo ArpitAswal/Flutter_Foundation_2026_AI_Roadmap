@@ -132,7 +132,35 @@ class _LessonContent extends StatelessWidget {
             fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
+
+        // ── Tags ─────────────────────────────────────────────────────────────
+        if (lesson.tags.isNotEmpty) ...[
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: lesson.tags.map((tag) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  tag,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+        ],
 
         // ── Prerequisites ────────────────────────────────────────────────────
         if (content.prerequisites.isNotEmpty) ...[
@@ -157,7 +185,7 @@ class _LessonContent extends StatelessWidget {
                 color: colorScheme.primary,
               ),
               h3Padding: const EdgeInsets.only(top: 16),
-              h3: theme.textTheme.titleSmall?.copyWith(
+              h3: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: colorScheme.primary,
               ),
@@ -165,6 +193,17 @@ class _LessonContent extends StatelessWidget {
               a: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.primary,
                 decoration: TextDecoration.underline,
+              ),
+              // This targets inline code wrapped in single backticks (e.g., `int`)
+              code: TextStyle(
+                fontSize: theme
+                    .textTheme
+                    .bodyMedium
+                    ?.fontSize, // Matches your body text size
+                color: Colors.black, // High contrast for Light Theme
+                backgroundColor:
+                    Colors.grey.shade200, // Very subtle gray background
+                fontFamily: 'monospace', // Keeps the developer aesthetic
               ),
             ),
             builders: {'pre': CodeElementBuilder(context)},
@@ -229,25 +268,46 @@ class _PrerequisitesCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colorScheme.primaryContainer),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border(left: BorderSide(color: colorScheme.primary, width: 4)),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            size: 18,
-            color: colorScheme.primary,
+          Row(
+            children: [
+              Icon(
+                Icons.check_circle_outline_rounded,
+                size: 20,
+                color: colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Prerequisites',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              prerequisites,
-              style: theme.textTheme.bodySmall?.copyWith(height: 1.5),
+          const SizedBox(height: 8),
+          MarkdownBody(
+            data: prerequisites,
+            styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+              p: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
+              listBullet: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
+              listBulletPadding: const EdgeInsets.only(right: 8),
             ),
           ),
         ],

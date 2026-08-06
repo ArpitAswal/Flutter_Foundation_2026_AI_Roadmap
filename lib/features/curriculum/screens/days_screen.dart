@@ -204,7 +204,7 @@ class _DayCardNode extends StatelessWidget {
           border: Border.all(color: colorScheme.surface, width: 4),
         ),
         child: Icon(
-          Icons.check_rounded,
+          Icons.check_outlined,
           color: colorScheme.onPrimary,
           size: 20,
         ),
@@ -219,7 +219,7 @@ class _DayCardNode extends StatelessWidget {
           border: Border.all(color: colorScheme.secondaryContainer, width: 3),
         ),
         child: Icon(
-          Icons.play_arrow_rounded,
+          Icons.play_arrow_outlined,
           color: colorScheme.secondaryContainer,
           size: 20,
         ),
@@ -233,7 +233,7 @@ class _DayCardNode extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: colorScheme.surface, width: 4),
         ),
-        child: Icon(Icons.lock_rounded, color: colorScheme.outline, size: 16),
+        child: Icon(Icons.lock_outline, color: colorScheme.outline, size: 16),
       );
     }
 
@@ -290,7 +290,7 @@ class _DayCardNode extends StatelessWidget {
                   },
             borderRadius: BorderRadius.circular(12),
             child: Opacity(
-              opacity: isLocked ? 0.7 : 1.0,
+              opacity: isLocked ? 0.5 : 1.0,
               child: Container(
                 decoration: cardDecoration,
                 child: ClipRRect(
@@ -299,13 +299,16 @@ class _DayCardNode extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(20),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Text(
                                     isCurrent
                                         ? '${StringConstants.dayPrefix} ${day.day} • ${StringConstants.currentLabel}'
                                         : '${StringConstants.dayPrefix} ${day.day}',
@@ -319,57 +322,46 @@ class _DayCardNode extends StatelessWidget {
                                       letterSpacing: 1.2,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    day.title,
-                                    style: theme.textTheme.titleMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: colorScheme.onSurface,
-                                          fontFamily:
-                                              GoogleFonts.hankenGrotesk()
-                                                  .fontFamily,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    day.description,
-                                    style: theme.textTheme.bodySmall?.copyWith(
+                                ),
+                                if (isCompleted)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 12),
+                                    child: Icon(
+                                      Icons.chevron_right_rounded,
                                       color: colorScheme.onSurfaceVariant,
+                                      size: 20,
                                     ),
-                                  ),
-                                ],
+                                  )
+                                else if (isCurrent)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 12),
+                                    child: Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: colorScheme.secondaryContainer,
+                                      size: 20,
+                                    ),
+                                  )
+                                else
+                                  SizedBox.shrink(),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              day.title,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                                fontFamily:
+                                    GoogleFonts.hankenGrotesk().fontFamily,
                               ),
                             ),
-                            if (isLocked)
-                              Padding(
-                                padding: const EdgeInsets.only(left: 12),
-                                child: Icon(
-                                  Icons.lock_rounded,
-                                  color: colorScheme.onSurfaceVariant.withAlpha(
-                                    128,
-                                  ),
-                                  size: 20,
-                                ),
-                              )
-                            else if (isCompleted)
-                              Padding(
-                                padding: const EdgeInsets.only(left: 12),
-                                child: Icon(
-                                  Icons.chevron_right_rounded,
-                                  color: colorScheme.onSurfaceVariant,
-                                  size: 20,
-                                ),
-                              )
-                            else
-                              Padding(
-                                padding: const EdgeInsets.only(left: 12),
-                                child: Icon(
-                                  Icons.chevron_right_rounded,
-                                  color: colorScheme.secondaryContainer,
-                                  size: 20,
-                                ),
+                            const SizedBox(height: 8),
+                            Text(
+                              day.description,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
                               ),
+                            ),
                           ],
                         ),
                       ),
