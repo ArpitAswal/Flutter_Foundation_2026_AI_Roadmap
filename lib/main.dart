@@ -48,6 +48,10 @@ class FlutterAiTutorApp extends StatelessWidget {
           backgroundColor: Color(0XFFffffff),
           elevation: 4,
           shadowColor: Colors.grey.shade200,
+          titleTextStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: Color(0xFF005cad),
+            fontWeight: FontWeight.bold,
+          ),
         ),
         colorScheme: const ColorScheme(
           brightness: Brightness.light,

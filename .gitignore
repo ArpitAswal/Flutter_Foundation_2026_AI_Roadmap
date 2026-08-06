@@ -74,8 +74,11 @@ Thumbs.db
 # ======================
 *.md
 !/README.md
+!Phase-*/**/*.md
+!Phase-*/README.md
 
 *.json
 !ios/**/Contents.json
 !macosx/**/Contents.json
-!assets/curriculum/curriculum_index.json
+!assets/curriculum/**/*.json
+!assets/curriculum/*.json

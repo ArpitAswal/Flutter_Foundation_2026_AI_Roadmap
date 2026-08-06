@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_foundation/core/constants/string_constants.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/di/injection.dart';
+import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
 import '../../../shared/widgets/expandable_widget.dart';
 import '../../../shared/widgets/code_block_widget.dart';
@@ -54,26 +54,6 @@ class _LessonView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface.withAlpha(200),
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          '${StringConstants.dayPrefix} $dayID',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.6,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-      ),
       body: BlocBuilder<LessonBloc, LessonState>(
         builder: (context, state) {
           if (state is LessonLoading) {
@@ -90,6 +70,7 @@ class _LessonView extends StatelessWidget {
           if (state is LessonLoaded) {
             return _LessonContent(
               lesson: state.lesson,
+              content: state.content,
               isComplete: state.isComplete,
             );
           }
@@ -99,7 +80,10 @@ class _LessonView extends StatelessWidget {
       floatingActionButton: BlocBuilder<LessonBloc, LessonState>(
         builder: (context, state) {
           if (state is LessonLoaded) {
-            return AiTutorFab(contextLesson: state.lesson);
+            return AiTutorFab(
+              contextLesson: state.lesson,
+              contextContent: state.content,
+            );
           }
           return const AiTutorFab();
         },
@@ -110,150 +94,164 @@ class _LessonView extends StatelessWidget {
 
 class _LessonContent extends StatelessWidget {
   final LessonDay lesson;
+  final LessonContent content;
   final bool isComplete;
 
-  const _LessonContent({required this.lesson, required this.isComplete});
+  const _LessonContent({
+    required this.lesson,
+    required this.content,
+    required this.isComplete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final content = lesson.content;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-      children: [
-        // ── Lesson Title ────────────────────────────────────────────────────
-        Text(
-          lesson.title,
-          style: theme.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-            fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
+    /*
+    IconButton(
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
+          onPressed: () => context.pop(),
         ),
-        const SizedBox(height: 16),
-
-        // ── Tags ─────────────────────────────────────────────────────────────
-        if (lesson.tags.isNotEmpty) ...[
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: lesson.tags.map((tag) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  tag,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w600,
+     */
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        children: [
+          // ── Lesson Title ────────────────────────────────────────────────────
+          Text(
+            lesson.title,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+              fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
+            ),
+          ),
+          const SizedBox(height: 16),
+      
+          // ── Tags ─────────────────────────────────────────────────────────────
+          if (lesson.tags.isNotEmpty) ...[
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: lesson.tags.map((tag) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    tag,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 24),
+          ],
+      
+          // ── Prerequisites ────────────────────────────────────────────────────
+          if (content.prerequisites.isNotEmpty) ...[
+            _PrerequisitesCard(prerequisites: content.prerequisites),
+            const SizedBox(height: 20),
+          ],
+      
+          // ── Theory (Markdown) ─────────────────────────────────────────────
+          if (content.theory.isNotEmpty)
+            MarkdownBody(
+              data: content.theory,
+              styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+                p: theme.textTheme.bodyMedium?.copyWith(height: 1.7),
+                h1Padding: const EdgeInsets.only(top: 16),
+                h1: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: colorScheme.primary,
                 ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 24),
+                h2Padding: const EdgeInsets.only(top: 16),
+                h2: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.primary,
+                ),
+                h3Padding: const EdgeInsets.only(top: 16),
+                h3: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.primary,
+                ),
+                blockSpacing: 12,
+                a: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.primary,
+                  decoration: TextDecoration.underline,
+                ),
+                // This targets inline code wrapped in single backticks (e.g., `int`)
+                code: TextStyle(
+                  fontSize: theme
+                      .textTheme
+                      .bodyMedium
+                      ?.fontSize, // Matches your body text size
+                  color: Colors.black, // High contrast for Light Theme
+                  backgroundColor:
+                      Colors.grey.shade200, // Very subtle gray background
+                  fontFamily: 'monospace', // Keeps the developer aesthetic
+                ),
+              ),
+              builders: {'pre': CodeElementBuilder(context)},
+            ),
+      
+          // ── Additional Sections (Accordions) ─────────────────────────────────
+          if (content.comparisons != null ||
+              content.implementation != null ||
+              content.hasDeepDives) ...[
+            const SizedBox(height: 32),
+      
+            if (content.comparisons != null && content.comparisons!.isNotEmpty)
+              ExpandableWidget(
+                title: 'Comparisons',
+                markdownContent: content.comparisons!,
+              ),
+            if (content.implementation != null &&
+                content.implementation!.isNotEmpty)
+              ExpandableWidget(
+                title: 'Implementation',
+                markdownContent: content.implementation!,
+              ),
+            if (content.architecture != null && content.architecture!.isNotEmpty)
+              ExpandableWidget(
+                title: 'Architecture',
+                markdownContent: content.architecture!,
+              ),
+            if (content.optimization != null && content.optimization!.isNotEmpty)
+              ExpandableWidget(
+                title: 'Optimization',
+                markdownContent: content.optimization!,
+              ),
+            if (content.commonMistakes != null &&
+                content.commonMistakes!.isNotEmpty)
+              ExpandableWidget(
+                title: 'Common Mistakes',
+                markdownContent: content.commonMistakes!,
+              ),
+            if (content.interviewQuestions != null &&
+                content.interviewQuestions!.isNotEmpty)
+              ExpandableWidget(
+                title: 'Interview Prep: Key Questions',
+                markdownContent: content.interviewQuestions!,
+              ),
+          ],
+      
+          // ── Mark as Complete ─────────────────────────────────────────────────
+          const SizedBox(height: 36),
+          _MarkCompleteButton(isComplete: isComplete),
         ],
-
-        // ── Prerequisites ────────────────────────────────────────────────────
-        if (content.prerequisites.isNotEmpty) ...[
-          _PrerequisitesCard(prerequisites: content.prerequisites),
-          const SizedBox(height: 20),
-        ],
-
-        // ── Theory (Markdown) ─────────────────────────────────────────────
-        if (content.theory.isNotEmpty)
-          MarkdownBody(
-            data: content.theory,
-            styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-              p: theme.textTheme.bodyMedium?.copyWith(height: 1.7),
-              h1Padding: const EdgeInsets.only(top: 16),
-              h1: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: colorScheme.primary,
-              ),
-              h2Padding: const EdgeInsets.only(top: 16),
-              h2: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: colorScheme.primary,
-              ),
-              h3Padding: const EdgeInsets.only(top: 16),
-              h3: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: colorScheme.primary,
-              ),
-              blockSpacing: 12,
-              a: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.primary,
-                decoration: TextDecoration.underline,
-              ),
-              // This targets inline code wrapped in single backticks (e.g., `int`)
-              code: TextStyle(
-                fontSize: theme
-                    .textTheme
-                    .bodyMedium
-                    ?.fontSize, // Matches your body text size
-                color: Colors.black, // High contrast for Light Theme
-                backgroundColor:
-                    Colors.grey.shade200, // Very subtle gray background
-                fontFamily: 'monospace', // Keeps the developer aesthetic
-              ),
-            ),
-            builders: {'pre': CodeElementBuilder(context)},
-          ),
-
-        // ── Additional Sections (Accordions) ─────────────────────────────────
-        if (content.comparisons != null ||
-            content.implementation != null ||
-            content.hasDeepDives) ...[
-          const SizedBox(height: 32),
-
-          if (content.comparisons != null && content.comparisons!.isNotEmpty)
-            ExpandableWidget(
-              title: 'Comparisons',
-              markdownContent: content.comparisons!,
-            ),
-          if (content.implementation != null &&
-              content.implementation!.isNotEmpty)
-            ExpandableWidget(
-              title: 'Implementation',
-              markdownContent: content.implementation!,
-            ),
-          if (content.architecture != null && content.architecture!.isNotEmpty)
-            ExpandableWidget(
-              title: 'Architecture',
-              markdownContent: content.architecture!,
-            ),
-          if (content.optimization != null && content.optimization!.isNotEmpty)
-            ExpandableWidget(
-              title: 'Optimization',
-              markdownContent: content.optimization!,
-            ),
-          if (content.commonMistakes != null &&
-              content.commonMistakes!.isNotEmpty)
-            ExpandableWidget(
-              title: 'Common Mistakes',
-              markdownContent: content.commonMistakes!,
-            ),
-          if (content.interviewQuestions != null &&
-              content.interviewQuestions!.isNotEmpty)
-            ExpandableWidget(
-              title: 'Interview Prep: Key Questions',
-              markdownContent: content.interviewQuestions!,
-            ),
-        ],
-
-        // ── Mark as Complete ─────────────────────────────────────────────────
-        const SizedBox(height: 36),
-        _MarkCompleteButton(isComplete: isComplete),
-      ],
+      ),
     );
   }
 }
@@ -267,6 +265,16 @@ class _PrerequisitesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Split by newlines in case there are multiple prerequisites in the string
+    final items = prerequisites
+        .split('\n')
+        .map(
+          (s) => s.trim().replaceFirst(RegExp(r'^- '), ''),
+        ) // clean up existing markdown bullets if any
+        .where((s) => s.isNotEmpty)
+        .toList();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -280,34 +288,49 @@ class _PrerequisitesCard extends StatelessWidget {
           Row(
             children: [
               Icon(
-                Icons.check_circle_outline_rounded,
+                Icons.task_alt_rounded,
                 size: 20,
                 color: colorScheme.primary,
               ),
               const SizedBox(width: 8),
               Text(
                 'Prerequisites',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.primary,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.tertiary,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          MarkdownBody(
-            data: prerequisites,
-            styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-              p: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                height: 1.5,
+          const SizedBox(height: 12),
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 6),
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: colorScheme.tertiary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              listBullet: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                height: 1.5,
-              ),
-              listBulletPadding: const EdgeInsets.only(right: 8),
             ),
           ),
         ],

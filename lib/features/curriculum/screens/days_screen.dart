@@ -73,8 +73,6 @@ class _DaysView extends StatelessWidget {
         return Scaffold(
           backgroundColor: colorScheme.surface,
           appBar: AppBar(
-            backgroundColor: colorScheme.surface.withAlpha(200),
-            elevation: 0,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
               icon: Icon(
@@ -83,13 +81,7 @@ class _DaysView extends StatelessWidget {
               ),
               onPressed: () => context.pop(),
             ),
-            title: Text(
-              module.title,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
-            ),
+            title: Text(module.title),
             centerTitle: true,
           ),
           body: ListView(

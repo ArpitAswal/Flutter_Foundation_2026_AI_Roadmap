@@ -1,10 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-import 'lesson_content.dart';
-
-/// Pure domain model for a single learning day.
+/// Pure domain model for a single learning day — skeleton only.
 ///
-/// Maps directly to a `dayN.json` file in `assets/curriculum/`.
+/// Heavy content (theory, implementation, etc.) is loaded on demand from
+/// [contentPath] via [CurriculumLocalDataSource.getDayContent].
 class LessonDay extends Equatable {
   final int phase;
   final int module;
@@ -12,7 +11,14 @@ class LessonDay extends Equatable {
   final String title;
   final String description;
   final List<String> tags;
-  final LessonContent content;
+
+  /// Asset path to the per-day JSON file, e.g.
+  /// `assets/curriculum/phase1/module1/day1.json`.
+  final String contentPath;
+
+  /// Optional named route for fully custom interactive screens.
+  /// When null the generic [LessonScreen] is used instead.
+  final String? customRoute;
 
   const LessonDay({
     required this.phase,
@@ -21,18 +27,13 @@ class LessonDay extends Equatable {
     required this.title,
     required this.description,
     required this.tags,
-    required this.content,
+    required this.contentPath,
+    this.customRoute,
   });
 
   /// Unique identifier for this lesson used in progress tracking.
   /// Format: "p{phase}_m{module}_d{day}" — e.g., "p1_m1_d1"
   String get lessonId => 'p${phase}_m${module}_d$day';
-
-  /// Returns the first ~120 characters of the theory as a preview for the Days screen.
-  String get theoryPreview {
-    final plain = content.theory.replaceAll(RegExp(r'#{1,6}\s|[\*\_]'), '');
-    return plain.length > 120 ? '${plain.substring(0, 120)}...' : plain;
-  }
 
   factory LessonDay.fromJson(Map<String, dynamic> json) {
     return LessonDay(
@@ -42,10 +43,20 @@ class LessonDay extends Equatable {
       title: json['title'] as String,
       description: json['description'] as String? ?? '',
       tags: List<String>.from(json['tags'] as List),
-      content: LessonContent.fromJson(json['content'] as Map<String, dynamic>),
+      contentPath: json['content_path'] as String,
+      customRoute: json['custom_route'] as String?,
     );
   }
 
   @override
-  List<Object?> get props => [phase, module, day, title, description, tags, content];
+  List<Object?> get props => [
+    phase,
+    module,
+    day,
+    title,
+    description,
+    tags,
+    contentPath,
+    customRoute,
+  ];
 }

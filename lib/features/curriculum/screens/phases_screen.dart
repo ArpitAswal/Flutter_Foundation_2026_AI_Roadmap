@@ -37,17 +37,13 @@ class _PhasesView extends StatelessWidget {
         leadingWidth: 70,
         leading: Padding(
           padding: const EdgeInsets.only(left: 24, top: 8, bottom: 8),
-          child: CircleAvatar(
-            backgroundImage: AssetImage(AssetConstants.avatar),
+          child: Image.asset(
+            AssetConstants.avatar,
+            filterQuality: FilterQuality.high,
+            fit: BoxFit.contain,
           ),
         ),
-        title: Text(
-          StringConstants.appName,
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        )
+        title: Text(StringConstants.appName),
       ),
       body: BlocBuilder<CurriculumBloc, CurriculumState>(
         builder: (context, state) {

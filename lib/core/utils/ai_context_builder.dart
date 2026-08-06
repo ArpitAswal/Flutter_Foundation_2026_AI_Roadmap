@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 
+import '../../domain/models/curriculum/lesson_content.dart';
 import '../../domain/models/curriculum/lesson_day.dart';
 import '../constants/ai_constants.dart';
 import '../constants/app_constants.dart';
@@ -9,8 +10,11 @@ import '../constants/app_constants.dart';
 class AiContextBuilder {
   /// Assembles the final system prompt by combining guardrails, meta-context,
   /// current lesson context, and historical completed lessons context.
+  ///
+  /// [currentContent] is the lazily-loaded lesson content; pass null when not yet loaded.
   String buildSystemPrompt({
     required LessonDay currentLesson,
+    LessonContent? currentContent,
     required List<LessonDay> historicalLessons,
   }) {
     final buffer = StringBuffer();
@@ -27,7 +31,7 @@ class AiContextBuilder {
     buffer.writeln(AiConstants.kLessonContextHeader);
     buffer.writeln('- Day ${currentLesson.day}: ${currentLesson.title}');
     buffer.writeln(
-      '- Summary: ${currentLesson.content.theory.isNotEmpty ? "Available" : "None"}',
+      '- Summary: ${currentContent != null && currentContent.theory.isNotEmpty ? "Available" : "None"}',
     );
     buffer.writeln();
 
@@ -36,9 +40,8 @@ class AiContextBuilder {
       buffer.writeln(AiConstants.kHistoricalContextHeader);
       for (final lesson in historicalLessons) {
         buffer.writeln('- Day ${lesson.day}: ${lesson.title}');
-        buffer.writeln(
-          '  Summary: ${lesson.content.theory.isNotEmpty ? "Available" : "None"}',
-        );
+        // Historical content is not eagerly loaded — only titles are tracked.
+        buffer.writeln('  Summary: None');
       }
       buffer.writeln();
     }

@@ -1,8 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
 import '../../../domain/usecases/get_completed_lesson_ids_use_case.dart';
+import '../../../domain/usecases/get_day_content_use_case.dart';
 import '../../../domain/usecases/get_lesson_day_use_case.dart';
 import '../../../domain/usecases/mark_lesson_complete_use_case.dart';
 
@@ -11,17 +13,24 @@ part 'lesson_state.dart';
 
 /// Bloc for loading and interacting with a single lesson day.
 ///
-/// Handles two events:
-/// - [LessonLoadRequested] — loads lesson content + checks completion status.
-/// - [LessonMarkCompleteRequested] — persists completion and updates UI state.
+/// Loading is split into two steps:
+/// 1. [GetLessonDayUseCase] — fetches the lightweight skeleton (title, tags, contentPath).
+/// 2. [GetDayContentUseCase] — lazily loads the full content from the day's asset file.
+///
+/// Both are fetched in parallel via [Future.wait] to minimise latency.
 @injectable
 class LessonBloc extends Bloc<LessonEvent, LessonState> {
   final GetLessonDayUseCase _getLessonDay;
+  final GetDayContentUseCase _getDayContent;
   final MarkLessonCompleteUseCase _markComplete;
   final GetCompletedLessonIdsUseCase _getCompletedIds;
 
-  LessonBloc(this._getLessonDay, this._markComplete, this._getCompletedIds)
-      : super(LessonInitial()) {
+  LessonBloc(
+    this._getLessonDay,
+    this._getDayContent,
+    this._markComplete,
+    this._getCompletedIds,
+  ) : super(LessonInitial()) {
     on<LessonLoadRequested>(_onLoadRequested);
     on<LessonMarkCompleteRequested>(_onMarkComplete);
   }
@@ -32,14 +41,19 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
   ) async {
     emit(LessonLoading());
     try {
+      // 1. Load skeleton to get the contentPath.
       final lesson = await _getLessonDay(
         phase: event.phase,
         module: event.module,
         day: event.day,
       );
+
+      // 2. Lazily load full content from the individual day asset file.
+      final content = await _getDayContent(lesson.contentPath);
+
       final completedIds = _getCompletedIds();
       final isComplete = completedIds.contains(lesson.lessonId);
-      emit(LessonLoaded(lesson: lesson, isComplete: isComplete));
+      emit(LessonLoaded(lesson: lesson, content: content, isComplete: isComplete));
     } catch (e) {
       emit(LessonError('Failed to load lesson: ${e.toString()}'));
     }

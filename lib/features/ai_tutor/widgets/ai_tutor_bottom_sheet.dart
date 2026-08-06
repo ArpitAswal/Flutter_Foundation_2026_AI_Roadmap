@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
 
 class AiTutorBottomSheet extends StatefulWidget {
   final LessonDay? contextLesson;
+  final LessonContent? contextContent;
 
-  const AiTutorBottomSheet({super.key, this.contextLesson});
+  const AiTutorBottomSheet({super.key, this.contextLesson, this.contextContent});
 
   @override
   State<AiTutorBottomSheet> createState() => _AiTutorBottomSheetState();

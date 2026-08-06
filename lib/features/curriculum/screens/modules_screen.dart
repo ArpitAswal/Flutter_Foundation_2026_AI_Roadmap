@@ -99,8 +99,6 @@ class _ModulesView extends StatelessWidget {
         return Scaffold(
           backgroundColor: colorScheme.surface,
           appBar: AppBar(
-            backgroundColor: colorScheme.surface.withAlpha(200),
-            elevation: 0,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
               icon: Icon(
@@ -110,11 +108,7 @@ class _ModulesView extends StatelessWidget {
               onPressed: () => context.pop(),
             ),
             title: Text(
-              phase.title,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
+              phase.title
             ),
             centerTitle: true,
           ),

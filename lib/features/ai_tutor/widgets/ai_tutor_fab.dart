@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
 import 'ai_tutor_bottom_sheet.dart';
 
 class AiTutorFab extends StatelessWidget {
   final LessonDay? contextLesson;
+  final LessonContent? contextContent;
 
-  const AiTutorFab({super.key, this.contextLesson});
+  const AiTutorFab({super.key, this.contextLesson, this.contextContent});
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +17,10 @@ class AiTutorFab extends StatelessWidget {
           context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
-          builder: (context) =>
-              AiTutorBottomSheet(contextLesson: contextLesson),
+          builder: (context) => AiTutorBottomSheet(
+            contextLesson: contextLesson,
+            contextContent: contextContent,
+          ),
         );
       },
       backgroundColor: const Color(0xFF192252),
