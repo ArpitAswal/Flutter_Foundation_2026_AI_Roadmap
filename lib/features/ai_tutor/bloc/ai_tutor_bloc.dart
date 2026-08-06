@@ -26,7 +26,7 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
 
     try {
       final responseStream = _askAiTutorUseCase.execute(
-        userMessage: event.userMessage,
+        userMessage: event.message,
         currentLesson: event.currentLesson,
         model: event.model,
       );
@@ -44,7 +44,10 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
           if (error is Failure) {
             return AiTutorError(message: error.message);
           }
-          return const AiTutorError(message: 'An unexpected error occurred while communicating with the AI Tutor.');
+          return const AiTutorError(
+            message:
+                'An unexpected error occurred while communicating with the AI Tutor.',
+          );
         },
       );
 
@@ -54,7 +57,11 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
       if (e is Failure) {
         emit(AiTutorError(message: e.message));
       } else {
-        emit(const AiTutorError(message: 'An unexpected error occurred. Please try again.'));
+        emit(
+          const AiTutorError(
+            message: 'An unexpected error occurred. Please try again.',
+          ),
+        );
       }
     }
   }

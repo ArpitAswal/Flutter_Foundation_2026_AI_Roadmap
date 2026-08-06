@@ -70,6 +70,15 @@ Thumbs.db
 
 
 # ======================
-# md files
+# md & json files
 # ======================
 *.md
+!/README.md
+!Phase-*/**/*.md
+!Phase-*/README.md
+
+*.json
+!ios/**/Contents.json
+!macosx/**/Contents.json
+!assets/curriculum/**/*.json
+!assets/curriculum/*.json

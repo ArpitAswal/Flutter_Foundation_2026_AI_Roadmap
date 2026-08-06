@@ -1,0 +1,77 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
+
+import '../../../domain/models/curriculum/lesson_content.dart';
+import '../../../domain/models/curriculum/lesson_day.dart';
+import '../../../domain/usecases/get_completed_lesson_ids_use_case.dart';
+import '../../../domain/usecases/get_day_content_use_case.dart';
+import '../../../domain/usecases/get_lesson_day_use_case.dart';
+import '../../../domain/usecases/mark_lesson_complete_use_case.dart';
+
+part 'lesson_event.dart';
+part 'lesson_state.dart';
+
+/// Bloc for loading and interacting with a single lesson day.
+///
+/// Loading is split into two steps:
+/// 1. [GetLessonDayUseCase] — fetches the lightweight skeleton (title, tags, contentPath).
+/// 2. [GetDayContentUseCase] — lazily loads the full content from the day's asset file.
+///
+/// Both are fetched in parallel via [Future.wait] to minimise latency.
+@injectable
+class LessonBloc extends Bloc<LessonEvent, LessonState> {
+  final GetLessonDayUseCase _getLessonDay;
+  final GetDayContentUseCase _getDayContent;
+  final MarkLessonCompleteUseCase _markComplete;
+  final GetCompletedLessonIdsUseCase _getCompletedIds;
+
+  LessonBloc(
+    this._getLessonDay,
+    this._getDayContent,
+    this._markComplete,
+    this._getCompletedIds,
+  ) : super(LessonInitial()) {
+    on<LessonLoadRequested>(_onLoadRequested);
+    on<LessonMarkCompleteRequested>(_onMarkComplete);
+  }
+
+  Future<void> _onLoadRequested(
+    LessonLoadRequested event,
+    Emitter<LessonState> emit,
+  ) async {
+    emit(LessonLoading());
+    try {
+      // Fetch skeleton and content while ensuring a minimum 500ms delay for smooth UI feedback.
+      final results = await Future.wait([
+        _getLessonDay(phase: event.phase, module: event.module, day: event.day),
+        Future.delayed(Duration(milliseconds: (event.again) ? 1000 : 100)),
+      ]);
+
+      final lesson = results[0] as LessonDay;
+      final content = await _getDayContent(lesson.contentPath);
+
+      final completedIds = _getCompletedIds();
+      final isComplete = completedIds.contains(lesson.lessonId);
+      emit(
+        LessonLoaded(lesson: lesson, content: content, isComplete: isComplete),
+      );
+    } catch (e) {
+      emit(LessonError('Failed to load lesson: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onMarkComplete(
+    LessonMarkCompleteRequested event,
+    Emitter<LessonState> emit,
+  ) async {
+    final current = state;
+    if (current is! LessonLoaded) return;
+
+    try {
+      await _markComplete(current.lesson.lessonId);
+      emit(current.copyWith(isComplete: true));
+    } catch (e) {
+      // Non-critical failure — lesson display is unaffected
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 
-import '../../domain/models/lesson.dart';
+import '../../domain/models/curriculum/lesson_content.dart';
+import '../../domain/models/curriculum/lesson_day.dart';
 import '../constants/ai_constants.dart';
 import '../constants/app_constants.dart';
 
@@ -9,9 +10,12 @@ import '../constants/app_constants.dart';
 class AiContextBuilder {
   /// Assembles the final system prompt by combining guardrails, meta-context,
   /// current lesson context, and historical completed lessons context.
+  ///
+  /// [currentContent] is the lazily-loaded lesson content; pass null when not yet loaded.
   String buildSystemPrompt({
-    required Lesson currentLesson,
-    required List<Lesson> historicalLessons,
+    required LessonDay currentLesson,
+    LessonContent? currentContent,
+    required List<LessonDay> historicalLessons,
   }) {
     final buffer = StringBuffer();
 
@@ -25,30 +29,30 @@ class AiContextBuilder {
 
     // 3. Current Lesson Context (What the user is learning right now)
     buffer.writeln(AiConstants.kLessonContextHeader);
-    buffer.writeln('- Day ${currentLesson.dayNumber}: ${currentLesson.title}');
-    buffer.writeln('- Category: ${currentLesson.category}');
-    buffer.writeln('- Technologies Taught: ${currentLesson.taughtTechnologies.join(', ')}');
-    buffer.writeln('- Summary: ${currentLesson.contentSummary}');
+    buffer.writeln('- Day ${currentLesson.day}: ${currentLesson.title}');
+    buffer.writeln(
+      '- Summary: ${currentContent != null && currentContent.theory.isNotEmpty ? "Available" : "None"}',
+    );
     buffer.writeln();
 
     // 4. Historical Lesson Context (If any match the user query)
     if (historicalLessons.isNotEmpty) {
       buffer.writeln(AiConstants.kHistoricalContextHeader);
       for (final lesson in historicalLessons) {
-        buffer.writeln('- Day ${lesson.dayNumber}: ${lesson.title}');
-        buffer.writeln('  Technologies: ${lesson.taughtTechnologies.join(', ')}');
-        buffer.writeln('  Summary: ${lesson.contentSummary}');
+        buffer.writeln('- Day ${lesson.day}: ${lesson.title}');
+        // Historical content is not eagerly loaded — only titles are tracked.
+        buffer.writeln('  Summary: None');
       }
       buffer.writeln();
     }
 
     final prompt = buffer.toString();
-    
+
     // Safety truncate to prevent exceeding context window
     if (prompt.length > AppConstants.maxSystemPromptCharacters) {
       return prompt.substring(0, AppConstants.maxSystemPromptCharacters);
     }
-    
+
     return prompt;
   }
 }

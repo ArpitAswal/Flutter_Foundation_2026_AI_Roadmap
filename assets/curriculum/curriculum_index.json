@@ -1,0 +1,56 @@
+{
+  "phases": [
+    {
+      "id": 1,
+      "title": "Dart Programming Foundation",
+      "description": "Build strong Dart programming fundamentals that become the foundation of every Flutter application developed throughout this roadmap.",
+      "modules": [
+        {
+          "id": 1,
+          "title": "Getting Started with Dart",
+          "subtitle": "Learn the core concepts of Dart before moving into Flutter, ensuring every future topic is built on a solid programming foundation.",
+          "days": [
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 1,
+              "title": "Introduction to Programming, Dart & Flutter Ecosystem",
+              "description": "Understand what programming is, why Dart powers Flutter, and how the Flutter ecosystem is organized before writing real applications.",
+              "tags": ["Dart", "Flutter Ecosystem", "CLI"],
+              "content_path": "assets/curriculum/phase1/module1/day1.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 2,
+              "title": "Variables, Data Types, Type Inference & Null Safety",
+              "description": "Learn how Dart stores data, infers types, and prevents null-related runtime errors using modern language features that form the foundation of every Flutter application.",
+              "tags": ["Dart", "Variables", "Data Types", "Null Safety"],
+              "content_path": "assets/curriculum/phase1/module1/day2.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 3,
+              "title": "Operators, Expressions & Control Flow",
+              "description": "Learn how Dart performs calculations, comparisons, decision making, and repetition using operators and control flow statements.",
+              "tags": [
+                "Dart",
+                "Operators",
+                "Expressions",
+                "Control Flow",
+                "if",
+                "switch",
+                "Loops"
+              ],
+              "content_path": "assets/curriculum/phase1/module1/day3.json",
+              "custom_route": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
