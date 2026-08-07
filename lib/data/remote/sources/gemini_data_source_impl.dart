@@ -3,24 +3,24 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../core/error/app_exception.dart';
-import '../../../domain/models/gemini_model.dart';
+import '../../../domain/models/ai_model.dart';
+import 'ai_remote_data_source.dart';
 
 /// Remote data source responsible for communicating with the Gemini API.
-@singleton
-class GeminiRemoteDataSource {
-  /// Sends a message to Gemini and streams the text response back.
-  ///
-  /// [systemPrompt] Contains the assembled guardrails, Meta-Context, and Lesson-Context.
-  /// [userMessage] The actual question asked by the user.
-  /// [model] The user-selected Gemini model (defaults to GeminiModel.flash).
+@Injectable(as: AiRemoteDataSource)
+@Named('gemini')
+class GeminiDataSourceImpl implements AiRemoteDataSource {
+  @override
   Stream<String> sendMessage({
     required String systemPrompt,
     required String userMessage,
-    GeminiModel model = GeminiModel.flash,
+    required AiModel model,
   }) async* {
     final apiKey = dotenv.env['GEMINI_API_KEY'];
     if (apiKey == null || apiKey.isEmpty) {
-      throw const AiTutorException('GEMINI_API_KEY is not set in the .env file.');
+      throw const AiTutorException(
+        'GEMINI_API_KEY is not set in the .env file.',
+      );
     }
 
     try {
@@ -41,7 +41,10 @@ class GeminiRemoteDataSource {
     } on GenerativeAIException catch (e) {
       throw NetworkException('Gemini API Error: ${e.message}', e);
     } catch (e) {
-      throw NetworkException('An unexpected error occurred while communicating with the AI Tutor.', e);
+      throw NetworkException(
+        'An unexpected error occurred while communicating with Gemini.',
+        e,
+      );
     }
   }
 }

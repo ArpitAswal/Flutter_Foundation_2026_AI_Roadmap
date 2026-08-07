@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../domain/models/gemini_model.dart';
+import '../../../domain/models/ai_model.dart';
+import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
 
 /// Base class for all events related to the AI Tutor feature.
@@ -16,18 +17,22 @@ final class AiTutorMessageSent extends AiTutorEvent {
   /// The raw question typed by the user.
   final String message;
 
-  /// The lesson context the user is currently studying.
-  final LessonDay currentLesson;
+  /// The lesson context the user is currently studying, if any.
+  final LessonDay? currentLesson;
 
-  /// The Gemini model selected by the user for this query (defaults to GeminiModel.flash).
-  final GeminiModel model;
+  /// The lesson theory content, if any.
+  final LessonContent? currentContent;
+
+  /// The AI model selected by the user for this query (defaults to AiModel.geminiFlash).
+  final AiModel model;
 
   const AiTutorMessageSent({
     required this.message,
-    required this.currentLesson,
-    this.model = GeminiModel.flash,
+    this.currentLesson,
+    this.currentContent,
+    this.model = AiModel.geminiFlash,
   });
 
   @override
-  List<Object?> get props => [message, currentLesson, model];
+  List<Object?> get props => [message, currentLesson, currentContent, model];
 }

@@ -1,26 +1,29 @@
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../core/error/app_exception.dart';
 import '../../../core/error/failure.dart';
-import '../../../data/remote/sources/gemini_remote_data_source.dart';
-import '../../../domain/models/gemini_model.dart';
+import '../../../data/remote/sources/ai_data_source_factory.dart';
+import '../../../domain/models/ai_model.dart';
 import '../../../domain/repositories/ai_tutor_repository.dart';
 
-/// Implementation of [AiTutorRepository] that coordinates with the Gemini API.
+/// Implementation of [AiTutorRepository] that coordinates with the AI APIs.
 @Injectable(as: AiTutorRepository)
 class AiTutorRepositoryImpl implements AiTutorRepository {
-  final GeminiRemoteDataSource _remoteDataSource;
+  final AiDataSourceFactory _dataSourceFactory;
 
-  const AiTutorRepositoryImpl(this._remoteDataSource);
+  const AiTutorRepositoryImpl(this._dataSourceFactory);
 
   @override
   Stream<String> askQuestion({
     required String systemPrompt,
     required String userMessage,
-    GeminiModel model = GeminiModel.flash,
+    required AiModel model,
   }) async* {
     try {
-      yield* _remoteDataSource.sendMessage(
+      debugPrint("ask Question...");
+      final dataSource = _dataSourceFactory.getDataSource(model);
+      yield* dataSource.sendMessage(
         systemPrompt: systemPrompt,
         userMessage: userMessage,
         model: model,
@@ -28,7 +31,9 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
     } on NetworkException catch (e) {
       throw AiTutorFailure(e.message);
     } catch (e) {
-      throw const AiTutorFailure('An unexpected error occurred while communicating with the AI Tutor.');
+      throw const AiTutorFailure(
+        'An unexpected error occurred while communicating with the AI Tutor.',
+      );
     }
   }
 }

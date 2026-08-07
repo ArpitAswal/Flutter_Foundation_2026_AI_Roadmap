@@ -1,37 +1,60 @@
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../core/utils/ai_context_builder.dart';
 import '../models/curriculum/lesson_content.dart';
 import '../models/curriculum/lesson_day.dart';
-import '../models/gemini_model.dart';
+import '../models/ai_model.dart';
 import '../repositories/ai_tutor_repository.dart';
+import 'get_phases_use_case.dart';
+import 'get_completed_lesson_ids_use_case.dart';
 
 /// Orchestrates the process of querying the AI Tutor with context injection.
 @injectable
 class AskAiTutorUseCase {
   final AiTutorRepository _aiTutorRepository;
   final AiContextBuilder _aiContextBuilder;
+  final GetPhasesUseCase _getPhasesUseCase;
+  final GetCompletedLessonIdsUseCase _getCompletedLessonIdsUseCase;
 
-  const AskAiTutorUseCase(this._aiTutorRepository, this._aiContextBuilder);
+  const AskAiTutorUseCase(
+    this._aiTutorRepository,
+    this._aiContextBuilder,
+    this._getPhasesUseCase,
+    this._getCompletedLessonIdsUseCase,
+  );
 
-  /// Executes the context pipeline and returns a streamed response from Gemini.
+  /// Executes the context pipeline and returns a streamed response from the AI.
   ///
-  /// [currentContent] is the lazily-loaded content for [currentLesson]; it is optional
-  /// so the AI Tutor can still work even before content has loaded.
+  /// [currentLesson] and [currentContent] are optional so the AI Tutor can
+  /// work globally from high-level curriculum screens (Phase/Module).
   Stream<String> execute({
     required String userMessage,
-    required LessonDay currentLesson,
+    LessonDay? currentLesson,
     LessonContent? currentContent,
-    GeminiModel model = GeminiModel.flash,
+    AiModel model = AiModel.geminiFlash,
   }) async* {
-    // Assemble the final system prompt with available context
+    debugPrint('AskAiTutorUseCase: Fetching phases...');
+    // 1. Fetch the global roadmap skeleton
+    final phases = await _getPhasesUseCase();
+
+    // 2. Fetch user's exact progress state
+    final completedIds = _getCompletedLessonIdsUseCase();
+
+    // 3. Assemble the final system prompt with global + local context
     final systemPrompt = _aiContextBuilder.buildSystemPrompt(
+      phases: phases,
+      completedLessonIds: completedIds,
       currentLesson: currentLesson,
       currentContent: currentContent,
       historicalLessons: [],
     );
 
-    // Stream the response from the repository using the selected model
+    debugPrint(
+      'AskAiTutorUseCase: System Prompt length: ${systemPrompt.length} chars. Asking repository...',
+    );
+
+    // 4. Stream the response from the repository using the selected model
     yield* _aiTutorRepository.askQuestion(
       systemPrompt: systemPrompt,
       userMessage: userMessage,

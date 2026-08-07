@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
@@ -19,15 +20,20 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
     AiTutorMessageSent event,
     Emitter<AiTutorState> emit,
   ) async {
+    debugPrint(
+      'AiTutorBloc: Received message - "${event.message}" for model ${event.model.name}',
+    );
     // Prevent multiple requests at once
     if (state is AiTutorLoading || state is AiTutorResponseStreaming) return;
 
     emit(AiTutorLoading());
 
     try {
+      debugPrint('AiTutorBloc: Calling AskAiTutorUseCase...');
       final responseStream = _askAiTutorUseCase.execute(
         userMessage: event.message,
         currentLesson: event.currentLesson,
+        currentContent: event.currentContent,
         model: event.model,
       );
 
@@ -41,6 +47,7 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
           return AiTutorResponseStreaming(partialResponse: buffer.toString());
         },
         onError: (error, stackTrace) {
+          debugPrint('AiTutorBloc: Error during stream - $error');
           if (error is Failure) {
             return AiTutorError(message: error.message);
           }
@@ -50,6 +57,8 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
           );
         },
       );
+
+      debugPrint('AiTutorBloc: Stream completed successfully.');
 
       // Once the stream completes without error, emit the final state
       emit(AiTutorResponseComplete(fullResponse: buffer.toString()));

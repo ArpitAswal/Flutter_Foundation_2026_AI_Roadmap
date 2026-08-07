@@ -11,6 +11,8 @@ class AiTutorFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return FloatingActionButton(
       onPressed: () {
         showModalBottomSheet(
@@ -23,8 +25,8 @@ class AiTutorFab extends StatelessWidget {
           ),
         );
       },
-      backgroundColor: const Color(0xFF192252),
-      foregroundColor: Colors.white,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onSecondary,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: const Icon(Icons.smart_toy_outlined),
