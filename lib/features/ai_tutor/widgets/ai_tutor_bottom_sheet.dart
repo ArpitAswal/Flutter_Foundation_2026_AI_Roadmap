@@ -1,28 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../../core/di/injection.dart';
 import '../bloc/ai_tutor_bloc.dart';
 import '../bloc/ai_tutor_event.dart';
 import '../bloc/ai_tutor_state.dart';
+import '../models/chat_message.dart';
 import '../../../domain/models/ai_model.dart';
 import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
-
-class _ChatMessage {
-  final String text;
-  final bool isUser;
-  final bool isError;
-  final bool isLoading;
-
-  _ChatMessage({
-    required this.text,
-    required this.isUser,
-    this.isError = false,
-    this.isLoading = false,
-  });
-}
 
 class AiTutorBottomSheet extends StatefulWidget {
   final LessonDay? contextLesson;
@@ -44,19 +32,11 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  final List<_ChatMessage> _messages = [];
-
   @override
   void initState() {
     super.initState();
-    // Add initial greeting message
     final contextText = widget.contextLesson?.title ?? 'the curriculum';
-    _messages.add(
-      _ChatMessage(
-        text: 'I see you are learning about **$contextText**! Any questions?',
-        isUser: false,
-      ),
-    );
+    getIt<AiTutorBloc>().add(AiTutorInitialized(contextText: contextText));
   }
 
   @override
@@ -80,31 +60,33 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<AiTutorBloc>(),
+    return BlocProvider.value(
+      value: getIt<AiTutorBloc>(),
       child: Builder(
         builder: (context) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
+          return SafeArea(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
               ),
-            ),
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.85,
-            ),
-            child: Column(
-              children: [
-                _buildHeader(),
-                const Divider(height: 1, color: Color(0xFFEEEEEE)),
-                Expanded(child: _buildChatBody(context)),
-                _buildInputArea(context),
-              ],
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.85,
+              ),
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  const Divider(height: 1, color: Color(0xFFEEEEEE)),
+                  Expanded(child: _buildChatBody(context)),
+                  _buildInputArea(context),
+                ],
+              ),
             ),
           );
         },
@@ -208,62 +190,39 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
   Widget _buildChatBody(BuildContext context) {
     return BlocConsumer<AiTutorBloc, AiTutorState>(
       listener: (context, state) {
-        if (state is AiTutorLoading) {
-          setState(() {
-            // Add a temporary loading message for the AI
-            _messages.add(
-              _ChatMessage(text: '', isUser: false, isLoading: true),
-            );
-          });
-          _scrollToBottom();
-        } else if (state is AiTutorResponseStreaming) {
-          setState(() {
-            // Update the last AI message
-            if (_messages.isNotEmpty && !_messages.last.isUser) {
-              _messages.last = _ChatMessage(
-                text: state.partialResponse,
-                isUser: false,
-              );
-            }
-          });
-          _scrollToBottom();
-        } else if (state is AiTutorResponseComplete) {
-          setState(() {
-            if (_messages.isNotEmpty && !_messages.last.isUser) {
-              _messages.last = _ChatMessage(
-                text: state.fullResponse,
-                isUser: false,
-              );
-            }
-          });
-          _scrollToBottom();
-        } else if (state is AiTutorError) {
-          setState(() {
-            // Remove the loading message if present
-            if (_messages.isNotEmpty && _messages.last.isLoading) {
-              _messages.removeLast();
-            }
-            _messages.add(
-              _ChatMessage(text: state.message, isUser: false, isError: true),
-            );
-          });
-          _scrollToBottom();
-        }
+        _scrollToBottom();
       },
       builder: (context, state) {
+        // Prepare the message list
+        final messages = List<ChatMessage>.from(state.messages);
+
         return ListView.builder(
           controller: _scrollController,
-          padding: const EdgeInsets.all(20),
-          itemCount: _messages.length,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+          ).copyWith(bottom: 16.0),
+          itemCount: messages.length,
           itemBuilder: (context, index) {
-            final message = _messages[index];
+            final message = messages[index];
             if (message.isUser) {
-              return _buildUserMessage(message.text);
+              return Align(
+                alignment: Alignment.centerRight,
+                child: _buildUserMessage(message.text),
+              );
+            } else if (message.isLoading) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SpinKitThreeBounce(
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 24.0,
+                  ),
+                ],
+              );
             } else {
-              return _buildAiMessage(
-                message.text,
-                isLoading: message.isLoading,
-                isError: message.isError,
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: _buildAiMessage(message.text, isError: message.isError),
               );
             }
           },
@@ -273,30 +232,47 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
   }
 
   Widget _buildUserMessage(String text) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      padding: const EdgeInsets.only(top: 4.0),
+      child: Stack(
         children: [
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(4),
-                ),
+          Container(
+            margin: EdgeInsetsGeometry.only(top: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(4),
               ),
-              child: Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  height: 1.4,
-                ),
+              border: Border.all(color: colorScheme.onPrimary),
+            ),
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.w500,
+                height: 1.5,
+              ),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            right: 10,
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.smart_toy_outlined,
+                size: 18,
+                color: colorScheme.primary,
               ),
             ),
           ),
@@ -305,62 +281,56 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
     );
   }
 
-  Widget _buildAiMessage(
-    String text, {
-    bool isLoading = false,
-    bool isError = false,
-  }) {
+  Widget _buildAiMessage(String text, {bool isError = false}) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.only(top: 4.0),
+      child: Stack(
         children: [
           Container(
-            width: 32,
-            height: 32,
+            margin: EdgeInsetsGeometry.only(top: 16.0),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isError ? Colors.red.shade100 : const Color(0xFFF0F0F0),
-              shape: BoxShape.circle,
+              color: isError
+                  ? colorScheme.errorContainer
+                  : colorScheme.onPrimary,
+              border: Border.all(
+                color: isError
+                    ? colorScheme.errorContainer
+                    : colorScheme.outlineVariant,
+              ),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              isError ? Icons.error_outline : Icons.smart_toy_outlined,
-              size: 18,
-              color: isError ? Colors.red : Colors.black54,
+            child: MarkdownBody(
+              data: text,
+              styleSheet: MarkdownStyleSheet(
+                p: TextStyle(
+                  fontSize: 14,
+                  color: isError ? colorScheme.error : colorScheme.onSurface,
+                  height: 1.5,
+                ),
+                code: TextStyle(
+                  backgroundColor: colorScheme.surface,
+                  fontFamily: 'monospace',
+                ),
+              ),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
+          Positioned(
+            left: 10,
+            top: 0,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
-                color: isError ? Colors.red.shade50 : Colors.white,
-                border: Border.all(
-                  color: isError
-                      ? Colors.red.shade200
-                      : const Color(0xFFF0F0F0),
-                ),
-                borderRadius: BorderRadius.circular(12),
+                color: isError ? colorScheme.error : colorScheme.surface,
+                shape: BoxShape.circle,
               ),
-              child: isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : MarkdownBody(
-                      data: text,
-                      styleSheet: MarkdownStyleSheet(
-                        p: TextStyle(
-                          fontSize: 14,
-                          color: isError ? Colors.red.shade900 : Colors.black87,
-                          height: 1.5,
-                        ),
-                        code: const TextStyle(
-                          backgroundColor: Color(0xFFF5F5F5),
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                    ),
+              child: Icon(
+                Icons.smart_toy_outlined,
+                size: 18,
+                color: isError ? colorScheme.onError : colorScheme.outline,
+              ),
             ),
           ),
         ],
@@ -369,18 +339,23 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
   }
 
   Widget _buildInputArea(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: colorScheme.onPrimary,
         border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF8F9FA),
-          borderRadius: BorderRadius.circular(24),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(36),
+          border: Border.all(
+            color: colorScheme.surfaceContainerHighest,
+            width: 3,
+          ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         child: Row(
           children: [
             Expanded(
@@ -388,7 +363,11 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
                 controller: _textController,
                 decoration: const InputDecoration(
                   hintText: 'Ask a question...',
-                  hintStyle: TextStyle(color: Colors.black38, fontSize: 14),
+                  hintStyle: TextStyle(
+                    color: Colors.black38,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                   border: InputBorder.none,
                 ),
                 onSubmitted: (_) => _sendMessage(context),
@@ -420,11 +399,7 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
 
-    // Instantly add the user message to UI
-    setState(() {
-      _messages.add(_ChatMessage(text: text, isUser: true));
-    });
-    _scrollToBottom();
+    _textController.clear();
 
     context.read<AiTutorBloc>().add(
       AiTutorMessageSent(
@@ -434,7 +409,5 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
         currentContent: widget.contextContent,
       ),
     );
-
-    _textController.clear();
   }
 }

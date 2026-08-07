@@ -8,6 +8,8 @@ import '../../../domain/models/curriculum/lesson_module.dart';
 import '../../../domain/models/curriculum/phase.dart';
 import '../../ai_tutor/widgets/ai_tutor_fab.dart';
 import '../bloc/curriculum_bloc.dart';
+import '../widgets/curriculum_card_node.dart';
+import '../widgets/curriculum_progress_bar.dart';
 
 class ModulesScreen extends StatelessWidget {
   final int phaseId;
@@ -159,23 +161,9 @@ class _ModulesView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Container(
-                height: 8,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: phaseProgress,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      color: colorScheme.primary,
-                    ),
-                  ),
-                ),
+              CurriculumProgressBar(
+                fraction: phaseProgress,
+                isCurrent: true, // Header progress always colored
               ),
               const SizedBox(height: 40),
               // Modules List
@@ -312,250 +300,103 @@ class _ModuleCard extends StatelessWidget {
       );
     }
 
-    final cardDecoration = isCurrent
-        ? BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.secondaryContainer.withAlpha(25),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          )
-        : isCompleted
-        ? BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(8),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          )
-        : BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
-          );
-
-    return InkWell(
-      onTap: isLocked
-          ? null
-          : () {
-              context.goNamed(
-                'days',
-                pathParameters: {
-                  'phaseId': '$phaseId',
-                  'moduleId': '${module.id}',
-                },
-              );
-            },
-      borderRadius: BorderRadius.circular(12),
-      child: Opacity(
-        opacity: isLocked ? 0.5 : 1.0,
-        child: Container(
-          decoration: cardDecoration,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Stack(
+    return CurriculumCard(
+      isLocked: isLocked,
+      isCompleted: isCompleted,
+      isCurrent: isCurrent,
+      onTap: () {
+        context.goNamed(
+          'days',
+          pathParameters: {'phaseId': '$phaseId', 'moduleId': '${module.id}'},
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          icon,
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: isLocked
-                                ? SizedBox.shrink()
-                                : Icon(
-                                    Icons.chevron_right_rounded,
-                                    color: isCurrent
-                                        ? colorScheme.primary
-                                        : (isLocked
-                                              ? colorScheme.onSurfaceVariant
-                                                    .withAlpha(128)
-                                              : colorScheme.onSurfaceVariant),
-                                  ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  isCurrent
-                                      ? '${StringConstants.modulePrefix} ${module.id} • ${StringConstants.currentLabel}'
-                                      : '${StringConstants.modulePrefix} ${module.id}',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: isCurrent
-                                        ? colorScheme.secondaryContainer
-                                        : (isLocked
-                                              ? colorScheme.onSurfaceVariant
-                                              : colorScheme.primary),
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.2,
-                                  ),
-                                ),
-                                if (!isLocked)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: isCurrent
-                                          ? colorScheme.secondaryContainer
-                                                .withAlpha(25)
-                                          : colorScheme.surfaceContainerHighest,
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Text(
-                                      '$completedDays/${module.totalDays}',
-                                      style: theme.textTheme.labelSmall
-                                          ?.copyWith(
-                                            color: isCurrent
-                                                ? colorScheme.secondaryContainer
-                                                : colorScheme.onSurfaceVariant,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              module.title,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.onSurface,
-                                fontFamily:
-                                    GoogleFonts.hankenGrotesk().fontFamily,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              module.subtitle,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            if (!isLocked && isCurrent) ...[
-                              const SizedBox(height: 16),
-                              _ProgressBar(
-                                fraction: module.totalDays == 0
-                                    ? 0.0
-                                    : completedDays / module.totalDays,
-                                isCurrent: isCurrent,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (isCompleted)
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 4,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          bottomLeft: Radius.circular(12),
-                        ),
+                icon,
+                if (!isLocked) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isCurrent
+                          ? colorScheme.secondaryContainer.withAlpha(25)
+                          : colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$completedDays/${module.totalDays}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: isCurrent
+                            ? colorScheme.secondaryContainer
+                            : colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                if (isCurrent)
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 4,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.secondaryContainer,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          bottomLeft: Radius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
+                ],
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ProgressBar extends StatelessWidget {
-  final double fraction;
-  final bool isCurrent;
-
-  const _ProgressBar({required this.fraction, required this.isCurrent});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Container(
-      height: 6,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: FractionallySizedBox(
-        alignment: Alignment.centerLeft,
-        widthFactor: fraction,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            gradient: isCurrent
-                ? LinearGradient(
-                    colors: [
-                      colorScheme.primary,
-                      colorScheme.secondaryContainer,
-                    ],
-                  )
-                : null,
-            color: isCurrent ? null : colorScheme.primary,
-            boxShadow: isCurrent
-                ? [
-                    BoxShadow(
-                      color: colorScheme.primary.withAlpha(128),
-                      blurRadius: 10,
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${StringConstants.modulePrefix} ${module.id}',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: isCurrent
+                          ? colorScheme.secondaryContainer
+                          : isLocked
+                          ? colorScheme.outline
+                          : colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
                     ),
-                  ]
-                : null,
-          ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    module.title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isLocked
+                          ? colorScheme.onSurfaceVariant
+                          : colorScheme.onSurface,
+                      fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    isLocked
+                        ? 'Unlock by completing previous modules.'
+                        : module.subtitle,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: isLocked
+                          ? colorScheme.outline
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  if (!isLocked) ...[
+                    const SizedBox(height: 20),
+                    CurriculumProgressBar(
+                      fraction: module.totalDays == 0
+                          ? 0.0
+                          : completedDays / module.totalDays,
+                      isCurrent: isCurrent,
+                      height: 6.0,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

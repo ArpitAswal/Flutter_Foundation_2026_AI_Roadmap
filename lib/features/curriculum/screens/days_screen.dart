@@ -9,6 +9,7 @@ import '../../../domain/models/curriculum/lesson_module.dart';
 import '../../../domain/models/curriculum/phase.dart';
 import '../../ai_tutor/widgets/ai_tutor_fab.dart';
 import '../bloc/curriculum_bloc.dart';
+import '../widgets/curriculum_card_node.dart';
 
 class DaysScreen extends StatelessWidget {
   final int phaseId;
@@ -250,169 +251,82 @@ class _DayCardNode extends StatelessWidget {
       );
     }
 
-    final cardDecoration = isCurrent
-        ? BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.secondaryContainer.withAlpha(25),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          )
-        : isCompleted
-        ? BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(8),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          )
-        : BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
-          );
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         node,
         const SizedBox(width: 16),
         Expanded(
-          child: InkWell(
-            onTap: isLocked
-                ? null
-                : () {
-                    context.goNamed(
-                      'lesson',
-                      pathParameters: {
-                        'phaseId': '$phaseId',
-                        'moduleId': '$moduleId',
-                        'day': '${day.day}',
-                      },
-                    );
-                  },
-            borderRadius: BorderRadius.circular(12),
-            child: Opacity(
-              opacity: isLocked ? 0.5 : 1.0,
-              child: Container(
-                decoration: cardDecoration,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Stack(
+          child: CurriculumCard(
+            isLocked: isLocked,
+            isCompleted: isCompleted,
+            isCurrent: isCurrent,
+            onTap: () {
+              context.goNamed(
+                'lesson',
+                pathParameters: {
+                  'phaseId': '$phaseId',
+                  'moduleId': '$moduleId',
+                  'day': '${day.day}',
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              mainAxisSize: MainAxisSize.max,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    isCurrent
-                                        ? '${StringConstants.dayPrefix} ${day.day} • ${StringConstants.currentLabel}'
-                                        : '${StringConstants.dayPrefix} ${day.day}',
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: isCurrent
-                                          ? colorScheme.secondaryContainer
-                                          : (isLocked
-                                                ? colorScheme.onSurfaceVariant
-                                                : colorScheme.primary),
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 1.2,
-                                    ),
-                                  ),
-                                ),
-                                if (isCompleted)
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 12),
-                                    child: Icon(
-                                      Icons.chevron_right_rounded,
-                                      color: colorScheme.onSurfaceVariant,
-                                      size: 20,
-                                    ),
-                                  )
-                                else if (isCurrent)
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 12),
-                                    child: Icon(
-                                      Icons.chevron_right_rounded,
-                                      color: colorScheme.secondaryContainer,
-                                      size: 20,
-                                    ),
-                                  )
-                                else
-                                  SizedBox.shrink(),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              day.title,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.onSurface,
-                                fontFamily:
-                                    GoogleFonts.hankenGrotesk().fontFamily,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              day.description,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (isCompleted)
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          bottom: 0,
-                          width: 4,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(12),
-                                bottomLeft: Radius.circular(12),
-                              ),
-                            ),
+                      Expanded(
+                        child: Text(
+                          isCurrent
+                              ? '${StringConstants.dayPrefix} ${day.day} • ${StringConstants.currentLabel}'
+                              : '${StringConstants.dayPrefix} ${day.day}',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: isCurrent
+                                ? colorScheme.secondaryContainer
+                                : (isLocked
+                                      ? colorScheme.onSurfaceVariant
+                                      : colorScheme.primary),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
                           ),
                         ),
-                      if (isCurrent)
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          bottom: 0,
-                          width: 4,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: colorScheme.secondaryContainer,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(12),
-                                bottomLeft: Radius.circular(12),
-                              ),
-                            ),
+                      ),
+                      if (!isLocked)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: Icon(
+                            Icons.chevron_right_rounded,
+                            color: isCompleted
+                                ? colorScheme.onSurfaceVariant
+                                : colorScheme.primary,
+                            size: 20,
                           ),
                         ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    day.title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                      fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    day.description,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

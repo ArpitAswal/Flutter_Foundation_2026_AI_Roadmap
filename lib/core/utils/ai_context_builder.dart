@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../domain/models/curriculum/lesson_content.dart';
@@ -21,9 +20,6 @@ class AiContextBuilder {
     LessonContent? currentContent,
     required List<LessonDay> historicalLessons,
   }) {
-    debugPrint(
-      'AiContextBuilder: Assembling system prompt. Completed IDs: ${completedLessonIds.length}',
-    );
     final buffer = StringBuffer();
 
     // 1. System Guardrails

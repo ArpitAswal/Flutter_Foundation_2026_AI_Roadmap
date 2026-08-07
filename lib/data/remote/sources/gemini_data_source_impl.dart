@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../core/constants/string_constants.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../domain/models/ai_model.dart';
 import 'ai_remote_data_source.dart';
@@ -18,9 +19,7 @@ class GeminiDataSourceImpl implements AiRemoteDataSource {
   }) async* {
     final apiKey = dotenv.env['GEMINI_API_KEY'];
     if (apiKey == null || apiKey.isEmpty) {
-      throw const AiTutorException(
-        'GEMINI_API_KEY is not set in the .env file.',
-      );
+      throw const AiTutorException(StringConstants.missingGeminiKey);
     }
 
     try {

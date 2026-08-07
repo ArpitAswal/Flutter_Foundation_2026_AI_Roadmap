@@ -36,4 +36,18 @@ class StringConstants {
   static const String relatedTags = 'Related Tags';
   static const String prerequisites = 'Prerequisites';
   static const String lastUpdated = 'Last updated:';
+
+  // AI Tutor
+  static const String aiTutorUnexpectedError =
+      'An unexpected error occurred while communicating with the AI Tutor.';
+  static const String aiTutorGenericError =
+      'An unexpected error occurred. Please try again.';
+
+  // API Key Errors
+  static const String missingGeminiKey =
+      'Gemini API Key is missing. Please configure it to use this model.';
+  static const String missingOpenAiKey =
+      'OpenAI API Key is missing. Please configure it to use this model.';
+  static const String missingAnthropicKey =
+      'Anthropic API Key is missing. Please configure it to use this model.';
 }

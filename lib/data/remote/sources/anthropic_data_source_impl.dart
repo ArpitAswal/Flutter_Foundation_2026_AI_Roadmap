@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../core/constants/string_constants.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../domain/models/ai_model.dart';
 import 'ai_remote_data_source.dart';
@@ -23,7 +24,7 @@ class AnthropicDataSourceImpl implements AiRemoteDataSource {
   }) async* {
     final apiKey = dotenv.env['CLAUDE_API_KEY'];
     if (apiKey == null || apiKey.isEmpty) {
-      throw const AiTutorException('CLAUDE_API_KEY is not set in the .env file.');
+      throw const AiTutorException(StringConstants.missingAnthropicKey);
     }
 
     try {

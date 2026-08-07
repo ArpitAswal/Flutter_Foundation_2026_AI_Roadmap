@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../core/utils/ai_context_builder.dart';
@@ -34,7 +33,6 @@ class AskAiTutorUseCase {
     LessonContent? currentContent,
     AiModel model = AiModel.geminiFlash,
   }) async* {
-    debugPrint('AskAiTutorUseCase: Fetching phases...');
     // 1. Fetch the global roadmap skeleton
     final phases = await _getPhasesUseCase();
 
@@ -48,10 +46,6 @@ class AskAiTutorUseCase {
       currentLesson: currentLesson,
       currentContent: currentContent,
       historicalLessons: [],
-    );
-
-    debugPrint(
-      'AskAiTutorUseCase: System Prompt length: ${systemPrompt.length} chars. Asking repository...',
     );
 
     // 4. Stream the response from the repository using the selected model

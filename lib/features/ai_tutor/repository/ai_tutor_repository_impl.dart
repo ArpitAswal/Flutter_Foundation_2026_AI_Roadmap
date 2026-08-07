@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../core/constants/string_constants.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/error/failure.dart';
 import '../../../data/remote/sources/ai_data_source_factory.dart';
@@ -21,19 +21,21 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
     required AiModel model,
   }) async* {
     try {
-      debugPrint("ask Question...");
       final dataSource = _dataSourceFactory.getDataSource(model);
-      yield* dataSource.sendMessage(
+      await for (final chunk in dataSource.sendMessage(
         systemPrompt: systemPrompt,
         userMessage: userMessage,
         model: model,
-      );
-    } on NetworkException catch (e) {
+      )) {
+        yield chunk;
+      }
+    } on AppException catch (e) {
+      // Map all custom application exceptions (network drops, missing keys, api filters)
+      // to the UI-friendly AiTutorFailure so the user sees exactly what went wrong.
       throw AiTutorFailure(e.message);
     } catch (e) {
-      throw const AiTutorFailure(
-        'An unexpected error occurred while communicating with the AI Tutor.',
-      );
+      // For completely unknown exceptions, fallback to a generic constant error message.
+      throw const AiTutorFailure(StringConstants.aiTutorUnexpectedError);
     }
   }
 }

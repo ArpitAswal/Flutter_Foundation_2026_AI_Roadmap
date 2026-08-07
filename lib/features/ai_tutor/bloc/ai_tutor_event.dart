@@ -12,6 +12,17 @@ sealed class AiTutorEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// Dispatched when the AI Tutor bottom sheet is opened to initialize the chat.
+final class AiTutorInitialized extends AiTutorEvent {
+  /// The title of the current lesson context.
+  final String contextText;
+
+  const AiTutorInitialized({required this.contextText});
+
+  @override
+  List<Object?> get props => [contextText];
+}
+
 /// Dispatched when the user submits a question to the AI Tutor.
 final class AiTutorMessageSent extends AiTutorEvent {
   /// The raw question typed by the user.
