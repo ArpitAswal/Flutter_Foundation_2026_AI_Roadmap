@@ -21,12 +21,15 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
 
   void _onInitialized(AiTutorInitialized event, Emitter<AiTutorState> emit) {
     if (state.messages.isEmpty) {
+      final text = event.contextText != null
+          ? StringConstants.aiTutorGreetingContext.replaceAll(
+              '{context}',
+              event.contextText!,
+            )
+          : StringConstants.aiTutorGreetingGeneric;
+
       final messages = [
-        ChatMessage(
-          text:
-              'I see you are learning about **${event.contextText}**! Any questions?',
-          isUser: false,
-        ),
+        ChatMessage(text: text, isUser: false, suggestions: event.suggestions),
       ];
       emit(AiTutorInitial(messages));
     }

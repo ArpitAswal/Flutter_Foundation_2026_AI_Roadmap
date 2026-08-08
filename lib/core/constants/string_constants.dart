@@ -38,6 +38,10 @@ class StringConstants {
   static const String lastUpdated = 'Last updated:';
 
   // AI Tutor
+  static const String aiTutorGreetingContext =
+      'Hello! I see you are learning about **{context}**. What would you like to know?';
+  static const String aiTutorGreetingGeneric =
+      'Hello! I am your AI Tutor. What would you like to learn today?';
   static const String aiTutorUnexpectedError =
       'An unexpected error occurred while communicating with the AI Tutor.';
   static const String aiTutorGenericError =

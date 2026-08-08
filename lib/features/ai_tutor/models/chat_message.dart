@@ -14,11 +14,15 @@ class ChatMessage extends Equatable {
   /// Whether this message is currently loading.
   final bool isLoading;
 
+  /// Optional list of suggestion chips to display below the message.
+  final List<String>? suggestions;
+
   const ChatMessage({
     required this.text,
     required this.isUser,
     this.isError = false,
     this.isLoading = false,
+    this.suggestions,
   });
 
   /// Creates a copy of this message with the given fields replaced.
@@ -27,15 +31,17 @@ class ChatMessage extends Equatable {
     bool? isUser,
     bool? isError,
     bool? isLoading,
+    List<String>? suggestions,
   }) {
     return ChatMessage(
       text: text ?? this.text,
       isUser: isUser ?? this.isUser,
       isError: isError ?? this.isError,
       isLoading: isLoading ?? this.isLoading,
+      suggestions: suggestions ?? this.suggestions,
     );
   }
 
   @override
-  List<Object?> get props => [text, isUser, isError, isLoading];
+  List<Object?> get props => [text, isUser, isError, isLoading, suggestions];
 }

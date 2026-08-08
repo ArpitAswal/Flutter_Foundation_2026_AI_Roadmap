@@ -64,40 +64,29 @@ class _LessonView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocBuilder<LessonBloc, LessonState>(
-        builder: (context, state) {
-          if (state is LessonLoading) {
-            return const _LessonLoadingView();
-          }
-          if (state is LessonError) {
-            return _LessonErrorView(
+    return BlocBuilder<LessonBloc, LessonState>(
+      builder: (context, state) {
+        if (state is LessonLoading) {
+          return const Scaffold(body: _LessonLoadingView());
+        }
+        if (state is LessonError) {
+          return Scaffold(
+            body: _LessonErrorView(
               phaseId: phaseId,
               moduleId: moduleId,
               day: dayID,
-            );
-          }
-          if (state is LessonLoaded) {
-            return _LessonContent(
-              lesson: state.lesson,
-              content: state.content,
-              isComplete: state.isComplete,
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
-      floatingActionButton: BlocBuilder<LessonBloc, LessonState>(
-        builder: (context, state) {
-          if (state is LessonLoaded) {
-            return AiTutorFab(
-              contextLesson: state.lesson,
-              contextContent: state.content,
-            );
-          }
-          return const AiTutorFab();
-        },
-      ),
+            ),
+          );
+        }
+        if (state is LessonLoaded) {
+          return _LessonContent(
+            lesson: state.lesson,
+            content: state.content,
+            isComplete: state.isComplete,
+          );
+        }
+        return const Scaffold(body: SizedBox.shrink());
+      },
     );
   }
 }
@@ -265,10 +254,21 @@ class _LessonContent extends StatefulWidget {
 class _LessonContentState extends State<_LessonContent> {
   String? _expandedTitle;
   bool _isTransitioning = true;
+  late final ScrollController _scrollController;
+  bool _showScrollToTop = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 400 && !_showScrollToTop) {
+        setState(() => _showScrollToTop = true);
+      } else if (_scrollController.offset <= 400 && _showScrollToTop) {
+        setState(() => _showScrollToTop = false);
+      }
+    });
+
     // Delay rendering heavy Markdown content until route transition finishes
     // to prevent screen freeze/stutter during navigation.
     Future.delayed(const Duration(milliseconds: 350), () {
@@ -278,6 +278,12 @@ class _LessonContentState extends State<_LessonContent> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _handleExpansion(String title, bool isExpanded) {
@@ -296,12 +302,14 @@ class _LessonContentState extends State<_LessonContent> {
     final colorScheme = theme.colorScheme;
 
     if (_isTransitioning) {
-      return const _LessonLoadingView();
+      return const Scaffold(body: _LessonLoadingView());
     }
 
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          controller: _scrollController,
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
         children: [
           // ── Lesson Title ────────────────────────────────────────────────────
           Text(
@@ -472,10 +480,45 @@ class _LessonContentState extends State<_LessonContent> {
                     _handleExpansion('Interview Prep: Key Questions', exp),
               ),
           ],
-
-          // ── Mark as Complete ─────────────────────────────────────────────────
-          const SizedBox(height: 36),
-          _MarkCompleteButton(isComplete: widget.isComplete),
+        ],
+      ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: _MarkCompleteButton(isComplete: widget.isComplete),
+        ),
+      ),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          AnimatedOpacity(
+            opacity: _showScrollToTop ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 200),
+            child: FloatingActionButton(
+              heroTag: 'scrollToTop',
+              onPressed: () {
+                if (_showScrollToTop) {
+                  _scrollController.animateTo(
+                    0,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOutCubic,
+                  );
+                }
+              },
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onSecondary,
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: const Icon(Icons.arrow_upward_rounded),
+            ),
+          ),
+          const SizedBox(height: 16),
+          AiTutorFab(
+            contextLesson: widget.lesson,
+            contextContent: widget.content,
+          ),
         ],
       ),
     );

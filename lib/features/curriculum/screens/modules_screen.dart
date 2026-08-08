@@ -104,6 +104,25 @@ class _ModulesView extends StatelessWidget {
             ? 0.0
             : completedDays / phase.totalDays;
 
+        String? currentTitle;
+        for (int i = 0; i < phase.modules.length; i++) {
+          final m = phase.modules[i];
+          final isLocked = _isModuleLockedAt(
+            phase,
+            i,
+            state.completedLessonIds,
+          );
+          final isCompleted = _isModuleCompleted(
+            phase,
+            m,
+            state.completedLessonIds,
+          );
+          if (!isLocked && !isCompleted) {
+            currentTitle = m.title;
+            break;
+          }
+        }
+
         return Scaffold(
           backgroundColor: colorScheme.surface,
           appBar: AppBar(
@@ -202,7 +221,9 @@ class _ModulesView extends StatelessWidget {
               }),
             ],
           ),
-          floatingActionButton: const AiTutorFab(),
+          floatingActionButton: AiTutorFab(
+            contextTitle: currentTitle ?? phase.title,
+          ),
         );
       },
     );

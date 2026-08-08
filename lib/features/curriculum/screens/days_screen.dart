@@ -9,7 +9,7 @@ import '../../../domain/models/curriculum/lesson_module.dart';
 import '../../../domain/models/curriculum/phase.dart';
 import '../../ai_tutor/widgets/ai_tutor_fab.dart';
 import '../bloc/curriculum_bloc.dart';
-import '../widgets/curriculum_card_node.dart';
+import '../widgets/day_card_node.dart';
 
 class DaysScreen extends StatelessWidget {
   final int phaseId;
@@ -67,6 +67,27 @@ class _DaysView extends StatelessWidget {
         final phase = state.phases.firstWhere((p) => p.id == phaseId);
         final module = phase.modules.firstWhere((m) => m.id == moduleId);
 
+        String? currentTitle;
+        for (int i = 0; i < module.days.length; i++) {
+          final d = module.days[i];
+          final isLocked = _isDayLockedAt(
+            phase,
+            module,
+            i,
+            state.completedLessonIds,
+          );
+          final isCompleted = _isDayCompleted(
+            phase,
+            module,
+            d,
+            state.completedLessonIds,
+          );
+          if (!isLocked && !isCompleted) {
+            currentTitle = d.title;
+            break;
+          }
+        }
+
         return Scaffold(
           backgroundColor: colorScheme.surface,
           appBar: AppBar(
@@ -107,10 +128,10 @@ class _DaysView extends StatelessWidget {
               Stack(
                 children: [
                   Positioned(
-                    left: 20,
+                    left: 16,
                     top: 16,
                     bottom: 16,
-                    width: 2,
+                    width: 4,
                     child: Container(
                       decoration: BoxDecoration(
                         color: colorScheme.outlineVariant.withAlpha(50),
@@ -137,7 +158,7 @@ class _DaysView extends StatelessWidget {
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 24),
-                        child: _DayCardNode(
+                        child: DayCardNode(
                           phaseId: phase.id,
                           moduleId: module.id,
                           day: day,
@@ -152,186 +173,11 @@ class _DaysView extends StatelessWidget {
               ),
             ],
           ),
-          floatingActionButton: const AiTutorFab(),
+          floatingActionButton: AiTutorFab(
+            contextTitle: currentTitle ?? module.title,
+          ),
         );
       },
-    );
-  }
-}
-
-class _DayCardNode extends StatelessWidget {
-  final int phaseId;
-  final int moduleId;
-  final LessonDay day;
-  final bool isLocked;
-  final bool isCompleted;
-  final bool isCurrent;
-
-  const _DayCardNode({
-    required this.phaseId,
-    required this.moduleId,
-    required this.day,
-    required this.isLocked,
-    required this.isCompleted,
-    required this.isCurrent,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    // Node
-    Widget node;
-    if (isCompleted) {
-      node = Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: colorScheme.primary,
-          shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.onPrimary, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.primary.withValues(alpha: 0.4),
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Icon(
-          Icons.check_rounded,
-          color: colorScheme.onPrimary,
-          size: 18,
-        ),
-      );
-    } else if (isCurrent) {
-      node = Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: colorScheme.secondaryContainer,
-          shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.onPrimary, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.secondaryContainer.withValues(alpha: 0.4),
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Icon(
-          Icons.play_arrow_outlined,
-          color: colorScheme.onPrimary,
-          size: 18,
-        ),
-      );
-    } else {
-      node = Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          shape: BoxShape.circle,
-          border: Border.all(color: colorScheme.outlineVariant, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.surfaceContainerHighest,
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Icon(
-          Icons.lock_outline,
-          color: colorScheme.outline.withValues(alpha: 0.5),
-          size: 16,
-        ),
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        node,
-        const SizedBox(width: 16),
-        Expanded(
-          child: CurriculumCard(
-            isLocked: isLocked,
-            isCompleted: isCompleted,
-            isCurrent: isCurrent,
-            onTap: () {
-              context.goNamed(
-                'lesson',
-                pathParameters: {
-                  'phaseId': '$phaseId',
-                  'moduleId': '$moduleId',
-                  'day': '${day.day}',
-                },
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          isCurrent
-                              ? '${StringConstants.dayPrefix} ${day.day} • ${StringConstants.currentLabel}'
-                              : '${StringConstants.dayPrefix} ${day.day}',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: isCurrent
-                                ? colorScheme.secondaryContainer
-                                : (isLocked
-                                      ? colorScheme.onSurfaceVariant
-                                      : colorScheme.primary),
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                      ),
-                      if (!isLocked)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12),
-                          child: Icon(
-                            Icons.chevron_right_rounded,
-                            color: isCompleted
-                                ? colorScheme.onSurfaceVariant
-                                : colorScheme.primary,
-                            size: 20,
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    day.title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
-                      fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    day.description,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -4,10 +4,16 @@ import '../../../domain/models/curriculum/lesson_day.dart';
 import 'ai_tutor_bottom_sheet.dart';
 
 class AiTutorFab extends StatelessWidget {
+  final String? contextTitle;
   final LessonDay? contextLesson;
   final LessonContent? contextContent;
 
-  const AiTutorFab({super.key, this.contextLesson, this.contextContent});
+  const AiTutorFab({
+    super.key,
+    this.contextTitle,
+    this.contextLesson,
+    this.contextContent,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +26,7 @@ class AiTutorFab extends StatelessWidget {
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           builder: (context) => AiTutorBottomSheet(
+            contextTitle: contextTitle,
             contextLesson: contextLesson,
             contextContent: contextContent,
           ),
