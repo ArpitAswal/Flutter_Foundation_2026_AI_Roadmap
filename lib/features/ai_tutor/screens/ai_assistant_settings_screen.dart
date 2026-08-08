@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../../core/constants/string_constants.dart';
 import '../../../core/di/injection.dart';
@@ -53,12 +54,38 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
         ),
         body: SafeArea(
           child:
-              BlocBuilder<AiAssistantSettingsCubit, AiAssistantSettingsState>(
+              BlocConsumer<AiAssistantSettingsCubit, AiAssistantSettingsState>(
+                listenWhen: (previous, current) =>
+                    previous.errorMessage != current.errorMessage &&
+                    current.errorMessage != null,
+                listener: (context, state) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        state.errorMessage!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.errorContainer,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  );
+                },
                 builder: (context, state) {
                   if (state.isLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(
+                      child: SpinKitThreeBounce(
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 24,
+                      ),
+                    );
                   }
-
                   return ListView(
                     padding: const EdgeInsets.all(20),
                     children: [
@@ -83,10 +110,6 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                         state,
                         model: AiModel.claudeHaiku,
                       ),
-                      if (state.errorMessage != null) ...[
-                        const SizedBox(height: 20),
-                        _buildErrorBanner(context, state.errorMessage!),
-                      ],
                     ],
                   );
                 },
@@ -273,9 +296,11 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
             runSpacing: 12,
             children: [
               FilledButton(
-                onPressed: state.isSaving
+                onPressed: state.savingKeyModel == model
                     ? null
                     : () async {
+                        if (state.savingKeyModel != null) return;
+
                         final key = _controllers[model]!.text;
                         if (key.trim().isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -294,12 +319,19 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                             .saveProviderKey(model, key);
                         _controllers[model]!.clear();
                       },
-                child: const Text(StringConstants.settingsSaveKeyBtn),
+                child: state.savingKeyModel == model
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text(StringConstants.settingsSaveKeyBtn),
               ),
               OutlinedButton(
-                onPressed: state.isSaving || !hasKey
+                onPressed: (state.savingKeyModel == model) || !hasKey
                     ? null
                     : () async {
+                        if (state.savingKeyModel != null) return;
                         // Delete the key and let the cubit update the state.
                         await context
                             .read<AiAssistantSettingsCubit>()
@@ -332,18 +364,6 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
           color: hasKey ? colorScheme.onPrimaryContainer : colorScheme.error,
         ),
       ),
-    );
-  }
-
-  Widget _buildErrorBanner(BuildContext context, String message) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Text(message, style: TextStyle(color: colorScheme.error)),
     );
   }
 }

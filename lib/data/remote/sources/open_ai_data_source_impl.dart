@@ -104,4 +104,17 @@ class OpenAiDataSourceImpl implements AiRemoteDataSource {
       );
     }
   }
+
+  @override
+  Future<bool> isValidKey(String apiKey, AiModel model) async {
+    try {
+      final response = await _dio.get(
+        'https://api.openai.com/v1/models',
+        options: Options(headers: {'Authorization': 'Bearer $apiKey'}),
+      );
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
 }

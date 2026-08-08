@@ -50,6 +50,8 @@ class StringConstants {
       'Unable to save the API key securely.';
   static const String aiAssistantKeyDeleteError =
       'Unable to remove the saved API key.';
+  static const String aiAssistantInvalidKey =
+      'The provided API key is invalid. Please check and try again.';
 
   // API Key Errors
   static const String missingGeminiKey =

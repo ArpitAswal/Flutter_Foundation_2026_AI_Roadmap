@@ -262,7 +262,7 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
                 ),
               )
               .toList(),
-          onChanged: settingsState.isSaving
+          onChanged: settingsState.isSavingModel
               ? null
               : (newValue) {
                   if (newValue != null) {
@@ -473,7 +473,7 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDisabled =
-        settingsState.isSelectedModelLocked || settingsState.isSaving;
+        settingsState.isSelectedModelLocked || settingsState.isSavingModel;
 
     return Container(
       padding: const EdgeInsets.all(12),

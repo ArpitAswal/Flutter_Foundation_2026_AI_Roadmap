@@ -4,15 +4,19 @@ import 'package:injectable/injectable.dart';
 import '../../../core/constants/string_constants.dart';
 import '../../../domain/models/ai_model.dart';
 import '../../../data/local/sources/ai_assistant_settings_local_data_source.dart';
+import '../../../data/remote/sources/ai_data_source_factory.dart';
 import 'ai_assistant_settings_state.dart';
 
 /// Holds the persisted AI assistant configuration for the chat and settings UI.
 @lazySingleton
 class AiAssistantSettingsCubit extends Cubit<AiAssistantSettingsState> {
   final AiAssistantSettingsLocalDataSource _localDataSource;
+  final AiDataSourceFactory _dataSourceFactory;
 
-  AiAssistantSettingsCubit(this._localDataSource)
-    : super(AiAssistantSettingsState.initial());
+  AiAssistantSettingsCubit(
+    this._localDataSource,
+    this._dataSourceFactory,
+  ) : super(AiAssistantSettingsState.initial());
 
   Future<void> loadSettings() async {
     if (!state.isLoading && state.errorMessage == null) {
@@ -44,13 +48,13 @@ class AiAssistantSettingsCubit extends Cubit<AiAssistantSettingsState> {
   }
 
   Future<void> selectModel(AiModel model) async {
-    emit(state.copyWith(isSaving: true, clearErrorMessage: true));
+    emit(state.copyWith(isSavingModel: true, clearErrorMessage: true));
 
     try {
       await _localDataSource.saveSelectedModel(model);
       emit(
         state.copyWith(
-          isSaving: false,
+          isSavingModel: false,
           selectedModel: model,
           clearErrorMessage: true,
         ),
@@ -58,7 +62,7 @@ class AiAssistantSettingsCubit extends Cubit<AiAssistantSettingsState> {
     } catch (_) {
       emit(
         state.copyWith(
-          isSaving: false,
+          isSavingModel: false,
           errorMessage: StringConstants.aiAssistantSettingsSaveError,
         ),
       );
@@ -66,16 +70,28 @@ class AiAssistantSettingsCubit extends Cubit<AiAssistantSettingsState> {
   }
 
   Future<void> saveProviderKey(AiModel model, String apiKey) async {
-    emit(state.copyWith(isSaving: true, clearErrorMessage: true));
+    emit(state.copyWith(savingKeyModel: model, clearErrorMessage: true));
 
     try {
+      // Validate the key before persisting it
+      final isValid = await _dataSourceFactory.validateKey(model, apiKey);
+      if (!isValid) {
+        emit(
+          state.copyWith(
+            clearSavingKeyModel: true,
+            errorMessage: StringConstants.aiAssistantInvalidKey,
+          ),
+        );
+        return;
+      }
+
       await _localDataSource.saveProviderKey(model, apiKey);
       await _reloadKeyAvailability();
-      emit(state.copyWith(isSaving: false, clearErrorMessage: true));
+      emit(state.copyWith(clearSavingKeyModel: true, clearErrorMessage: true));
     } catch (_) {
       emit(
         state.copyWith(
-          isSaving: false,
+          clearSavingKeyModel: true,
           errorMessage: StringConstants.aiAssistantKeySaveError,
         ),
       );
@@ -83,16 +99,16 @@ class AiAssistantSettingsCubit extends Cubit<AiAssistantSettingsState> {
   }
 
   Future<void> deleteProviderKey(AiModel model) async {
-    emit(state.copyWith(isSaving: true, clearErrorMessage: true));
+    emit(state.copyWith(savingKeyModel: model, clearErrorMessage: true));
 
     try {
       await _localDataSource.deleteProviderKey(model);
       await _reloadKeyAvailability();
-      emit(state.copyWith(isSaving: false, clearErrorMessage: true));
+      emit(state.copyWith(clearSavingKeyModel: true, clearErrorMessage: true));
     } catch (_) {
       emit(
         state.copyWith(
-          isSaving: false,
+          clearSavingKeyModel: true,
           errorMessage: StringConstants.aiAssistantKeyDeleteError,
         ),
       );

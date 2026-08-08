@@ -5,14 +5,16 @@ import '../../../domain/models/ai_model.dart';
 /// State for AI assistant configuration persistence.
 class AiAssistantSettingsState extends Equatable {
   final bool isLoading;
-  final bool isSaving;
+  final bool isSavingModel;
+  final AiModel? savingKeyModel;
   final AiModel selectedModel;
   final Map<AiModel, bool> keyAvailability;
   final String? errorMessage;
 
   const AiAssistantSettingsState({
     required this.isLoading,
-    required this.isSaving,
+    required this.isSavingModel,
+    this.savingKeyModel,
     required this.selectedModel,
     required this.keyAvailability,
     required this.errorMessage,
@@ -21,7 +23,8 @@ class AiAssistantSettingsState extends Equatable {
   factory AiAssistantSettingsState.initial() {
     return const AiAssistantSettingsState(
       isLoading: true,
-      isSaving: false,
+      isSavingModel: false,
+      savingKeyModel: null,
       selectedModel: AiModel.geminiFlash,
       keyAvailability: {
         AiModel.geminiFlash: false,
@@ -42,7 +45,9 @@ class AiAssistantSettingsState extends Equatable {
 
   AiAssistantSettingsState copyWith({
     bool? isLoading,
-    bool? isSaving,
+    bool? isSavingModel,
+    AiModel? savingKeyModel,
+    bool clearSavingKeyModel = false,
     AiModel? selectedModel,
     Map<AiModel, bool>? keyAvailability,
     String? errorMessage,
@@ -50,7 +55,10 @@ class AiAssistantSettingsState extends Equatable {
   }) {
     return AiAssistantSettingsState(
       isLoading: isLoading ?? this.isLoading,
-      isSaving: isSaving ?? this.isSaving,
+      isSavingModel: isSavingModel ?? this.isSavingModel,
+      savingKeyModel: clearSavingKeyModel
+          ? null
+          : (savingKeyModel ?? this.savingKeyModel),
       selectedModel: selectedModel ?? this.selectedModel,
       keyAvailability: keyAvailability ?? this.keyAvailability,
       errorMessage: clearErrorMessage
@@ -62,7 +70,8 @@ class AiAssistantSettingsState extends Equatable {
   @override
   List<Object?> get props => [
     isLoading,
-    isSaving,
+    isSavingModel,
+    savingKeyModel,
     selectedModel,
     keyAvailability,
     errorMessage,

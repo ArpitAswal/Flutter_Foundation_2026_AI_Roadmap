@@ -50,4 +50,19 @@ class GeminiDataSourceImpl implements AiRemoteDataSource {
       );
     }
   }
+
+  @override
+  Future<bool> isValidKey(String apiKey, AiModel model) async {
+    try {
+      final generativeModel = GenerativeModel(
+        model: model.modelName,
+        apiKey: apiKey,
+      );
+      // Make a minimal token count request to validate auth
+      await generativeModel.countTokens([Content.text('test')]);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 }

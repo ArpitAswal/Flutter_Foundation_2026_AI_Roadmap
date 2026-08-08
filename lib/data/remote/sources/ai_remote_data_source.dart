@@ -12,4 +12,7 @@ abstract class AiRemoteDataSource {
     required String userMessage,
     required AiModel model,
   });
+
+  /// Verifies if the provided [apiKey] is valid by making a lightweight API call.
+  Future<bool> isValidKey(String apiKey, AiModel model);
 }

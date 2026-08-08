@@ -28,4 +28,10 @@ class AiDataSourceFactory {
         return _anthropicDataSource;
     }
   }
+
+  /// Verifies if the [apiKey] is valid for the given [model].
+  Future<bool> validateKey(AiModel model, String apiKey) async {
+    final dataSource = getDataSource(model);
+    return dataSource.isValidKey(apiKey, model);
+  }
 }

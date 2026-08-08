@@ -108,4 +108,32 @@ class AnthropicDataSourceImpl implements AiRemoteDataSource {
       );
     }
   }
+
+  @override
+  Future<bool> isValidKey(String apiKey, AiModel model) async {
+    try {
+      final response = await _dio.post(
+        'https://api.anthropic.com/v1/messages',
+        options: Options(
+          headers: {
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json',
+          },
+        ),
+        data: {
+          'model': model.modelName,
+          'max_tokens': 1,
+          'messages': [
+            {'role': 'user', 'content': 'test'},
+          ],
+        },
+      );
+      return response.statusCode == 200;
+    } catch (_) {
+      // If it throws DioException for 401 Unauthorized, it's invalid.
+      // Other errors might indicate network issues, but for simplicity we return false.
+      return false;
+    }
+  }
 }
