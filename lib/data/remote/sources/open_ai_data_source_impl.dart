@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../core/constants/string_constants.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../domain/models/ai_model.dart';
+import '../../local/sources/ai_assistant_settings_local_data_source.dart';
 import 'ai_remote_data_source.dart';
 
 /// Remote data source responsible for communicating with the OpenAI API via Dio.
@@ -13,8 +13,9 @@ import 'ai_remote_data_source.dart';
 @Named('openai')
 class OpenAiDataSourceImpl implements AiRemoteDataSource {
   final Dio _dio;
+  final AiAssistantSettingsLocalDataSource _settingsLocalDataSource;
 
-  const OpenAiDataSourceImpl(this._dio);
+  const OpenAiDataSourceImpl(this._dio, this._settingsLocalDataSource);
 
   @override
   Stream<String> sendMessage({
@@ -22,7 +23,7 @@ class OpenAiDataSourceImpl implements AiRemoteDataSource {
     required String userMessage,
     required AiModel model,
   }) async* {
-    final apiKey = dotenv.env['CHATGPT_API_KEY'];
+    final apiKey = await _settingsLocalDataSource.readProviderKey(model);
     if (apiKey == null || apiKey.isEmpty) {
       throw const AiTutorException(StringConstants.missingOpenAiKey);
     }
@@ -49,17 +50,34 @@ class OpenAiDataSourceImpl implements AiRemoteDataSource {
 
       final stream = response.data?.stream;
       if (stream == null) {
-        throw const NetworkException('Failed to receive stream from OpenAI API.');
+        throw const NetworkException(
+          'Failed to receive stream from OpenAI API.',
+        );
       }
 
-      await for (final rawData in stream) {
-        final chunkStr = utf8.decode(rawData);
-        final lines = chunkStr.split('\n');
+      var eventBuffer = '';
 
-        for (final line in lines) {
-          if (line.startsWith('data: ') && line != 'data: [DONE]') {
-            final jsonStr = line.substring(6);
-            if (jsonStr.trim().isEmpty) continue;
+      await for (final rawData in stream) {
+        eventBuffer += utf8.decode(rawData, allowMalformed: true);
+
+        while (true) {
+          final newlineIndex = eventBuffer.indexOf('\n');
+          if (newlineIndex == -1) {
+            break;
+          }
+
+          final line = eventBuffer.substring(0, newlineIndex).trimRight();
+          eventBuffer = eventBuffer.substring(newlineIndex + 1);
+
+          if (line.startsWith('data: ')) {
+            if (line == 'data: [DONE]') {
+              continue;
+            }
+
+            final jsonStr = line.substring(6).trim();
+            if (jsonStr.isEmpty) {
+              continue;
+            }
 
             try {
               final parsed = jsonDecode(jsonStr);
@@ -72,7 +90,7 @@ class OpenAiDataSourceImpl implements AiRemoteDataSource {
                 }
               }
             } catch (_) {
-              // Ignore parse errors for malformed chunks
+              // Ignore parse errors for malformed chunks.
             }
           }
         }
@@ -80,7 +98,10 @@ class OpenAiDataSourceImpl implements AiRemoteDataSource {
     } on DioException catch (e) {
       throw NetworkException('OpenAI API Error: ${e.message}', e);
     } catch (e) {
-      throw NetworkException('An unexpected error occurred while communicating with OpenAI.', e);
+      throw NetworkException(
+        'An unexpected error occurred while communicating with OpenAI.',
+        e,
+      );
     }
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +8,7 @@ import 'core/di/injection.dart';
 import 'core/router/app_router.dart';
 import 'data/local/adapters/hive_adapters.dart';
 import 'data/local/models/user_progress_record.dart';
+import 'features/ai_tutor/bloc/ai_assistant_settings_cubit.dart';
 import 'features/curriculum/bloc/curriculum_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,10 +16,7 @@ void main() async {
   // Ensure Flutter binding is initialized before async setup.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Load Environment Variables (.env)
-  await dotenv.load(fileName: 'assets/.env');
-
-  // 2. Initialize Hive local database
+  // 1. Initialize Hive local database
   await Hive.initFlutter();
 
   // Register custom TypeAdapters before opening boxes
@@ -28,10 +25,13 @@ void main() async {
   // Open all Hive boxes used by the application
   await Hive.openBox<UserProgressRecord>(AppConstants.progressBox);
 
-  // 3. Configure Dependency Injection (get_it + injectable)
+  // 2. Configure Dependency Injection (get_it + injectable)
   await configureDependencies();
 
-  // 4. Run the App
+  // Preload AI assistant settings before the UI renders.
+  await getIt<AiAssistantSettingsCubit>().loadSettings();
+
+  // 3. Run the App
   runApp(const FlutterAiTutorApp());
 }
 

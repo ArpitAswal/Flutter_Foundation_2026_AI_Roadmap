@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../features/ai_tutor/screens/ai_assistant_settings_screen.dart';
 import '../../features/curriculum/screens/days_screen.dart';
 import '../../features/curriculum/screens/modules_screen.dart';
 import '../../features/curriculum/screens/phases_screen.dart';
@@ -18,6 +19,7 @@ import '../../features/lesson/screens/lesson_screen.dart';
 /// /phases/:phaseId/modules                          → ModulesScreen
 /// /phases/:phaseId/modules/:moduleId/days           → DaysScreen
 /// /phases/:phaseId/modules/:moduleId/days/:day      → LessonScreen
+/// /ai-assistant/settings                            → AiAssistantSettingsScreen
 /// ```
 @singleton
 class AppRouter {
@@ -77,6 +79,12 @@ class AppRouter {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: '/ai-assistant/settings',
+        name: 'aiAssistantSettings',
+        pageBuilder: (context, state) =>
+            _slide(state, child: const AiAssistantSettingsScreen()),
       ),
     ],
   );

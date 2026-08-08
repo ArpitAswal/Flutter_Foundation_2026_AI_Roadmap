@@ -10,7 +10,7 @@ import 'ai_tutor_event.dart';
 import 'ai_tutor_state.dart';
 
 /// Manages the state of the AI Tutor chat interface.
-@lazySingleton
+@injectable
 class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
   final AskAiTutorUseCase _askAiTutorUseCase;
 
@@ -36,9 +36,6 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
     AiTutorMessageSent event,
     Emitter<AiTutorState> emit,
   ) async {
-    debugPrint(
-      'AiTutorBloc: Received message - "${event.message}" for model ${event.model.name}',
-    );
     // Prevent multiple requests at once
     if (state is AiTutorLoading || state is AiTutorResponseStreaming) return;
 

@@ -42,6 +42,14 @@ class StringConstants {
       'An unexpected error occurred while communicating with the AI Tutor.';
   static const String aiTutorGenericError =
       'An unexpected error occurred. Please try again.';
+  static const String aiAssistantSettingsLoadError =
+      'Unable to load your AI assistant settings.';
+  static const String aiAssistantSettingsSaveError =
+      'Unable to save your selected model.';
+  static const String aiAssistantKeySaveError =
+      'Unable to save the API key securely.';
+  static const String aiAssistantKeyDeleteError =
+      'Unable to remove the saved API key.';
 
   // API Key Errors
   static const String missingGeminiKey =
@@ -50,4 +58,41 @@ class StringConstants {
       'OpenAI API Key is missing. Please configure it to use this model.';
   static const String missingAnthropicKey =
       'Anthropic API Key is missing. Please configure it to use this model.';
+
+  // AI Assistant Settings Screen
+  static const String settingsTitle = 'AI Assistant Settings';
+  static const String settingsAssistantLocked = 'Assistant locked';
+  static const String settingsAssistantReady = 'Assistant ready';
+  static const String settingsUnlockPrompt =
+      'Add at least one provider key to unlock chat.';
+  static const String settingsKeysSaved =
+      'Your keys are saved locally in encrypted storage on this device.';
+  static const String settingsDefaultModelTitle = 'Default model';
+  static const String settingsDefaultModelDesc =
+      'This model will be restored automatically the next time you open the assistant.';
+  static const String settingsSecureStorageDesc =
+      'Stored securely in the platform keychain or keystore.';
+  static const String settingsApiKeySuffix = 'API key';
+  static const String settingsPasteHint = 'Paste your API key here';
+  static const String settingsEnterKeyFirst = 'Enter a key before saving.';
+  static const String settingsSaveKeyBtn = 'Save key';
+  static const String settingsRemoveBtn = 'Remove';
+  static const String settingsSavedChip = 'Saved';
+  static const String settingsMissingChip = 'Missing';
+
+  // AI Tutor Bottom Sheet
+  static const String bottomSheetTitle = 'AI Tutor';
+  static const String bottomSheetOnline = 'Online';
+  static const String bottomSheetTooltipSettings = 'Open AI settings';
+  static const String bottomSheetKeyMissing = 'Key missing';
+  static const String bottomSheetReady = 'Ready';
+  static const String bottomSheetNotConfigured =
+      'is not configured. Open Settings or switch to another model.';
+  static const String bottomSheetHintLocked =
+      'Add a key in Settings to start chatting';
+  static const String bottomSheetHintAsk = 'Ask a question...';
+  static const String bottomSheetLockTitle = 'AI Assistant Locked';
+  static const String bottomSheetLockDesc =
+      'Add at least one provider key to unlock the assistant. Keys stay encrypted on this device.';
+  static const String bottomSheetOpenSettings = 'Open Settings';
 }

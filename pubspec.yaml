@@ -84,8 +84,8 @@ dependencies:
 
   # ── [APP INFRASTRUCTURE] Local Database ───────────────────────────────────
   # hive: Lightweight, fast NoSQL key-value / box database for Flutter/Dart.
-  # Role: PRIMARY local database for all app data — lesson records,
-  #       user progress, and AI tutor settings (selected model, etc.).
+  # Role: PRIMARY local database for curriculum data — lesson records and
+  #       user progress.
   # Uses @HiveType / @HiveField annotations + code-generated TypeAdapters.
   hive: ^2.2.3
 
@@ -110,12 +110,6 @@ dependencies:
   #   • LESSON-CONTEXT → what the user is currently learning (e.g., Hive)
   # Used in: gemini_remote_data_source.dart, ask_ai_tutor_use_case.dart
   google_generative_ai: ^0.4.6
-
-  # flutter_dotenv: Loads environment variables from a .env file at runtime.
-  # Role: Securely provides the GEMINI_API_KEY without hardcoding it in source.
-  # .env file is git-ignored; bundled as a Flutter asset (assets/.env).
-  # Used in: main.dart (dotenv.load) and gemini_remote_data_source.dart.
-  flutter_dotenv: ^5.2.1
 
   # ── [APP INFRASTRUCTURE] Secure Storage ───────────────────────────────────
   # flutter_secure_storage: Encrypted key-value storage backed by Keychain/Keystore.
@@ -235,10 +229,7 @@ flutter:
   uses-material-design: true
 
   # Assets bundled with the application.
-  # .env is listed here so flutter_dotenv can load it at runtime.
-  # WARNING: .env must be added to .gitignore — never commit API keys.
   assets:
-    - assets/.env
     - assets/curriculum/
     - assets/curriculum/phase1/module1/
     - assets/images/

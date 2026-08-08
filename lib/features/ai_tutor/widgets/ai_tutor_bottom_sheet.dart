@@ -1,13 +1,20 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/string_constants.dart';
 import '../../../core/di/injection.dart';
+import '../bloc/ai_assistant_settings_cubit.dart';
+import '../bloc/ai_assistant_settings_state.dart';
 import '../bloc/ai_tutor_bloc.dart';
 import '../bloc/ai_tutor_event.dart';
 import '../bloc/ai_tutor_state.dart';
-import '../models/chat_message.dart';
 import '../../../domain/models/ai_model.dart';
 import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
@@ -27,204 +34,323 @@ class AiTutorBottomSheet extends StatefulWidget {
 }
 
 class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
-  AiModel _selectedModel = AiModel.geminiFlash;
-  final List<AiModel> _models = AiModel.values;
+  late final AiTutorBloc _aiTutorBloc;
+  late final AiAssistantSettingsCubit _settingsCubit;
+
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+
+  Timer? _scrollDebounce;
+  bool _isUserNearBottom = true;
+
+  final List<AiModel> _models = AiModel.values;
 
   @override
   void initState() {
     super.initState();
+    _aiTutorBloc = getIt<AiTutorBloc>();
+    _settingsCubit = getIt<AiAssistantSettingsCubit>();
+
     final contextText = widget.contextLesson?.title ?? 'the curriculum';
-    getIt<AiTutorBloc>().add(AiTutorInitialized(contextText: contextText));
+    _aiTutorBloc.add(AiTutorInitialized(contextText: contextText));
+    _settingsCubit.loadSettings();
+
+    _scrollController.addListener(_handleScroll);
   }
 
   @override
   void dispose() {
+    _scrollDebounce?.cancel();
+    _scrollController
+      ..removeListener(_handleScroll)
+      ..dispose();
     _textController.dispose();
-    _scrollController.dispose();
+    _aiTutorBloc.close();
     super.dispose();
   }
 
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
+  void _handleScroll() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+
+    _isUserNearBottom = _scrollController.position.extentAfter < 160;
+  }
+
+  void _scheduleScrollToBottom({required bool animated}) {
+    if (!_scrollController.hasClients || !_isUserNearBottom) {
+      return;
+    }
+
+    _scrollDebounce?.cancel();
+    _scrollDebounce = Timer(const Duration(milliseconds: 48), () {
+      if (!mounted || !_scrollController.hasClients) {
+        return;
+      }
+
+      final targetOffset = _scrollController.position.maxScrollExtent;
+      if (animated) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
+          targetOffset,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
         );
+      } else {
+        _scrollController.jumpTo(targetOffset);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: getIt<AiTutorBloc>(),
-      child: Builder(
-        builder: (context) {
-          return SafeArea(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-              ),
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.85,
-              ),
-              child: Column(
-                children: [
-                  _buildHeader(),
-                  const Divider(height: 1, color: Color(0xFFEEEEEE)),
-                  Expanded(child: _buildChatBody(context)),
-                  _buildInputArea(context),
-                ],
-              ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _settingsCubit),
+        BlocProvider.value(value: _aiTutorBloc),
+      ],
+      child: SafeArea(
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.88,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(28),
+              topRight: Radius.circular(28),
             ),
-          );
-        },
+          ),
+          child:
+              BlocBuilder<AiAssistantSettingsCubit, AiAssistantSettingsState>(
+                builder: (context, settingsState) {
+                  final content = Column(
+                    children: [
+                      _buildHeader(context, settingsState),
+                      const Divider(height: 1, color: Color(0xFFEEEEEE)),
+                      Expanded(child: _buildChatBody(context)),
+                      _buildInputArea(context, settingsState),
+                    ],
+                  );
+
+                  if (!settingsState.isAssistantLocked) {
+                    return content;
+                  }
+
+                  return Stack(
+                    children: [
+                      AbsorbPointer(child: content),
+                      Positioned.fill(child: _buildLockOverlay(context)),
+                    ],
+                  );
+                },
+              ),
+        ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(
+    BuildContext context,
+    AiAssistantSettingsState settingsState,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.smart_toy_rounded,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'AI Tutor',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [colorScheme.primary, colorScheme.primaryContainer],
                   ),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(height: 4),
-                Row(
+                child: const Icon(
+                  Icons.smart_toy_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
+                    Text(
+                      StringConstants.bottomSheetTitle,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    const Text(
-                      'Online',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          StringConstants.bottomSheetOnline,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<AiModel>(
-                value: _selectedModel,
-                icon: const Icon(Icons.keyboard_arrow_down, size: 18),
-                isDense: true,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-                items: _models.map((AiModel model) {
-                  return DropdownMenuItem<AiModel>(
-                    value: model,
-                    child: Text('Model: ${model.label}'),
-                  );
-                }).toList(),
-                onChanged: (AiModel? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      _selectedModel = newValue;
-                    });
-                  }
-                },
               ),
-            ),
+              IconButton(
+                tooltip: StringConstants.bottomSheetTooltipSettings,
+                onPressed: () {
+                  context.pushNamed('aiAssistantSettings');
+                },
+                icon: const Icon(Icons.settings_outlined),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              _buildModelDropdown(context, settingsState),
+              _buildStateChip(context, settingsState),
+            ],
           ),
         ],
       ),
     );
   }
 
+  Widget _buildModelDropdown(
+    BuildContext context,
+    AiAssistantSettingsState settingsState,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<AiModel>(
+          value: settingsState.selectedModel,
+          isDense: true,
+          borderRadius: BorderRadius.circular(16),
+          items: _models
+              .map(
+                (model) => DropdownMenuItem<AiModel>(
+                  value: model,
+                  child: Text(model.label),
+                ),
+              )
+              .toList(),
+          onChanged: settingsState.isSaving
+              ? null
+              : (newValue) {
+                  if (newValue != null) {
+                    context.read<AiAssistantSettingsCubit>().selectModel(
+                      newValue,
+                    );
+                  }
+                },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStateChip(
+    BuildContext context,
+    AiAssistantSettingsState settingsState,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final chipColor = settingsState.isSelectedModelLocked
+        ? colorScheme.errorContainer
+        : colorScheme.primaryContainer;
+    final chipForeground = settingsState.isSelectedModelLocked
+        ? colorScheme.error
+        : colorScheme.onPrimaryContainer;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: chipColor,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        settingsState.isSelectedModelLocked
+            ? StringConstants.bottomSheetKeyMissing
+            : StringConstants.bottomSheetReady,
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: chipForeground),
+      ),
+    );
+  }
+
   Widget _buildChatBody(BuildContext context) {
     return BlocConsumer<AiTutorBloc, AiTutorState>(
+      // Schedule scrolling down when there's a new loading chunk or complete response.
       listener: (context, state) {
-        _scrollToBottom();
+        _scheduleScrollToBottom(
+          animated: state is AiTutorLoading || state is AiTutorResponseComplete,
+        );
       },
       builder: (context, state) {
-        // Prepare the message list
-        final messages = List<ChatMessage>.from(state.messages);
+        final messages = state.messages;
 
         return ListView.builder(
           controller: _scrollController,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.symmetric(
             horizontal: 20,
-          ).copyWith(bottom: 16.0),
+          ).copyWith(top: 12, bottom: 16),
+          scrollCacheExtent: const ScrollCacheExtent.pixels(1000.0),
           itemCount: messages.length,
           itemBuilder: (context, index) {
             final message = messages[index];
+
             if (message.isUser) {
               return Align(
                 alignment: Alignment.centerRight,
                 child: _buildUserMessage(message.text),
               );
-            } else if (message.isLoading) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SpinKitThreeBounce(
+            }
+
+            if (message.isLoading) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SpinKitThreeBounce(
                     color: Theme.of(context).colorScheme.primary,
-                    size: 24.0,
+                    size: 24,
                   ),
-                ],
-              );
-            } else {
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: _buildAiMessage(message.text, isError: message.isError),
+                ),
               );
             }
+
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: _buildAiMessage(message.text, isError: message.isError),
+            );
           },
         );
       },
@@ -233,27 +359,29 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
 
   Widget _buildUserMessage(String text) {
     final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.only(top: 4.0),
+      padding: const EdgeInsets.only(top: 4),
       child: Stack(
         children: [
           Container(
-            margin: EdgeInsetsGeometry.only(top: 16.0),
+            margin: const EdgeInsets.only(top: 16),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
+              gradient: LinearGradient(
+                colors: [colorScheme.primary, colorScheme.primaryContainer],
+              ),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
                 bottomLeft: Radius.circular(12),
                 bottomRight: Radius.circular(4),
               ),
-              border: Border.all(color: colorScheme.onPrimary),
             ),
             child: Text(
               text,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: colorScheme.onPrimary,
                 fontWeight: FontWeight.w500,
                 height: 1.5,
               ),
@@ -270,7 +398,7 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.smart_toy_outlined,
+                Icons.person_rounded,
                 size: 18,
                 color: colorScheme.primary,
               ),
@@ -283,12 +411,13 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
 
   Widget _buildAiMessage(String text, {bool isError = false}) {
     final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.only(top: 4.0),
+      padding: const EdgeInsets.only(top: 4),
       child: Stack(
         children: [
           Container(
-            margin: EdgeInsetsGeometry.only(top: 16.0),
+            margin: const EdgeInsets.only(top: 16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isError
@@ -338,76 +467,201 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
     );
   }
 
-  Widget _buildInputArea(BuildContext context) {
+  Widget _buildInputArea(
+    BuildContext context,
+    AiAssistantSettingsState settingsState,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDisabled =
+        settingsState.isSelectedModelLocked || settingsState.isSaving;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: colorScheme.onPrimary,
-        border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
+        border: const Border(top: BorderSide(color: Color(0xFFEEEEEE))),
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(36),
-          border: Border.all(
-            color: colorScheme.surfaceContainerHighest,
-            width: 3,
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _textController,
-                decoration: const InputDecoration(
-                  hintText: 'Ask a question...',
-                  hintStyle: TextStyle(
-                    color: Colors.black38,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  border: InputBorder.none,
-                ),
-                onSubmitted: (_) => _sendMessage(context),
-              ),
-            ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (settingsState.hasAnyConfiguredKey &&
+              settingsState.isSelectedModelLocked)
             Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                shape: BoxShape.circle,
+                color: colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_upward,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                onPressed: () => _sendMessage(context),
-                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                padding: EdgeInsets.zero,
+              child: Row(
+                children: [
+                  Icon(Icons.lock_outline, color: colorScheme.error),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      '${settingsState.selectedModel.label} ${StringConstants.bottomSheetNotConfigured}',
+                      style: TextStyle(color: colorScheme.error),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          Container(
+            decoration: BoxDecoration(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(36),
+              border: Border.all(
+                color: colorScheme.surfaceContainerHighest,
+                width: 2,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _textController,
+                    enabled: !isDisabled,
+                    minLines: 1,
+                    maxLines: 4,
+                    textInputAction: TextInputAction.send,
+                    decoration: InputDecoration(
+                      // Provide visual hint if chat is disabled because the key is missing.
+                      hintText: settingsState.isSelectedModelLocked
+                          ? StringConstants.bottomSheetHintLocked
+                          : StringConstants.bottomSheetHintAsk,
+                      hintStyle: const TextStyle(
+                        color: Colors.black38,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                    onSubmitted: (_) => _sendMessage(context, settingsState),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDisabled
+                        ? colorScheme.outlineVariant
+                        : colorScheme.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_upward,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    onPressed: isDisabled
+                        ? null
+                        : () => _sendMessage(context, settingsState),
+                    constraints: const BoxConstraints(
+                      minWidth: 36,
+                      minHeight: 36,
+                    ),
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLockOverlay(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // Renders a blurred lock overlay when no API keys are present in local storage.
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.28),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 340),
+          child: Material(
+            color: colorScheme.surface,
+            elevation: 8,
+            borderRadius: BorderRadius.circular(24),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: colorScheme.errorContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.lock_rounded,
+                      size: 34,
+                      color: colorScheme.error,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    StringConstants.bottomSheetLockTitle,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    StringConstants.bottomSheetLockDesc,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    onPressed: () => _openSettings(context),
+                    icon: const Icon(Icons.settings_outlined),
+                    label: const Text(StringConstants.bottomSheetOpenSettings),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  void _sendMessage(BuildContext context) {
+  void _sendMessage(
+    BuildContext context,
+    AiAssistantSettingsState settingsState,
+  ) {
     final text = _textController.text.trim();
-    if (text.isEmpty) return;
+    // Do not send if text is empty or the selected model is not configured.
+    if (text.isEmpty || settingsState.isSelectedModelLocked) {
+      return;
+    }
 
     _textController.clear();
 
     context.read<AiTutorBloc>().add(
       AiTutorMessageSent(
         message: text,
-        model: _selectedModel,
+        model: settingsState.selectedModel,
         currentLesson: widget.contextLesson,
         currentContent: widget.contextContent,
       ),
     );
+  }
+
+  void _openSettings(BuildContext context) {
+    final router = GoRouter.of(context);
+    Navigator.of(context).pop();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      router.pushNamed('aiAssistantSettings');
+    });
   }
 }
