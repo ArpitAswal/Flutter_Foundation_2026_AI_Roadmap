@@ -11,6 +11,7 @@ class StringConstants {
   static const String phasePrefix = 'PHASE';
   static const String continueLearning = 'Continue Learning';
   static const String reviewPhase = 'Review Phase';
+  static const String doubleTapToExit = 'Press back again to exit';
 
   // Modules Screen
   static const String modulesTitle = 'Modules';

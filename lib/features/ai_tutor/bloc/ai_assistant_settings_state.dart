@@ -9,6 +9,7 @@ class AiAssistantSettingsState extends Equatable {
   final AiModel? savingKeyModel;
   final AiModel selectedModel;
   final Map<AiModel, bool> keyAvailability;
+  final Map<AiModel, String> savedKeys;
   final String? errorMessage;
 
   const AiAssistantSettingsState({
@@ -17,6 +18,7 @@ class AiAssistantSettingsState extends Equatable {
     this.savingKeyModel,
     required this.selectedModel,
     required this.keyAvailability,
+    required this.savedKeys,
     required this.errorMessage,
   });
 
@@ -30,6 +32,11 @@ class AiAssistantSettingsState extends Equatable {
         AiModel.geminiFlash: false,
         AiModel.gpt4oMini: false,
         AiModel.claudeHaiku: false,
+      },
+      savedKeys: {
+        AiModel.geminiFlash: '',
+        AiModel.gpt4oMini: '',
+        AiModel.claudeHaiku: '',
       },
       errorMessage: null,
     );
@@ -50,6 +57,7 @@ class AiAssistantSettingsState extends Equatable {
     bool clearSavingKeyModel = false,
     AiModel? selectedModel,
     Map<AiModel, bool>? keyAvailability,
+    Map<AiModel, String>? savedKeys,
     String? errorMessage,
     bool clearErrorMessage = false,
   }) {
@@ -61,6 +69,7 @@ class AiAssistantSettingsState extends Equatable {
           : (savingKeyModel ?? this.savingKeyModel),
       selectedModel: selectedModel ?? this.selectedModel,
       keyAvailability: keyAvailability ?? this.keyAvailability,
+      savedKeys: savedKeys ?? this.savedKeys,
       errorMessage: clearErrorMessage
           ? null
           : errorMessage ?? this.errorMessage,
@@ -74,6 +83,7 @@ class AiAssistantSettingsState extends Equatable {
     savingKeyModel,
     selectedModel,
     keyAvailability,
+    savedKeys,
     errorMessage,
   ];
 }

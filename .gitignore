@@ -74,6 +74,7 @@ Thumbs.db
 # ======================
 *.md
 !/README.md
+!/App_Summary.md
 !Phase-*/**/*.md
 !Phase-*/README.md
 

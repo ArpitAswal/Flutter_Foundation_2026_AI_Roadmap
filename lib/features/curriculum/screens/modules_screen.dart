@@ -158,7 +158,7 @@ class _ModulesView extends StatelessWidget {
                 ),
                 textAlign: TextAlign.left,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 18),
               // Progress Bar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -184,7 +184,7 @@ class _ModulesView extends StatelessWidget {
                 fraction: phaseProgress,
                 isCurrent: true, // Header progress always colored
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
               // Modules List
               ...phase.modules.asMap().entries.map((entry) {
                 final index = entry.key;
@@ -251,12 +251,13 @@ class _ModuleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final size = MediaQuery.of(context).size;
 
     Widget icon;
     if (isCompleted) {
       icon = Container(
-        width: 48,
-        height: 48,
+        width: size.width * 0.12,
+        height: size.width * 0.12,
         decoration: BoxDecoration(
           color: colorScheme.primary,
           shape: BoxShape.circle,
@@ -272,13 +273,13 @@ class _ModuleCard extends StatelessWidget {
         child: Icon(
           Icons.check_rounded,
           color: colorScheme.onPrimary,
-          size: 21,
+          size: size.width * 0.08,
         ),
       );
     } else if (isCurrent) {
       icon = Container(
-        width: 48,
-        height: 48,
+        width: size.width * 0.12,
+        height: size.width * 0.12,
         decoration: BoxDecoration(
           color: colorScheme.secondaryContainer,
           shape: BoxShape.circle,
@@ -294,13 +295,13 @@ class _ModuleCard extends StatelessWidget {
         child: Icon(
           Icons.play_arrow_outlined,
           color: colorScheme.onPrimary,
-          size: 21,
+          size: size.width * 0.08,
         ),
       );
     } else {
       icon = Container(
-        width: 48,
-        height: 48,
+        width: size.width * 0.12,
+        height: size.width * 0.12,
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
@@ -316,7 +317,7 @@ class _ModuleCard extends StatelessWidget {
         child: Icon(
           Icons.lock_outline,
           color: colorScheme.outline.withValues(alpha: 0.5),
-          size: 18,
+          size: size.width * 0.08,
         ),
       );
     }
@@ -332,7 +333,10 @@ class _ModuleCard extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(
+          vertical: 16.0,
+          horizontal: 20.0,
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

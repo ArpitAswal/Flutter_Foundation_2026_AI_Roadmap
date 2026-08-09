@@ -128,9 +128,9 @@ class _DaysView extends StatelessWidget {
               Stack(
                 children: [
                   Positioned(
-                    left: 16,
+                    left: MediaQuery.of(context).size.width * 0.04,
                     top: 16,
-                    bottom: 16,
+                    bottom: 20,
                     width: 4,
                     child: Container(
                       decoration: BoxDecoration(

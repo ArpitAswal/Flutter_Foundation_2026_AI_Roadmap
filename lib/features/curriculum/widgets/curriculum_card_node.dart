@@ -24,7 +24,7 @@ class CurriculumCard extends StatelessWidget {
     final cardDecoration = isCurrent
         ? BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
             boxShadow: [
               BoxShadow(
@@ -35,28 +35,28 @@ class CurriculumCard extends StatelessWidget {
             ],
           )
         : isCompleted
-            ? BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(8),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              )
-            : BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
-              );
+        ? BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.primary.withAlpha(8),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          )
+        : BoxDecoration(
+            color: colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
+          );
 
     Widget cardContent = Container(
       decoration: cardDecoration,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Stack(
           children: [
             child,
@@ -65,13 +65,13 @@ class CurriculumCard extends StatelessWidget {
                 left: 0,
                 top: 0,
                 bottom: 0,
-                width: 4,
+                width: 6,
                 child: Container(
                   decoration: BoxDecoration(
                     color: colorScheme.primary,
                     borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      bottomLeft: Radius.circular(12),
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
                     ),
                   ),
                 ),
@@ -81,13 +81,13 @@ class CurriculumCard extends StatelessWidget {
                 left: 0,
                 top: 0,
                 bottom: 0,
-                width: 4,
+                width: 6,
                 child: Container(
                   decoration: BoxDecoration(
                     color: colorScheme.secondaryContainer,
                     borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      bottomLeft: Radius.circular(12),
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
                     ),
                   ),
                 ),
@@ -100,14 +100,11 @@ class CurriculumCard extends StatelessWidget {
     if (onTap != null && !isLocked) {
       cardContent = InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: cardContent,
       );
     }
 
-    return Opacity(
-      opacity: isLocked ? 0.5 : 1.0,
-      child: cardContent,
-    );
+    return Opacity(opacity: isLocked ? 0.5 : 1.0, child: cardContent);
   }
 }

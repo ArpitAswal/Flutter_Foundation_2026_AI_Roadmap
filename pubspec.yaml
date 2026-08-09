@@ -185,6 +185,13 @@ dependencies:
   #       the raw Markdown into elements (like <pre> and <code>) before rendering.
   markdown: ^7.3.1
 
+  # ── [APP INFRASTRUCTURE] Screen Security ──────────────────────────────────
+  # no_screenshot: Plugin for blocking screenshots and screen recordings.
+  # Role: Protects sensitive security screens (like AI Assistant Settings)
+  #       from screen captures or recordings to protect user API keys.
+  # Used in: ai_assistant_settings_screen.dart (screenshotOff / screenshotOn).
+  no_screenshot: ^0.7.1
+
 # ─────────────────────────────────────────────────────────────────────────────
 # DEV DEPENDENCIES
 # ─────────────────────────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
@@ -28,11 +29,13 @@ class _PhasesScreenState extends State<PhasesScreen> {
   Timer? _debounce;
   String _searchQuery = '';
   ValueNotifier<bool> isSearching = ValueNotifier(false);
+  DateTime? _lastBackPressTime;
 
   @override
   void dispose() {
     _searchController.dispose();
     _debounce?.cancel();
+    isSearching.dispose();
     super.dispose();
   }
 
@@ -56,133 +59,159 @@ class _PhasesScreenState extends State<PhasesScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface, // Matches surface-container-low
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        leadingWidth: 60,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-          child: Image.asset(
-            AssetConstants.avatar,
-            filterQuality: FilterQuality.high,
-            fit: BoxFit.contain,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        final now = DateTime.now();
+        if (_lastBackPressTime == null ||
+            now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+          _lastBackPressTime = now;
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                StringConstants.doubleTapToExit,
+                textAlign: TextAlign.center,
+              ),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.fixed,
+            ),
+          );
+        } else {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: colorScheme.surface, // Matches surface-container-low
+        appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
+          leadingWidth: 60,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                AssetConstants.logo,
+                filterQuality: FilterQuality.high,
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
-        ),
-        title: ValueListenableBuilder(
-          valueListenable: isSearching,
-          builder: (BuildContext context, value, Widget? child) {
-            return (isSearching.value)
-                ? TextField(
-                    controller: _searchController,
-                    onChanged: _onSearchChanged,
-                    onSubmitted: _onSearchSubmit,
-                    textInputAction: TextInputAction.done,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                      ),
-                      hintText: 'Search lessons by title or description...',
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                                _onSearchChanged('');
-                                _onSearchSubmit('');
-                              },
-                            )
-                          : null,
-                      filled: true,
-                      fillColor: colorScheme.surfaceContainerHighest.withValues(
-                        alpha: 0.5,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  )
-                : Text(StringConstants.appName);
-          },
-        ),
-        actions: [
-          ValueListenableBuilder(
+          title: ValueListenableBuilder(
             valueListenable: isSearching,
             builder: (BuildContext context, value, Widget? child) {
               return (isSearching.value)
-                  ? SizedBox.shrink()
-                  : IconButton(
-                      onPressed: () {
-                        isSearching.value = !isSearching.value;
-                      },
-                      icon: Icon(
-                        Icons.manage_search_outlined,
-                        color: Theme.of(context).primaryColor,
-                        size: 32,
+                  ? TextField(
+                      controller: _searchController,
+                      onChanged: _onSearchChanged,
+                      onSubmitted: _onSearchSubmit,
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12.0,
+                        ),
+                        hintText: 'Search lessons by title or description...',
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  _onSearchChanged('');
+                                  _onSearchSubmit('');
+                                },
+                              )
+                            : null,
+                        filled: true,
+                        fillColor: colorScheme.surfaceContainerHighest
+                            .withValues(alpha: 0.5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
-                    );
+                    )
+                  : Text(StringConstants.appName);
             },
           ),
-        ],
-      ),
-      body: BlocBuilder<CurriculumBloc, CurriculumState>(
-        builder: (context, state) {
-          if (state is CurriculumLoading) {
-            return Center(
-              child: SpinKitCircle(
-                color: Theme.of(context).colorScheme.primary,
-                size: 40.0,
-              ),
-            );
-          }
-          if (state is CurriculumError) {
-            return Center(child: Text(state.message));
-          }
-          if (state is CurriculumLoaded) {
-            if (_searchQuery.isNotEmpty) {
-              return _SearchResultsList(
-                query: _searchQuery,
+          actions: [
+            ValueListenableBuilder(
+              valueListenable: isSearching,
+              builder: (BuildContext context, value, Widget? child) {
+                return (isSearching.value)
+                    ? SizedBox.shrink()
+                    : IconButton(
+                        onPressed: () {
+                          isSearching.value = !isSearching.value;
+                        },
+                        icon: Icon(
+                          Icons.manage_search_outlined,
+                          color: Theme.of(context).primaryColor,
+                          size: 32,
+                        ),
+                      );
+              },
+            ),
+          ],
+        ),
+        body: BlocBuilder<CurriculumBloc, CurriculumState>(
+          builder: (context, state) {
+            if (state is CurriculumLoading) {
+              return Center(
+                child: SpinKitCircle(
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 40.0,
+                ),
+              );
+            }
+            if (state is CurriculumError) {
+              return Center(child: Text(state.message));
+            }
+            if (state is CurriculumLoaded) {
+              if (_searchQuery.isNotEmpty) {
+                return _SearchResultsList(
+                  query: _searchQuery,
+                  phases: state.phases,
+                  completedIds: state.completedLessonIds,
+                );
+              }
+              return _PhaseList(
                 phases: state.phases,
                 completedIds: state.completedLessonIds,
               );
             }
-            return _PhaseList(
-              phases: state.phases,
-              completedIds: state.completedLessonIds,
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
-      floatingActionButton: BlocBuilder<CurriculumBloc, CurriculumState>(
-        builder: (context, state) {
-          if (state is CurriculumLoaded) {
-            String? currentTitle;
-            for (final phase in state.phases) {
-              bool isCompleted = true;
-              for (final module in phase.modules) {
-                for (var day = 1; day <= module.totalDays; day++) {
-                  if (!state.completedLessonIds.contains(
-                    'p${phase.id}_m${module.id}_d$day',
-                  )) {
-                    isCompleted = false;
-                    break;
+            return const SizedBox.shrink();
+          },
+        ),
+        floatingActionButton: BlocBuilder<CurriculumBloc, CurriculumState>(
+          builder: (context, state) {
+            if (state is CurriculumLoaded) {
+              String? currentTitle;
+              for (final phase in state.phases) {
+                bool isCompleted = true;
+                for (final module in phase.modules) {
+                  for (var day = 1; day <= module.totalDays; day++) {
+                    if (!state.completedLessonIds.contains(
+                      'p${phase.id}_m${module.id}_d$day',
+                    )) {
+                      isCompleted = false;
+                      break;
+                    }
                   }
+                  if (!isCompleted) break;
                 }
-                if (!isCompleted) break;
+                if (!isCompleted) {
+                  currentTitle = phase.title;
+                  break;
+                }
               }
-              if (!isCompleted) {
-                currentTitle = phase.title;
-                break;
-              }
+              return AiTutorFab(
+                contextTitle: currentTitle ?? StringConstants.phasesTitle,
+              );
             }
-            return AiTutorFab(
-              contextTitle: currentTitle ?? StringConstants.phasesTitle,
-            );
-          }
-          return const SizedBox.shrink();
-        },
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
@@ -234,7 +263,7 @@ class _PhaseList extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
       children: [
         Text(
           StringConstants.phasesTitle,
@@ -253,14 +282,14 @@ class _PhaseList extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
         Stack(
           children: [
             // Vertical timeline line
             Positioned(
-              left: 28,
+              left: MediaQuery.of(context).size.width * 0.05,
               top: 16,
-              bottom: 16,
+              bottom: 20,
               width: 4,
               child: Container(
                 decoration: BoxDecoration(
@@ -316,13 +345,14 @@ class _PhaseCardNode extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final size = MediaQuery.of(context).size;
 
     // Timeline Node
     Widget node;
     if (isCompleted) {
       node = Container(
-        width: 60,
-        height: 60,
+        width: size.width * 0.12,
+        height: size.width * 0.12,
         decoration: BoxDecoration(
           color: colorScheme.primary,
           shape: BoxShape.circle,
@@ -338,13 +368,13 @@ class _PhaseCardNode extends StatelessWidget {
         child: Icon(
           Icons.check_rounded,
           color: colorScheme.onPrimary,
-          size: 28,
+          size: size.width * 0.08,
         ),
       );
     } else if (isCurrent) {
       node = Container(
-        width: 60,
-        height: 60,
+        width: size.width * 0.12,
+        height: size.width * 0.12,
         decoration: BoxDecoration(
           color: colorScheme.secondaryContainer,
           shape: BoxShape.circle,
@@ -360,13 +390,13 @@ class _PhaseCardNode extends StatelessWidget {
         child: Icon(
           Icons.play_arrow_outlined,
           color: colorScheme.onPrimary,
-          size: 28,
+          size: size.width * 0.08,
         ),
       );
     } else {
       node = Container(
-        width: 60,
-        height: 60,
+        width: size.width * 0.12,
+        height: size.width * 0.12,
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
@@ -382,7 +412,7 @@ class _PhaseCardNode extends StatelessWidget {
         child: Icon(
           Icons.lock_outline,
           color: colorScheme.outline.withValues(alpha: 0.5),
-          size: 28,
+          size: size.width * 0.08,
         ),
       );
     }
@@ -391,14 +421,17 @@ class _PhaseCardNode extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         node,
-        const SizedBox(width: 16),
+        const SizedBox(width: 12),
         Expanded(
           child: CurriculumCard(
             isLocked: isLocked,
             isCompleted: isCompleted,
             isCurrent: isCurrent,
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 16.0,
+                horizontal: 20.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -464,7 +497,7 @@ class _PhaseCardNode extends StatelessWidget {
                     ),
                   ),
                   if (!isLocked) ...[
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 18),
                     CurriculumProgressBar(
                       fraction: phase.totalDays == 0
                           ? 0.0
@@ -473,7 +506,7 @@ class _PhaseCardNode extends StatelessWidget {
                     ),
                   ],
                   if (isCurrent) ...[
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 18),
                     ElevatedButton.icon(
                       onPressed: () => context.goNamed(
                         'modules',
@@ -560,6 +593,7 @@ class _SearchResultsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final lowerQuery = query.toLowerCase();
     final List<_SearchResultItem> results = [];
+    final size = MediaQuery.of(context).size;
 
     for (final phase in phases) {
       for (int mIndex = 0; mIndex < phase.modules.length; mIndex++) {
@@ -634,10 +668,9 @@ class _SearchResultsList extends StatelessWidget {
           children: [
             // Vertical timeline line
             Positioned(
-              left:
-                  16, // Matches the center of the DayCardNode circle (width is 36, so center is roughly at 18)
+              left: size.width * 0.04,
               top: 16,
-              bottom: 16,
+              bottom: 20,
               width: 4,
               child: Container(
                 decoration: BoxDecoration(

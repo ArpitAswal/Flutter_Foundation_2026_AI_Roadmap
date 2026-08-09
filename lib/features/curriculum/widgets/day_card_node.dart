@@ -30,13 +30,14 @@ class DayCardNode extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final size = MediaQuery.of(context).size;
 
     // Node
     Widget node;
     if (isCompleted) {
       node = Container(
-        width: 36,
-        height: 36,
+        width: size.width * 0.09,
+        height: size.width * 0.09,
         decoration: BoxDecoration(
           color: colorScheme.primary,
           shape: BoxShape.circle,
@@ -52,13 +53,13 @@ class DayCardNode extends StatelessWidget {
         child: Icon(
           Icons.check_rounded,
           color: colorScheme.onPrimary,
-          size: 18,
+          size: size.width * 0.05,
         ),
       );
     } else if (isCurrent) {
       node = Container(
-        width: 36,
-        height: 36,
+        width: size.width * 0.09,
+        height: size.width * 0.09,
         decoration: BoxDecoration(
           color: colorScheme.secondaryContainer,
           shape: BoxShape.circle,
@@ -74,13 +75,13 @@ class DayCardNode extends StatelessWidget {
         child: Icon(
           Icons.play_arrow_outlined,
           color: colorScheme.onPrimary,
-          size: 18,
+          size: size.width * 0.05,
         ),
       );
     } else {
       node = Container(
-        width: 36,
-        height: 36,
+        width: size.width * 0.09,
+        height: size.width * 0.09,
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
@@ -96,7 +97,7 @@ class DayCardNode extends StatelessWidget {
         child: Icon(
           Icons.lock_outline,
           color: colorScheme.outline.withValues(alpha: 0.5),
-          size: 16,
+          size: size.width * 0.05,
         ),
       );
     }
@@ -105,7 +106,7 @@ class DayCardNode extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         node,
-        const SizedBox(width: 16),
+        const SizedBox(width: 12),
         Expanded(
           child: CurriculumCard(
             isLocked: isLocked,
@@ -124,7 +125,10 @@ class DayCardNode extends StatelessWidget {
                   );
                 },
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(
+                vertical: 16.0,
+                horizontal: 20.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

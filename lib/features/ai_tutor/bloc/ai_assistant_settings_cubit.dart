@@ -28,12 +28,14 @@ class AiAssistantSettingsCubit extends Cubit<AiAssistantSettingsState> {
     try {
       final selectedModel = await _localDataSource.readSelectedModel();
       final keyAvailability = await _localDataSource.readKeyAvailability();
+      final savedKeys = await _readSavedKeys();
 
       emit(
         state.copyWith(
           isLoading: false,
           selectedModel: selectedModel,
           keyAvailability: keyAvailability,
+          savedKeys: savedKeys,
           clearErrorMessage: true,
         ),
       );
@@ -117,6 +119,16 @@ class AiAssistantSettingsCubit extends Cubit<AiAssistantSettingsState> {
 
   Future<void> _reloadKeyAvailability() async {
     final keyAvailability = await _localDataSource.readKeyAvailability();
-    emit(state.copyWith(keyAvailability: keyAvailability));
+    final savedKeys = await _readSavedKeys();
+    emit(state.copyWith(keyAvailability: keyAvailability, savedKeys: savedKeys));
+  }
+
+  Future<Map<AiModel, String>> _readSavedKeys() async {
+    final map = <AiModel, String>{};
+    for (final model in AiModel.values) {
+      final key = await _localDataSource.readProviderKey(model);
+      map[model] = key ?? '';
+    }
+    return map;
   }
 }

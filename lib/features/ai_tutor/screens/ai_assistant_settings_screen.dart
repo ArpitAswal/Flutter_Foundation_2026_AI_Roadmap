@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../core/constants/string_constants.dart';
 import '../../../core/di/injection.dart';
@@ -25,21 +26,36 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
     for (final model in AiModel.values) model: true,
   };
 
+  final NoScreenshot _noScreenshot = NoScreenshot.instance;
   late final AiAssistantSettingsCubit _settingsCubit;
 
   @override
   void initState() {
     super.initState();
+    // Enable screenshot prevention for security on the settings screen.
+    _noScreenshot.screenshotOff();
     _settingsCubit = getIt<AiAssistantSettingsCubit>();
     _settingsCubit.loadSettings();
   }
 
   @override
   void dispose() {
+    // Re-enable screenshots when leaving the settings screen.
+    _noScreenshot.screenshotOn();
     for (final controller in _controllers.values) {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  String _maskApiKey(String key) {
+    final trimmed = key.trim();
+    if (trimmed.length <= 8) {
+      return '••••••••';
+    }
+    final firstFour = trimmed.substring(0, 4);
+    final lastFour = trimmed.substring(trimmed.length - 4);
+    return '$firstFour••••••••$lastFour';
   }
 
   @override
@@ -48,72 +64,86 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
       value: _settingsCubit,
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        appBar: AppBar(
-          title: const Text(StringConstants.settingsTitle),
-          centerTitle: false,
-        ),
+        appBar: AppBar(title: const Text(StringConstants.settingsTitle)),
         body: SafeArea(
-          child:
-              BlocConsumer<AiAssistantSettingsCubit, AiAssistantSettingsState>(
-                listenWhen: (previous, current) =>
-                    previous.errorMessage != current.errorMessage &&
-                    current.errorMessage != null,
-                listener: (context, state) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        state.errorMessage!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.errorContainer,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+          child: BlocConsumer<AiAssistantSettingsCubit, AiAssistantSettingsState>(
+            listenWhen: (previous, current) =>
+                (previous.errorMessage != current.errorMessage &&
+                    current.errorMessage != null) ||
+                previous.savedKeys != current.savedKeys ||
+                (previous.isLoading && !current.isLoading),
+            listener: (context, state) {
+              if (state.errorMessage != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      state.errorMessage!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
                       ),
                     ),
-                  );
-                },
-                builder: (context, state) {
-                  if (state.isLoading) {
-                    return Center(
-                      child: SpinKitThreeBounce(
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 24,
-                      ),
-                    );
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.errorContainer,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                );
+              }
+
+              // Populate text controllers with saved key values when loaded or updated
+              for (final model in AiModel.values) {
+                final savedKey = state.savedKeys[model] ?? '';
+                final hasKey = state.keyAvailability[model] ?? false;
+                if (hasKey && savedKey.isNotEmpty) {
+                  // Only update if text is currently empty or was cleared
+                  if (_controllers[model]!.text.isEmpty) {
+                    _controllers[model]!.text = savedKey;
                   }
-                  return ListView(
-                    padding: const EdgeInsets.all(20),
-                    children: [
-                      _buildHeroCard(context, state),
-                      const SizedBox(height: 20),
-                      _buildModelSection(context, state),
-                      const SizedBox(height: 20),
-                      _buildProviderSection(
-                        context,
-                        state,
-                        model: AiModel.geminiFlash,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildProviderSection(
-                        context,
-                        state,
-                        model: AiModel.gpt4oMini,
-                      ),
-                      const SizedBox(height: 16),
-                      _buildProviderSection(
-                        context,
-                        state,
-                        model: AiModel.claudeHaiku,
-                      ),
-                    ],
-                  );
-                },
-              ),
+                } else if (!hasKey) {
+                  _controllers[model]!.clear();
+                }
+              }
+            },
+            builder: (context, state) {
+              if (state.isLoading) {
+                return Center(
+                  child: SpinKitThreeBounce(
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 24,
+                  ),
+                );
+              }
+              return ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  _buildHeroCard(context, state),
+                  const SizedBox(height: 20),
+                  _buildModelSection(context, state),
+                  const SizedBox(height: 20),
+                  _buildProviderSection(
+                    context,
+                    state,
+                    model: AiModel.geminiFlash,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildProviderSection(
+                    context,
+                    state,
+                    model: AiModel.gpt4oMini,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildProviderSection(
+                    context,
+                    state,
+                    model: AiModel.claudeHaiku,
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -121,6 +151,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
 
   Widget _buildHeroCard(BuildContext context, AiAssistantSettingsState state) {
     final colorScheme = Theme.of(context).colorScheme;
+    final size = MediaQuery.of(context).size;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -134,8 +165,8 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 52,
-            height: 52,
+            width: size.width * 0.12,
+            height: size.width * 0.12,
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(16),
@@ -230,8 +261,10 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
     AiAssistantSettingsState state, {
     required AiModel model,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final hasKey = state.keyAvailability[model] ?? false;
+    final savedKey = state.savedKeys[model] ?? '';
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -246,10 +279,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  model.label,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                child: Text(model.label, style: theme.textTheme.titleMedium),
               ),
               _buildStatusChip(context, hasKey),
             ],
@@ -257,90 +287,144 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
           const SizedBox(height: 12),
           Text(
             StringConstants.settingsSecureStorageDesc,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 16),
-          TextFormField(
-            controller: _controllers[model],
-            // Use obscure text by default to hide the API key from plain sight.
-            obscureText: _obscureText[model] ?? true,
-            decoration: InputDecoration(
-              labelText:
-                  '${model.label} ${StringConstants.settingsApiKeySuffix}',
-              hintText: StringConstants.settingsPasteHint,
-              border: const OutlineInputBorder(),
-              suffixIcon: Row(
-                mainAxisSize: MainAxisSize.min,
+
+          // If a key is saved, display the masked key string box and ONLY the Remove button.
+          if (hasKey && savedKey.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: colorScheme.outlineVariant),
+              ),
+              child: Row(
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      (_obscureText[model] ?? true)
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                  Icon(
+                    Icons.lock_outline_rounded,
+                    color: colorScheme.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _maskApiKey(savedKey),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontFamily: 'monospace',
+                        letterSpacing: 1.1,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText[model] = !(_obscureText[model] ?? true);
-                      });
-                    },
+                  ),
+                  Icon(
+                    Icons.verified_rounded,
+                    color: colorScheme.primary,
+                    size: 18,
                   ),
                 ],
               ),
             ),
-            enableSuggestions: false,
-            autocorrect: false,
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              FilledButton(
-                onPressed: state.savingKeyModel == model
-                    ? null
-                    : () async {
-                        if (state.savingKeyModel != null) return;
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: state.savingKeyModel == model
+                  ? null
+                  : () async {
+                      if (state.savingKeyModel != null) return;
+                      // Remove the key and clear controller.
+                      await context
+                          .read<AiAssistantSettingsCubit>()
+                          .deleteProviderKey(model);
+                      _controllers[model]!.clear();
+                    },
+              icon: state.savingKeyModel == model
+                  ? const SizedBox.shrink()
+                  : const Icon(Icons.key_off_outlined, size: 18),
+              label: state.savingKeyModel == model
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text(StringConstants.settingsRemoveBtn),
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  colorScheme.onSecondary,
+                ),
+                shape: WidgetStatePropertyAll(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(24)),
+                    side: BorderSide(color: colorScheme.onSecondary),
+                  ),
+                ),
+                foregroundColor: WidgetStatePropertyAll(colorScheme.primary),
+              ),
+            ),
+          ] else ...[
+            // If key is NOT saved, display the text input field and ONLY the Save button.
+            TextFormField(
+              controller: _controllers[model],
+              obscureText: _obscureText[model] ?? true,
+              decoration: InputDecoration(
+                labelText:
+                    '${model.label} ${StringConstants.settingsApiKeySuffix}',
+                hintText: StringConstants.settingsPasteHint,
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    (_obscureText[model] ?? true)
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscureText[model] = !(_obscureText[model] ?? true);
+                    });
+                  },
+                ),
+              ),
+              enableSuggestions: false,
+              autocorrect: false,
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: state.savingKeyModel == model
+                  ? null
+                  : () async {
+                      if (state.savingKeyModel != null) return;
 
-                        final key = _controllers[model]!.text;
-                        if (key.trim().isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                StringConstants.settingsEnterKeyFirst,
-                              ),
+                      final key = _controllers[model]!.text;
+                      if (key.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              StringConstants.settingsEnterKeyFirst,
                             ),
-                          );
-                          return;
-                        }
+                          ),
+                        );
+                        return;
+                      }
 
-                        // Save the key through the cubit and clear the input field on success.
-                        await context
-                            .read<AiAssistantSettingsCubit>()
-                            .saveProviderKey(model, key);
-                        _controllers[model]!.clear();
-                      },
-                child: state.savingKeyModel == model
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text(StringConstants.settingsSaveKeyBtn),
-              ),
-              OutlinedButton(
-                onPressed: (state.savingKeyModel == model) || !hasKey
-                    ? null
-                    : () async {
-                        if (state.savingKeyModel != null) return;
-                        // Delete the key and let the cubit update the state.
-                        await context
-                            .read<AiAssistantSettingsCubit>()
-                            .deleteProviderKey(model);
-                      },
-                child: const Text(StringConstants.settingsRemoveBtn),
-              ),
-            ],
-          ),
+                      // Save the key through the cubit.
+                      await context
+                          .read<AiAssistantSettingsCubit>()
+                          .saveProviderKey(model, key);
+                    },
+              icon: state.savingKeyModel == model
+                  ? const SizedBox.shrink()
+                  : const Icon(Icons.save_outlined, size: 18),
+              label: state.savingKeyModel == model
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text(StringConstants.settingsSaveKeyBtn),
+            ),
+          ],
         ],
       ),
     );

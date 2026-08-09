@@ -108,47 +108,62 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final bottomInset = mediaQuery.viewInsets.bottom;
+
+    if (bottomInset > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scheduleScrollToBottom(animated: true);
+      });
+    }
+
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: _settingsCubit),
         BlocProvider.value(value: _aiTutorBloc),
       ],
-      child: SafeArea(
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.88,
-          ),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(28),
-              topRight: Radius.circular(28),
+      child: AnimatedPadding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOutCubic,
+        child: SafeArea(
+          bottom: bottomInset == 0,
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: (mediaQuery.size.height * 0.88) - bottomInset,
             ),
-          ),
-          child:
-              BlocBuilder<AiAssistantSettingsCubit, AiAssistantSettingsState>(
-                builder: (context, settingsState) {
-                  final content = Column(
-                    children: [
-                      _buildHeader(context, settingsState),
-                      const Divider(height: 1, color: Color(0xFFEEEEEE)),
-                      Expanded(child: _buildChatBody(context, settingsState)),
-                      _buildInputArea(context, settingsState),
-                    ],
-                  );
-
-                  if (!settingsState.isAssistantLocked) {
-                    return content;
-                  }
-
-                  return Stack(
-                    children: [
-                      AbsorbPointer(child: content),
-                      Positioned.fill(child: _buildLockOverlay(context)),
-                    ],
-                  );
-                },
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(28),
+                topRight: Radius.circular(28),
               ),
+            ),
+            child:
+                BlocBuilder<AiAssistantSettingsCubit, AiAssistantSettingsState>(
+                  builder: (context, settingsState) {
+                    final content = Column(
+                      children: [
+                        _buildHeader(context, settingsState),
+                        const Divider(height: 1, color: Color(0xFFEEEEEE)),
+                        Expanded(child: _buildChatBody(context, settingsState)),
+                        _buildInputArea(context, settingsState),
+                      ],
+                    );
+
+                    if (!settingsState.isAssistantLocked) {
+                      return content;
+                    }
+
+                    return Stack(
+                      children: [
+                        AbsorbPointer(child: content),
+                        Positioned.fill(child: _buildLockOverlay(context)),
+                      ],
+                    );
+                  },
+                ),
+          ),
         ),
       ),
     );
@@ -584,6 +599,9 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
                     minLines: 1,
                     maxLines: 4,
                     textInputAction: TextInputAction.send,
+                    onTap: () {
+                      _scheduleScrollToBottom(animated: true);
+                    },
                     decoration: InputDecoration(
                       // Provide visual hint if chat is disabled because the key is missing.
                       hintText: settingsState.isSelectedModelLocked
