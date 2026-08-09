@@ -11,16 +11,23 @@ A production-grade, interactive mobile application designed to guide developers 
 
 > [!IMPORTANT]
 > ### 📱 Device & Platform Compatibility
-> - **Platform Tested**: Currently, this application has only been rigorously tested on Android physical devices. While the codebase is cross-platform (iOS compatible), iOS-specific testing and native channel verification are pending.
+> - **Platform Tested**: This application has been rigorously tested and is fully supported on **Android** and **iOS** physical devices and emulators/simulators.
 > - **UI Optimization**: The user interface is strictly optimized for mobile phone form factors. Tablets, iPads, and desktop window sizes are not currently supported and may exhibit layout overflow or improper scaling.
 
 ---
 
 ## 📱 App Preview
 
-| Phases & Global Search | Module Navigation | Day-Wise Lessons | Contextual AI Tutor | BYOK Settings & Security |
-| :---: | :---: | :---: | :---: | :---: |
-| *Curriculum & Search* | *Linear Progress* | *Markdown & Code* | *Keyboard-Adaptive Chat* | *Masked Key & NoScreenshot* |
+| Phases & Global Search | Module Navigation | Day-Wise Lessons |
+
+| <img width="250" alt="Phases Screen" src="https://github.com/user-attachments/assets/eca8f43f-4724-4531-834a-f5d5234fcf92" />
+| <img width="250" alt="Modules Screen" src="https://github.com/user-attachments/assets/b048f938-4f31-41a2-a894-7e48db532195" />
+| <img width="250" alt="Days Screen" src="https://github.com/user-attachments/assets/67a5e2a7-1cc4-4c5b-a3c7-54b50f98ef58" /> |
+
+| Lesson Content | BYOK Settings & Security |
+
+| <img width="250" alt="Screenshot_20260809_174830" src="https://github.com/user-attachments/assets/3aa2c2a5-4d95-41ce-a88a-06140a423c70" />
+| <img width="250" alt="BYOK Setting Screen" src="https://github.com/user-attachments/assets/8398c83f-0fef-4224-8733-9b6c5533ce16" /> |
 
 ---
 
