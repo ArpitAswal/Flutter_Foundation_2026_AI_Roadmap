@@ -86,11 +86,11 @@ class _PhasesScreenState extends State<PhasesScreen> {
         backgroundColor: colorScheme.surface, // Matches surface-container-low
         appBar: AppBar(
           surfaceTintColor: Colors.transparent,
-          leadingWidth: context.isTablet ? 120.0 : 80.0,
+          leadingWidth: context.isTablet ? 120.0 : 60.0,
           leading: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
+              padding: const EdgeInsets.only(left: 16.0),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.asset(

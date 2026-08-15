@@ -42,7 +42,7 @@ class CurriculumProgressBar extends StatelessWidget {
             boxShadow: isCurrent
                 ? [
                     BoxShadow(
-                      color: colorScheme.primary.withAlpha(128),
+                      color: colorScheme.primary.withAlpha(90),
                       blurRadius: 10,
                     ),
                   ]

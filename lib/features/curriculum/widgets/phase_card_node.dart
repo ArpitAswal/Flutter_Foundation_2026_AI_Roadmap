@@ -169,9 +169,7 @@ class PhaseCardNode extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Text(
-      isLocked
-          ? 'Unlock by completing Phase ${phase.id - 1}. ${phase.description}'
-          : phase.description,
+      phase.description,
       maxLines: maxLines,
       overflow: maxLines == null ? null : TextOverflow.ellipsis,
       style: theme.textTheme.bodyMedium?.copyWith(
@@ -261,7 +259,7 @@ class PhaseCardNode extends StatelessWidget {
     // Slightly smaller node size when in Grid mode to save space, but still prominent
     double width;
     double height;
-     if (context.isTablet) {
+    if (context.isTablet) {
       width = size.height * 0.08;
       height = size.height * 0.08;
     } else {
@@ -279,7 +277,7 @@ class PhaseCardNode extends StatelessWidget {
           border: Border.all(color: colorScheme.onPrimary, width: 3),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.primary.withValues(alpha: 0.4),
+              color: colorScheme.primary.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -301,7 +299,7 @@ class PhaseCardNode extends StatelessWidget {
           border: Border.all(color: colorScheme.onPrimary, width: 3),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.secondaryContainer.withValues(alpha: 0.4),
+              color: colorScheme.secondaryContainer.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
