@@ -47,6 +47,59 @@
               ],
               "content_path": "assets/curriculum/phase1/module1/day3.json",
               "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 4,
+              "title": "Functions, Parameters, Return Values & Functional Concepts",
+              "description": "Learn how to divide Dart programs into reusable functions, pass data safely, return results, and use functions as values—the foundation for clean, reusable Flutter application logic.",
+              "tags": [
+                "Dart",
+                "Functions",
+                "Parameters",
+                "Return Values",
+                "Anonymous Functions",
+                "Closures",
+                "Callbacks"
+              ],
+              "content_path": "assets/curriculum/phase1/module1/day4.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 5,
+              "title": "Functions as First-Class Objects, Callbacks & Closures",
+              "description": "Go deeper into Dart's functional capabilities by understanding how functions can be stored, passed, returned, and used as callbacks and closures in real applications.",
+              "tags": [
+                "Dart",
+                "First-Class Functions",
+                "Callbacks",
+                "Function Types",
+                "Anonymous Functions",
+                "Closures",
+                "Tear-Offs"
+              ],
+              "content_path": "assets/curriculum/phase1/module1/day5.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 6,
+              "title": "Classes, Objects, Fields, Methods & Constructors",
+              "description": "Learn how Dart represents real-world entities through classes and objects, and how constructors initialize those objects with meaningful state and behavior.",
+              "tags": [
+                "Dart",
+                "OOP",
+                "Classes",
+                "Objects",
+                "Constructors",
+                "Methods"
+              ],
+              "content_path": "assets/curriculum/phase1/module1/day6.json",
+              "custom_route": null
             }
           ]
         }

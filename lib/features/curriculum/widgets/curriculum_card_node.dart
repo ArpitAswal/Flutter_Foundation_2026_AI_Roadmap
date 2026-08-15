@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 
 class CurriculumCard extends StatelessWidget {
   final bool isLocked;
@@ -20,11 +21,12 @@ class CurriculumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final curve = (context.screenWidth * (context.isTablet ? 0.02 : 0.04));
 
     final cardDecoration = isCurrent
         ? BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(curve),
             border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
             boxShadow: [
               BoxShadow(
@@ -37,7 +39,7 @@ class CurriculumCard extends StatelessWidget {
         : isCompleted
         ? BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(curve),
             border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
             boxShadow: [
               BoxShadow(
@@ -49,14 +51,14 @@ class CurriculumCard extends StatelessWidget {
           )
         : BoxDecoration(
             color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(curve),
             border: Border.all(color: colorScheme.outlineVariant.withAlpha(51)),
           );
 
     Widget cardContent = Container(
       decoration: cardDecoration,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(curve),
         child: Stack(
           children: [
             child,
@@ -65,13 +67,13 @@ class CurriculumCard extends StatelessWidget {
                 left: 0,
                 top: 0,
                 bottom: 0,
-                width: 6,
+                width: (context.isTablet) ? 12 : 6,
                 child: Container(
                   decoration: BoxDecoration(
                     color: colorScheme.primary,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      bottomLeft: Radius.circular(16),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(curve),
+                      bottomLeft: Radius.circular(curve),
                     ),
                   ),
                 ),
@@ -81,13 +83,13 @@ class CurriculumCard extends StatelessWidget {
                 left: 0,
                 top: 0,
                 bottom: 0,
-                width: 6,
+                width: (context.isTablet) ? 12 : 6,
                 child: Container(
                   decoration: BoxDecoration(
                     color: colorScheme.secondaryContainer,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      bottomLeft: Radius.circular(16),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(curve),
+                      bottomLeft: Radius.circular(curve),
                     ),
                   ),
                 ),
@@ -100,7 +102,7 @@ class CurriculumCard extends StatelessWidget {
     if (onTap != null && !isLocked) {
       cardContent = InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(curve),
         child: cardContent,
       );
     }
