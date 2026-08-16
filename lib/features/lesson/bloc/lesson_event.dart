@@ -19,3 +19,6 @@ class LessonLoadRequested extends LessonEvent {
 
 /// Triggers marking the current lesson as complete in local progress storage.
 class LessonMarkCompleteRequested extends LessonEvent {}
+
+/// Triggers marking the current lesson as incomplete in local progress storage.
+class LessonMarkIncompleteRequested extends LessonEvent {}

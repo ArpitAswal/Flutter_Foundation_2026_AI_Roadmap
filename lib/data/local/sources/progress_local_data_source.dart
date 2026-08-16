@@ -43,4 +43,12 @@ class ProgressLocalDataSource {
       await record.save();
     }
   }
+  /// Marks the lesson with [lessonId] as incomplete.
+  Future<void> markLessonIncomplete(String lessonId) async {
+    final record = _record;
+    if (record.completedLessonIds.contains(lessonId)) {
+      record.completedLessonIds = record.completedLessonIds.where((id) => id != lessonId).toList();
+      await record.save();
+    }
+  }
 }

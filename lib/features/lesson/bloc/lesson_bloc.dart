@@ -7,6 +7,7 @@ import '../../../domain/usecases/get_completed_lesson_ids_use_case.dart';
 import '../../../domain/usecases/get_day_content_use_case.dart';
 import '../../../domain/usecases/get_lesson_day_use_case.dart';
 import '../../../domain/usecases/mark_lesson_complete_use_case.dart';
+import '../../../domain/usecases/mark_lesson_incomplete_use_case.dart';
 
 part 'lesson_event.dart';
 part 'lesson_state.dart';
@@ -23,16 +24,19 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
   final GetLessonDayUseCase _getLessonDay;
   final GetDayContentUseCase _getDayContent;
   final MarkLessonCompleteUseCase _markComplete;
+  final MarkLessonIncompleteUseCase _markIncomplete;
   final GetCompletedLessonIdsUseCase _getCompletedIds;
 
   LessonBloc(
     this._getLessonDay,
     this._getDayContent,
     this._markComplete,
+    this._markIncomplete,
     this._getCompletedIds,
   ) : super(LessonInitial()) {
     on<LessonLoadRequested>(_onLoadRequested);
     on<LessonMarkCompleteRequested>(_onMarkComplete);
+    on<LessonMarkIncompleteRequested>(_onMarkIncomplete);
   }
 
   Future<void> _onLoadRequested(
@@ -71,7 +75,22 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
       await _markComplete(current.lesson.lessonId);
       emit(current.copyWith(isComplete: true));
     } catch (e) {
-      // Non-critical failure — lesson display is unaffected
+      // Non-critical failure
+    }
+  }
+
+  Future<void> _onMarkIncomplete(
+    LessonMarkIncompleteRequested event,
+    Emitter<LessonState> emit,
+  ) async {
+    final current = state;
+    if (current is! LessonLoaded) return;
+
+    try {
+      await _markIncomplete(current.lesson.lessonId);
+      emit(current.copyWith(isComplete: false));
+    } catch (e) {
+      // Non-critical failure
     }
   }
 }

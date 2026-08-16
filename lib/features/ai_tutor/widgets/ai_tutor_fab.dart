@@ -19,19 +19,21 @@ class AiTutorFab extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    void openBottomSheet() {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => AiTutorBottomSheet(
+          contextTitle: contextTitle,
+          contextLesson: contextLesson,
+          contextContent: contextContent,
+        ),
+      );
+    }
+
     return FloatingActionButton(
-      onPressed: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) => AiTutorBottomSheet(
-            contextTitle: contextTitle,
-            contextLesson: contextLesson,
-            contextContent: contextContent,
-          ),
-        );
-      },
+      onPressed: openBottomSheet,
       backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onSecondary,
       elevation: 4,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
@@ -306,221 +307,246 @@ class _LessonContentState extends State<_LessonContent> {
     }
 
     return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          controller: _scrollController,
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+      body: Stack(
         children: [
-          // ── Lesson Title ────────────────────────────────────────────────────
-          Text(
-            widget.lesson.title,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
-              fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // ── Last Updated Date Metadata ─────────────────────────────────────
-          if (widget.content.lastUpdated != null &&
-              widget.content.lastUpdated!.isNotEmpty) ...[
-            Row(
-              children: [
-                Icon(
-                  Icons.history_rounded,
-                  size: 14,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '${StringConstants.lastUpdated} ${widget.content.lastUpdated}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ] else
-            const SizedBox(height: 16),
-
-          // ── Tags ─────────────────────────────────────────────────────────────
-          if (widget.lesson.tags.isNotEmpty) ...[
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: widget.lesson.tags.map((tag) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    tag,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.w600,
+          Positioned.fill(
+            child: SafeArea(
+              child: ListView(
+                controller: _scrollController,
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+                children: [
+                  // ── Lesson Title ────────────────────────────────────────────────────
+                  Text(
+                    widget.lesson.title,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                      fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
                     ),
                   ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 24),
-          ],
+                  const SizedBox(height: 8),
 
-          // ── Prerequisites ────────────────────────────────────────────────────
-          if (widget.content.prerequisites.isNotEmpty) ...[
-            _PrerequisitesCard(prerequisites: widget.content.prerequisites),
-            const SizedBox(height: 20),
-          ],
+                  // ── Last Updated Date Metadata ─────────────────────────────────────
+                  if (widget.content.lastUpdated != null &&
+                      widget.content.lastUpdated!.isNotEmpty) ...[
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.history_rounded,
+                          size: 14,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${StringConstants.lastUpdated} ${widget.content.lastUpdated}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ] else
+                    const SizedBox(height: 16),
 
-          // ── Theory (Markdown) ─────────────────────────────────────────────
-          if (widget.content.theory.isNotEmpty)
-            MarkdownBody(
-              data: widget.content.theory,
-              styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-                p: theme.textTheme.bodyMedium?.copyWith(height: 1.7),
-                h1Padding: const EdgeInsets.only(top: 16),
-                h1: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: colorScheme.primary,
-                ),
-                h2Padding: const EdgeInsets.only(top: 16),
-                h2: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: colorScheme.primary,
-                ),
-                h3Padding: const EdgeInsets.only(top: 16),
-                h3: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.primary,
-                ),
-                blockSpacing: 12,
-                a: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.primary,
-                  decoration: TextDecoration.underline,
-                ),
-                // This targets inline code wrapped in single backticks (e.g., `int`)
-                code: TextStyle(
-                  fontSize: theme
-                      .textTheme
-                      .bodyMedium
-                      ?.fontSize, // Matches your body text size
-                  color: Colors.black, // High contrast for Light Theme
-                  backgroundColor:
-                      Colors.grey.shade200, // Very subtle gray background
-                  fontFamily: 'monospace', // Keeps the developer aesthetic
-                ),
-              ),
-              builders: {'pre': CodeElementBuilder(context)},
-            ),
+                  // ── Tags ─────────────────────────────────────────────────────────────
+                  if (widget.lesson.tags.isNotEmpty) ...[
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: widget.lesson.tags.map((tag) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primaryContainer.withValues(
+                              alpha: 0.6,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            tag,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
 
-          // ── Additional Sections (Accordions) ─────────────────────────────────
-          if (widget.content.hasDeepDives) ...[
-            const SizedBox(height: 32),
+                  // ── Prerequisites ────────────────────────────────────────────────────
+                  if (widget.content.prerequisites.isNotEmpty) ...[
+                    _PrerequisitesCard(
+                      prerequisites: widget.content.prerequisites,
+                    ),
+                    const SizedBox(height: 20),
+                  ],
 
-            if (widget.content.implementation != null &&
-                widget.content.implementation!.isNotEmpty)
-              ExpandableWidget(
-                title: 'Implementation',
-                markdownContent: widget.content.implementation!,
-                isExpanded: _expandedTitle == 'Implementation',
-                onExpansionChanged: (exp) =>
-                    _handleExpansion('Implementation', exp),
+                  // ── Theory (Markdown) ─────────────────────────────────────────────
+                  if (widget.content.theory.isNotEmpty)
+                    MarkdownBody(
+                      data: widget.content.theory,
+                      styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+                        p: theme.textTheme.bodyMedium?.copyWith(height: 1.7),
+                        h1Padding: const EdgeInsets.only(top: 16),
+                        h1: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: colorScheme.primary,
+                        ),
+                        h2Padding: const EdgeInsets.only(top: 16),
+                        h2: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.primary,
+                        ),
+                        h3Padding: const EdgeInsets.only(top: 16),
+                        h3: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.primary,
+                        ),
+                        blockSpacing: 12,
+                        a: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
+                        // This targets inline code wrapped in single backticks (e.g., `int`)
+                        code: TextStyle(
+                          fontSize: theme
+                              .textTheme
+                              .bodyMedium
+                              ?.fontSize, // Matches your body text size
+                          color: Colors.black, // High contrast for Light Theme
+                          backgroundColor: Colors
+                              .grey
+                              .shade200, // Very subtle gray background
+                          fontFamily:
+                              'monospace', // Keeps the developer aesthetic
+                        ),
+                      ),
+                      builders: {'pre': CodeElementBuilder(context)},
+                    ),
+
+                  // ── Additional Sections (Accordions) ─────────────────────────────────
+                  if (widget.content.hasDeepDives) ...[
+                    const SizedBox(height: 32),
+
+                    if (widget.content.implementation != null &&
+                        widget.content.implementation!.isNotEmpty)
+                      ExpandableWidget(
+                        title: 'Implementation',
+                        markdownContent: widget.content.implementation!,
+                        isExpanded: _expandedTitle == 'Implementation',
+                        onExpansionChanged: (exp) =>
+                            _handleExpansion('Implementation', exp),
+                      ),
+                    if (widget.content.architecture != null &&
+                        widget.content.architecture!.isNotEmpty)
+                      ExpandableWidget(
+                        title: 'Architecture',
+                        markdownContent: widget.content.architecture!,
+                        isExpanded: _expandedTitle == 'Architecture',
+                        onExpansionChanged: (exp) =>
+                            _handleExpansion('Architecture', exp),
+                      ),
+                    if (widget.content.comparisons != null &&
+                        widget.content.comparisons!.isNotEmpty)
+                      ExpandableWidget(
+                        title: 'Comparisons',
+                        markdownContent: widget.content.comparisons!,
+                        isExpanded: _expandedTitle == 'Comparisons',
+                        onExpansionChanged: (exp) =>
+                            _handleExpansion('Comparisons', exp),
+                      ),
+                    if (widget.content.optimization != null &&
+                        widget.content.optimization!.isNotEmpty)
+                      ExpandableWidget(
+                        title: 'Optimization',
+                        markdownContent: widget.content.optimization!,
+                        isExpanded: _expandedTitle == 'Optimization',
+                        onExpansionChanged: (exp) =>
+                            _handleExpansion('Optimization', exp),
+                      ),
+                    if (widget.content.commonMistakes != null &&
+                        widget.content.commonMistakes!.isNotEmpty)
+                      ExpandableWidget(
+                        title: 'Common Mistakes',
+                        markdownContent: widget.content.commonMistakes!,
+                        isExpanded: _expandedTitle == 'Common Mistakes',
+                        onExpansionChanged: (exp) =>
+                            _handleExpansion('Common Mistakes', exp),
+                      ),
+                    if (widget.content.interviewQuestions != null &&
+                        widget.content.interviewQuestions!.isNotEmpty)
+                      ExpandableWidget(
+                        title: 'Interview Prep: Key Questions',
+                        markdownContent: widget.content.interviewQuestions!,
+                        isExpanded:
+                            _expandedTitle == 'Interview Prep: Key Questions',
+                        onExpansionChanged: (exp) => _handleExpansion(
+                          'Interview Prep: Key Questions',
+                          exp,
+                        ),
+                      ),
+                  ],
+                ],
               ),
-            if (widget.content.architecture != null &&
-                widget.content.architecture!.isNotEmpty)
-              ExpandableWidget(
-                title: 'Architecture',
-                markdownContent: widget.content.architecture!,
-                isExpanded: _expandedTitle == 'Architecture',
-                onExpansionChanged: (exp) =>
-                    _handleExpansion('Architecture', exp),
-              ),
-            if (widget.content.comparisons != null &&
-                widget.content.comparisons!.isNotEmpty)
-              ExpandableWidget(
-                title: 'Comparisons',
-                markdownContent: widget.content.comparisons!,
-                isExpanded: _expandedTitle == 'Comparisons',
-                onExpansionChanged: (exp) =>
-                    _handleExpansion('Comparisons', exp),
-              ),
-            if (widget.content.optimization != null &&
-                widget.content.optimization!.isNotEmpty)
-              ExpandableWidget(
-                title: 'Optimization',
-                markdownContent: widget.content.optimization!,
-                isExpanded: _expandedTitle == 'Optimization',
-                onExpansionChanged: (exp) =>
-                    _handleExpansion('Optimization', exp),
-              ),
-            if (widget.content.commonMistakes != null &&
-                widget.content.commonMistakes!.isNotEmpty)
-              ExpandableWidget(
-                title: 'Common Mistakes',
-                markdownContent: widget.content.commonMistakes!,
-                isExpanded: _expandedTitle == 'Common Mistakes',
-                onExpansionChanged: (exp) =>
-                    _handleExpansion('Common Mistakes', exp),
-              ),
-            if (widget.content.interviewQuestions != null &&
-                widget.content.interviewQuestions!.isNotEmpty)
-              ExpandableWidget(
-                title: 'Interview Prep: Key Questions',
-                markdownContent: widget.content.interviewQuestions!,
-                isExpanded: _expandedTitle == 'Interview Prep: Key Questions',
-                onExpansionChanged: (exp) =>
-                    _handleExpansion('Interview Prep: Key Questions', exp),
-              ),
-          ],
-        ],
-      ),
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: _MarkCompleteButton(isComplete: widget.isComplete),
-        ),
-      ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          AnimatedOpacity(
-            opacity: _showScrollToTop ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 200),
-            child: FloatingActionButton(
-              heroTag: 'scrollToTop',
-              onPressed: () {
-                if (_showScrollToTop) {
-                  _scrollController.animateTo(
-                    0,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOutCubic,
-                  );
-                }
-              },
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onSecondary,
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: const Icon(Icons.arrow_upward_rounded),
             ),
           ),
-          const SizedBox(height: 16),
-          AiTutorFab(
-            contextLesson: widget.lesson,
-            contextContent: widget.content,
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  AnimatedOpacity(
+                    opacity: _showScrollToTop ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: FloatingActionButton(
+                      heroTag: 'scrollToTop',
+                      onPressed: () {
+                        if (_showScrollToTop) {
+                          _scrollController.animateTo(
+                            0,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeOutCubic,
+                          );
+                        }
+                      },
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: colorScheme.onSecondary,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(Icons.arrow_upward_rounded),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  AiTutorFab(
+                    contextLesson: widget.lesson,
+                    contextContent: widget.content,
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
+      bottomNavigationBar: widget.isComplete
+          ? null
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: _MarkCompleteButton(isComplete: widget.isComplete),
+              ),
+            ),
     );
   }
 }
@@ -622,23 +648,40 @@ class _MarkCompleteButton extends StatelessWidget {
       width: double.infinity,
       height: 52,
       child: ElevatedButton.icon(
-        onPressed: isComplete
-            ? null
-            : () {
-                context.read<LessonBloc>().add(LessonMarkCompleteRequested());
-                context.read<CurriculumBloc>().add(CurriculumLoadRequested());
-                // Navigate back after marking complete so the parent refreshes
-                Future.delayed(const Duration(milliseconds: 300), () {
-                  if (context.mounted) context.pop();
-                });
-              },
+        onPressed: () {
+          final lessonBloc = context.read<LessonBloc>();
+          final curriculumBloc = context.read<CurriculumBloc>();
+
+          lessonBloc.add(LessonMarkCompleteRequested());
+          curriculumBloc.add(CurriculumLoadRequested());
+
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Lesson marked as complete!'),
+              behavior: SnackBarBehavior.floating,
+              width: null,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              action: SnackBarAction(
+                label: 'UNDO',
+                onPressed: () {
+                  lessonBloc.add(LessonMarkIncompleteRequested());
+                  curriculumBloc.add(CurriculumLoadRequested());
+                },
+              ),
+            ),
+          );
+        },
         icon: Icon(
           isComplete
               ? Icons.check_circle_rounded
               : Icons.check_circle_outline_rounded,
+          size: context.screenHeight * 0.04,
         ),
         label: Text(
-          isComplete ? 'Completed' : 'Mark as Complete',
+          isComplete ? 'Marked as Complete' : 'Mark as Complete',
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         style: ElevatedButton.styleFrom(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
 import '../../../core/constants/string_constants.dart';
@@ -60,11 +62,25 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return BlocProvider.value(
       value: _settingsCubit,
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        appBar: AppBar(title: const Text(StringConstants.settingsTitle)),
+        appBar: AppBar(
+          title: const Text(StringConstants.settingsTitle),
+          surfaceTintColor: Colors.transparent,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_rounded,
+              color: colorScheme.onSurface,
+              size: context.screenWidth * (context.isTablet ? 0.03 : 0.06),
+            ),
+            onPressed: () => context.pop(),
+          ),
+          centerTitle: true,
+        ),
         body: SafeArea(
           child: BlocConsumer<AiAssistantSettingsCubit, AiAssistantSettingsState>(
             listenWhen: (previous, current) =>
@@ -116,31 +132,36 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                   ),
                 );
               }
-              return ListView(
-                padding: const EdgeInsets.all(20),
-                children: [
-                  _buildHeroCard(context, state),
-                  const SizedBox(height: 20),
-                  _buildModelSection(context, state),
-                  const SizedBox(height: 20),
-                  _buildProviderSection(
-                    context,
-                    state,
-                    model: AiModel.geminiFlash,
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 680),
+                  child: ListView(
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      _buildHeroCard(context, state),
+                      const SizedBox(height: 20),
+                      _buildModelSection(context, state),
+                      const SizedBox(height: 20),
+                      _buildProviderSection(
+                        context,
+                        state,
+                        model: AiModel.geminiFlash,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildProviderSection(
+                        context,
+                        state,
+                        model: AiModel.gpt4oMini,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildProviderSection(
+                        context,
+                        state,
+                        model: AiModel.claudeHaiku,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  _buildProviderSection(
-                    context,
-                    state,
-                    model: AiModel.gpt4oMini,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildProviderSection(
-                    context,
-                    state,
-                    model: AiModel.claudeHaiku,
-                  ),
-                ],
+                ),
               );
             },
           ),
@@ -159,21 +180,26 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
         gradient: LinearGradient(
           colors: [colorScheme.primary, colorScheme.primaryContainer],
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(
+          context.screenWidth * (context.isTablet ? 0.02 : 0.04),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: size.width * 0.12,
-            height: size.width * 0.12,
+            width: size.width * (context.isTablet ? 0.08 : 0.15),
+            height: size.width * (context.isTablet ? 0.08 : 0.15),
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(
+                context.screenWidth * (context.isTablet ? 0.01 : 0.02),
+              ),
             ),
             child: Icon(
               state.isAssistantLocked ? Icons.lock_rounded : Icons.key_rounded,
               color: colorScheme.onPrimary,
+              size: context.screenWidth * (context.isTablet ? 0.06 : 0.1),
             ),
           ),
           const SizedBox(width: 16),
@@ -190,7 +216,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                     color: colorScheme.onPrimary,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   // Show description corresponding to the lock state.
                   state.isAssistantLocked
@@ -307,7 +333,8 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                   Icon(
                     Icons.lock_outline_rounded,
                     color: colorScheme.primary,
-                    size: 20,
+                    size:
+                        context.screenHeight * (context.isTablet ? 0.04 : 0.02),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -323,7 +350,8 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                   Icon(
                     Icons.verified_rounded,
                     color: colorScheme.primary,
-                    size: 18,
+                    size:
+                        context.screenHeight * (context.isTablet ? 0.04 : 0.02),
                   ),
                 ],
               ),
@@ -357,7 +385,6 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                 shape: WidgetStatePropertyAll(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(24)),
-                    side: BorderSide(color: colorScheme.onSecondary),
                   ),
                 ),
                 foregroundColor: WidgetStatePropertyAll(colorScheme.primary),
@@ -423,6 +450,14 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Text(StringConstants.settingsSaveKeyBtn),
+              style: ButtonStyle(
+                padding: WidgetStatePropertyAll(
+                  EdgeInsets.symmetric(
+                    horizontal: (context.isTablet) ? 24 : 16,
+                    vertical: (context.isTablet) ? 12 : 8,
+                  ),
+                ),
+              ),
             ),
           ],
         ],

@@ -1,3 +1,4 @@
+import '../../../domain/models/curriculum/lesson_day.dart';
 import '../../../domain/models/curriculum/lesson_module.dart';
 import '../../../domain/models/curriculum/phase.dart';
 
@@ -75,4 +76,16 @@ int completedDaysInModule(Phase phase, LessonModule module, Set<String> complete
     }
   }
   return count;
+}
+
+/// Checks if a specific day is locked based on its index within a module.
+bool isDayLockedAt(Phase phase, LessonModule module, int dayIndex, Set<String> completedIds) {
+  if (dayIndex == 0) return false;
+  final previousDay = module.days[dayIndex - 1];
+  return !completedIds.contains('p${phase.id}_m${module.id}_d${previousDay.day}');
+}
+
+/// Checks if a specific day is completed.
+bool isDayCompleted(Phase phase, LessonModule module, LessonDay day, Set<String> completedIds) {
+  return completedIds.contains('p${phase.id}_m${module.id}_d${day.day}');
 }
