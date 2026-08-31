@@ -85,7 +85,7 @@ class DayCardNode extends StatelessWidget {
   Widget _buildGridChild(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -103,7 +103,7 @@ class DayCardNode extends StatelessWidget {
         const SizedBox(height: 8),
         _buildTitle(context),
         const SizedBox(height: 4),
-        _buildDescription(context, 4),
+        _buildDescription(context, 6),
         const Spacer(), // Ensure uniform stretch in tablet grid
       ],
     );
@@ -179,6 +179,7 @@ class DayCardNode extends StatelessWidget {
       overflow: maxLines == null ? null : TextOverflow.ellipsis,
       style: theme.textTheme.bodySmall?.copyWith(
         color: colorScheme.onSurfaceVariant,
+        fontSize: 12
       ),
     );
   }

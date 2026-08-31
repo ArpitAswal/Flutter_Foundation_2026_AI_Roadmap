@@ -279,7 +279,7 @@ class _PhaseList extends StatelessWidget {
                         completedIds,
                       );
                       final isCompleted = isPhaseCompleted(phase, completedIds);
-                      final completedDays = completedDaysInPhase(
+                      final completedModules = completedModulesInPhase(
                         phase,
                         completedIds,
                       );
@@ -292,7 +292,7 @@ class _PhaseList extends StatelessWidget {
                           isLocked: isLocked,
                           isCompleted: isCompleted,
                           isCurrent: isCurrent,
-                          completedDays: completedDays,
+                          completedModules: completedModules,
                           isGridMode: false,
                         ),
                       );

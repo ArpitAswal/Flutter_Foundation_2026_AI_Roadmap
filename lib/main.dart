@@ -141,7 +141,7 @@ class FlutterAiTutorApp extends StatelessWidget {
           // Calculate responsive text scale factor
           final mediaQueryData = MediaQuery.of(context);
           final screenWidth = mediaQueryData.size.width;
-          double textScaleFactor = 0.8;
+          double textScaleFactor = 0.9;
 
           if (screenWidth >= 600) {
             // Tablet portrait or landscape

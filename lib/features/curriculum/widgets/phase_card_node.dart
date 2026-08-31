@@ -13,7 +13,7 @@ class PhaseCardNode extends StatelessWidget {
   final bool isLocked;
   final bool isCompleted;
   final bool isCurrent;
-  final int completedDays;
+  final int completedModules;
   final bool isGridMode;
 
   const PhaseCardNode({
@@ -22,7 +22,7 @@ class PhaseCardNode extends StatelessWidget {
     required this.isLocked,
     required this.isCompleted,
     required this.isCurrent,
-    required this.completedDays,
+    required this.completedModules,
     this.isGridMode = false,
   });
 
@@ -81,33 +81,45 @@ class PhaseCardNode extends StatelessWidget {
 
   /// The standard list-based layout (used in Mobile and single-column tablet views)
   Widget _buildListChild(BuildContext context, {Widget? node}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildHeader(context),
-        const SizedBox(height: 8),
-        _buildTitle(context),
-        const SizedBox(height: 12),
-        _buildDescription(context, null),
-        _buildProgressAndActions(context, node: node),
-      ],
+    return InkWell(
+      onTap: () => context.goNamed(
+        'modules',
+        pathParameters: {'phaseId': '${phase.id}'},
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(context),
+          const SizedBox(height: 8),
+          _buildTitle(context),
+          const SizedBox(height: 12),
+          _buildDescription(context, null),
+          _buildProgressAndActions(context, node: node),
+        ],
+      ),
     );
   }
 
   /// The optimized Grid layout (used exclusively in Tablet Grid View)
   Widget _buildGridChild(BuildContext context, {required Widget node}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildHeader(context),
-        const SizedBox(height: 12),
-        _buildTitle(context),
-        const SizedBox(height: 8),
-        // MaxLines restricts vertical growth, while Spacer pushes footer to the bottom.
-        _buildDescription(context, 6),
-        const Spacer(),
-        _buildProgressAndActions(context, node: node),
-      ],
+    return InkWell(
+      onTap: () => context.goNamed(
+        'modules',
+        pathParameters: {'phaseId': '${phase.id}'},
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(context),
+          const SizedBox(height: 12),
+          _buildTitle(context),
+          const SizedBox(height: 8),
+          // MaxLines restricts vertical growth, while Spacer pushes footer to the bottom.
+          _buildDescription(context, 6),
+          const Spacer(),
+          _buildProgressAndActions(context, node: node),
+        ],
+      ),
     );
   }
 
@@ -139,7 +151,7 @@ class PhaseCardNode extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              '$completedDays/${phase.totalDays}',
+              '$completedModules/${phase.modules.length}',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: isCurrent
                     ? colorScheme.secondaryContainer
@@ -172,7 +184,7 @@ class PhaseCardNode extends StatelessWidget {
       phase.description,
       maxLines: maxLines,
       overflow: maxLines == null ? null : TextOverflow.ellipsis,
-      style: theme.textTheme.bodyMedium?.copyWith(
+      style: theme.textTheme.bodySmall?.copyWith(
         color: isLocked ? colorScheme.outline : colorScheme.onSurfaceVariant,
       ),
     );
@@ -208,7 +220,7 @@ class PhaseCardNode extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary,
+          backgroundColor: colorScheme.secondaryContainer,
           foregroundColor: colorScheme.onPrimary,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -233,9 +245,9 @@ class PhaseCardNode extends StatelessWidget {
       children: [
         const SizedBox(height: 18),
         CurriculumProgressBar(
-          fraction: phase.totalDays == 0
+          fraction: phase.modules.isEmpty
               ? 0.0
-              : completedDays / phase.totalDays,
+              : completedModules / phase.modules.length,
           isCurrent: isCurrent,
         ),
         const SizedBox(height: 18),

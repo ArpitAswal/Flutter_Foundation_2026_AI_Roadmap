@@ -44,7 +44,10 @@ class TabletPhaseGrid extends StatelessWidget {
                     isCurrent:
                         !firstIsLocked &&
                         !isPhaseCompleted(firstPhase, completed),
-                    completedDays: completedDaysInPhase(firstPhase, completed),
+                    completedModules: completedModulesInPhase(
+                      firstPhase,
+                      completed,
+                    ),
                     isGridMode: true,
                   ),
                 ),
@@ -58,7 +61,7 @@ class TabletPhaseGrid extends StatelessWidget {
                       isCurrent:
                           !secondIsLocked &&
                           !isPhaseCompleted(secondPhase, completed),
-                      completedDays: completedDaysInPhase(
+                      completedModules: completedModulesInPhase(
                         secondPhase,
                         completed,
                       ),

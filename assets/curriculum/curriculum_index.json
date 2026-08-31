@@ -16,7 +16,11 @@
               "day": 1,
               "title": "Introduction to Programming, Dart & Flutter Ecosystem",
               "description": "Understand what programming is, why Dart powers Flutter, and how the Flutter ecosystem is organized before writing real applications.",
-              "tags": ["Dart", "Flutter Ecosystem", "CLI"],
+              "tags": [
+                "Dart",
+                "Flutter Ecosystem",
+                "CLI"
+              ],
               "content_path": "assets/curriculum/phase1/module1/day1.json",
               "custom_route": null
             },
@@ -26,7 +30,12 @@
               "day": 2,
               "title": "Variables, Data Types, Type Inference & Null Safety",
               "description": "Learn how Dart stores data, infers types, and prevents null-related runtime errors using modern language features that form the foundation of every Flutter application.",
-              "tags": ["Dart", "Variables", "Data Types", "Null Safety"],
+              "tags": [
+                "Dart",
+                "Variables",
+                "Data Types",
+                "Null Safety"
+              ],
               "content_path": "assets/curriculum/phase1/module1/day2.json",
               "custom_route": null
             },
@@ -99,6 +108,90 @@
                 "Methods"
               ],
               "content_path": "assets/curriculum/phase1/module1/day6.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 7,
+              "title": "Encapsulation, Getters, Setters & Static Members",
+              "description": "Learn how Dart classes protect internal state, control mutation, expose computed properties, distinguish instance and static members, and establish clean boundaries between an object and its consumers.",
+              "tags": [
+                "Dart",
+                "OOP",
+                "Encapsulation",
+                "Getters",
+                "Setters",
+                "Static",
+                "Classes"
+              ],
+              "content_path": "assets/curriculum/phase1/module1/day7.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 8,
+              "title": "Inheritance, Types of Inheritance, Method Overriding & Polymorphism",
+              "description": "Learn how Dart classes establish parent-child relationships, reuse and specialize behavior, understand the different inheritance structures and Dart's single-inheritance model, override inherited members, and use polymorphism through common parent types.",
+              "tags": [
+                "Dart",
+                "OOP",
+                "Inheritance",
+                "Extends",
+                "Method Overriding",
+                "Polymorphism",
+                "super",
+                "Composition"
+              ],
+              "content_path": "assets/curriculum/phase1/module1/day8.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 9,
+              "title": "Abstract Classes, Interfaces & Contracts",
+              "description": "Learn how Dart defines abstractions and contracts through abstract classes & members, implicit interfaces, implements, interface classes, and abstract interface classes, and how these mechanisms support polymorphism and production-level separation between application logic and concrete implementations.",
+              "tags": [
+                "Dart",
+                "OOP",
+                "Abstraction",
+                "Abstract Class",
+                "Abstract Methods",
+                "Interfaces",
+                "Contracts",
+                "implements",
+                "interface class",
+                "abstract interface class",
+                "Polymorphism",
+                "Dependency Inversion"
+              ],
+              "content_path": "assets/curriculum/phase1/module1/day9.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 1,
+              "day": 10,
+              "title": "Dart Class Modifiers",
+              "description": "Learn how modern Dart class modifiers control construction, inheritance, interface implementation, mixin usage, subtype boundaries, API evolution, and exhaustive type hierarchies through abstract, base, interface, final, and sealed classes.",
+              "tags": [
+                "Dart",
+                "OOP",
+                "Class Modifiers",
+                "abstract",
+                "base",
+                "interface",
+                "abstract interface",
+                "final",
+                "sealed",
+                "Inheritance",
+                "Interfaces",
+                "Pattern Matching",
+                "API Design"
+              ],
+              "content_path": "assets/curriculum/phase1/module1/day10.json",
               "custom_route": null
             }
           ]

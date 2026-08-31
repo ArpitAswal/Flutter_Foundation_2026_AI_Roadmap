@@ -47,7 +47,9 @@ class LessonScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => getIt<LessonBloc>()
         ..add(LessonLoadRequested(phase: phaseId, module: moduleId, day: day)),
-      child: _LessonView(phaseId: phaseId, moduleId: moduleId, dayID: day),
+      child: ScaffoldMessenger(
+        child: _LessonView(phaseId: phaseId, moduleId: moduleId, dayID: day),
+      ),
     );
   }
 }
@@ -333,7 +335,7 @@ class _LessonContentState extends State<_LessonContent> {
                       children: [
                         Icon(
                           Icons.history_rounded,
-                          size: 14,
+                          size: context.isTablet ? 24 : 14,
                           color: colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 6),

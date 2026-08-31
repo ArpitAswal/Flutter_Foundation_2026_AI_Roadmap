@@ -40,6 +40,17 @@ int completedDaysInPhase(Phase phase, Set<String> completedIds) {
   return count;
 }
 
+/// Calculates the number of completely finished modules in a phase.
+int completedModulesInPhase(Phase phase, Set<String> completedIds) {
+  int count = 0;
+  for (final module in phase.modules) {
+    if (isModuleCompleted(phase, module, completedIds)) {
+      count++;
+    }
+  }
+  return count;
+}
+
 /// Checks if a module is locked based on its index within a phase.
 bool isModuleLockedAt(Phase phase, int moduleIndex, Set<String> completedIds) {
   if (moduleIndex == 0) {
@@ -57,7 +68,11 @@ bool isModuleLockedAt(Phase phase, int moduleIndex, Set<String> completedIds) {
 }
 
 /// Checks if a module is completely finished.
-bool isModuleCompleted(Phase phase, LessonModule module, Set<String> completedIds) {
+bool isModuleCompleted(
+  Phase phase,
+  LessonModule module,
+  Set<String> completedIds,
+) {
   if (module.totalDays == 0) return false;
   for (var day = 1; day <= module.totalDays; day++) {
     if (!completedIds.contains('p${phase.id}_m${module.id}_d$day')) {
@@ -68,7 +83,11 @@ bool isModuleCompleted(Phase phase, LessonModule module, Set<String> completedId
 }
 
 /// Calculates completed days for a specific module.
-int completedDaysInModule(Phase phase, LessonModule module, Set<String> completedIds) {
+int completedDaysInModule(
+  Phase phase,
+  LessonModule module,
+  Set<String> completedIds,
+) {
   int count = 0;
   for (var day = 1; day <= module.totalDays; day++) {
     if (completedIds.contains('p${phase.id}_m${module.id}_d$day')) {
@@ -79,13 +98,25 @@ int completedDaysInModule(Phase phase, LessonModule module, Set<String> complete
 }
 
 /// Checks if a specific day is locked based on its index within a module.
-bool isDayLockedAt(Phase phase, LessonModule module, int dayIndex, Set<String> completedIds) {
+bool isDayLockedAt(
+  Phase phase,
+  LessonModule module,
+  int dayIndex,
+  Set<String> completedIds,
+) {
   if (dayIndex == 0) return false;
   final previousDay = module.days[dayIndex - 1];
-  return !completedIds.contains('p${phase.id}_m${module.id}_d${previousDay.day}');
+  return !completedIds.contains(
+    'p${phase.id}_m${module.id}_d${previousDay.day}',
+  );
 }
 
 /// Checks if a specific day is completed.
-bool isDayCompleted(Phase phase, LessonModule module, LessonDay day, Set<String> completedIds) {
+bool isDayCompleted(
+  Phase phase,
+  LessonModule module,
+  LessonDay day,
+  Set<String> completedIds,
+) {
   return completedIds.contains('p${phase.id}_m${module.id}_d${day.day}');
 }

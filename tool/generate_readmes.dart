@@ -12,6 +12,92 @@ String formatDirName(String prefix, int id, String title) {
       .replaceAll(RegExp(r'-+'), '-');
   return '$prefix-${formatNum(id)}-$cleanTitle';
 }
+String extractOverview(String? theory) {
+  if (theory == null || theory.isEmpty) return '';
+  final cleanTheory = theory.replaceAll(RegExp(r'^#+.*$', multiLine: true), '').trim();
+  final paragraphs = cleanTheory
+      .split('\n\n')
+      .where((p) => p.trim().isNotEmpty && !p.trim().startsWith('|'))
+      .toList();
+  
+  if (paragraphs.isNotEmpty) {
+    // Take up to 3 paragraphs for a richer overview
+    final overviewText = paragraphs.take(3).map((p) => p.trim()).join('\n\n');
+    return '## 📖 Overview\n$overviewText\n\n';
+  }
+  return '';
+}
+
+String extractTopics(String? theory) {
+  if (theory == null || theory.isEmpty) return '';
+  final chunks = theory.split(RegExp(r'^## ', multiLine: true));
+  
+  List<String> topicLines = [];
+  for (int i = 1; i < chunks.length; i++) {
+    final chunk = chunks[i].trim();
+    if (chunk.isEmpty) continue;
+    
+    final lines = chunk.split('\n');
+    final title = lines.first.trim();
+    
+    String description = '';
+    bool inCodeBlock = false;
+    for (int j = 1; j < lines.length; j++) {
+      final line = lines[j].trim();
+      if (line.startsWith('```')) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+      if (inCodeBlock) continue;
+      
+      // Skip markdown tables/lists/images for description text
+      if (line.startsWith('|') || line.startsWith('*') || line.startsWith('-') || line.startsWith('![')) {
+        if (description.isEmpty && line.length > 15) {
+           description = line.replaceAll(RegExp(r'^\*\*(.*?)\*\*:\s*'), '').trim();
+           break;
+        }
+      } else if (line.isNotEmpty) {
+        description = line.replaceAll(RegExp(r'^\*\*(.*?)\*\*:\s*'), '').trim();
+        break;
+      }
+    }
+    
+    if (description.isNotEmpty) {
+      if (description.length > 150) {
+        description = '${description.substring(0, 147)}...';
+      }
+      topicLines.add('* **$title**: $description');
+    } else {
+      topicLines.add('* **$title**');
+    }
+  }
+  
+  if (topicLines.isNotEmpty) {
+    return '## 📚 Topics Covered\n${topicLines.join('\n')}\n\n';
+  }
+  return '';
+}
+
+String extractObjective(String? implementation) {
+  if (implementation == null || implementation.isEmpty) return '';
+  final match = RegExp(r'### Objective\n(.*?)(?=\n###|\Z)', dotAll: true).firstMatch(implementation);
+  if (match != null && match.group(1) != null) {
+    return '## 🎯 Implementation Objective\n${match.group(1)!.trim()}\n\n';
+  }
+  return '';
+}
+
+int countInterviewQuestions(String? questions) {
+  if (questions == null || questions.isEmpty) return 0;
+  return RegExp(r'^## Scenario', multiLine: true).allMatches(questions).length;
+}
+
+String extractComparisons(String? comparisons) {
+  if (comparisons == null || comparisons.isEmpty) return '';
+  final headings = RegExp(r'^### (.*)$', multiLine: true).allMatches(comparisons);
+  final comps = headings.map((m) => m.group(1)?.trim()).join(', ');
+  return comps;
+}
 
 void main() async {
   final indexFile = File('assets/curriculum/curriculum_index.json');
@@ -59,42 +145,59 @@ void main() async {
         final contentPath = day['content_path'] as String;
         final dayFile = File(contentPath);
         
-        String dayReadme = '# Day ${formatNum(day['day'])}: ${day['title']}\n\n';
-        dayReadme += '${day['description']}\n\n';
+        String dayReadme = '# 📘 Day ${day['day']}: ${day['title']}\n\n';
         
-        final tags = (day['tags'] as List).map((t) => '`$t`').join(' ');
+        dayReadme += '> [!NOTE]\n';
+        dayReadme += '> **Summary:** ${day['description']}\n\n';
+
+        final tags = (day['tags'] as List).map((t) => '`$t`').join(', ');
         dayReadme += '**Tags:** $tags\n\n';
+        
+        dayReadme += '---\n\n';
 
         if (await dayFile.exists()) {
           final dayData = json.decode(await dayFile.readAsString());
           
-          if (dayData['last_updated'] != null) {
-            dayReadme += '*Last Updated: ${dayData['last_updated']}*\n\n';
+          if (dayData['prerequisites'] != null && dayData['prerequisites'].toString().trim().isNotEmpty) {
+            dayReadme += '## 🚦 Prerequisites\n${dayData['prerequisites']}\n\n';
           }
-          if (dayData['prerequisites'] != null) {
-            dayReadme += '## Prerequisites\n${dayData['prerequisites']}\n\n';
+          
+          dayReadme += extractOverview(dayData['theory']);
+          dayReadme += extractTopics(dayData['theory']);
+          dayReadme += extractObjective(dayData['implementation']);
+          
+          // Additional Materials section
+          List<String> materials = [];
+          
+          final iqCount = countInterviewQuestions(dayData['interview_questions']);
+          if (iqCount > 0) {
+            materials.add('**$iqCount Interview Questions** included');
           }
-          if (dayData['theory'] != null) {
-            dayReadme += '${dayData['theory']}\n\n';
+          
+          final comps = extractComparisons(dayData['comparisons']);
+          if (comps.isNotEmpty) {
+            materials.add('**Comparisons:** $comps');
           }
-          if (dayData['implementation'] != null) {
-            dayReadme += '## Implementation\n${dayData['implementation']}\n\n';
-          }
-          if (dayData['architecture'] != null) {
-            dayReadme += '## Architecture\n${dayData['architecture']}\n\n';
-          }
-          if (dayData['comparisons'] != null) {
-            dayReadme += '## Comparisons\n${dayData['comparisons']}\n\n';
-          }
-          if (dayData['optimization'] != null) {
-            dayReadme += '## Optimization\n${dayData['optimization']}\n\n';
-          }
-          if (dayData['interview_questions'] != null) {
-            dayReadme += '## Interview Questions\n${dayData['interview_questions']}\n\n';
-          }
+          
           if (dayData['common_mistakes'] != null) {
-            dayReadme += '## Common Mistakes\n${dayData['common_mistakes']}\n\n';
+            materials.add('**Common Mistakes & Optimizations** included');
           }
+          
+          if (dayData['architecture'] != null) {
+            materials.add('**Architecture Implementation Notes** included');
+          }
+          
+          if (materials.isNotEmpty) {
+            dayReadme += '## 💡 Additional Materials Included\n';
+            for (final m in materials) {
+              dayReadme += '* $m\n';
+            }
+            dayReadme += '\n';
+          }
+          
+          // Add the deep dive tip
+          dayReadme += '> [!TIP]\n';
+          dayReadme += '> **Deep Dive:** To read the full theory, view detailed code implementations, architectures, and common interview questions, open this lesson interactively inside the **Flutter AI Tutor App**!\n';
         } else {
           dayReadme += '> *Content coming soon...*\n';
         }

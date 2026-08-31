@@ -268,7 +268,7 @@ class ModuleCardNode extends StatelessWidget {
       module.subtitle,
       maxLines: maxLines,
       overflow: maxLines == null ? null : TextOverflow.ellipsis,
-      style: theme.textTheme.bodyMedium?.copyWith(
+      style: theme.textTheme.bodySmall?.copyWith(
         color: isLocked ? colorScheme.outline : colorScheme.onSurfaceVariant,
       ),
     );
