@@ -134,7 +134,14 @@ class _PhasesScreenState extends State<PhasesScreen> {
                         ),
                       ),
                     )
-                  : const Text(StringConstants.appName);
+                  : Text(
+                      StringConstants.appName,
+                      style: context.responsiveTextTheme.headlineMedium
+                          ?.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    );
             },
           ),
           actions: [
@@ -147,11 +154,7 @@ class _PhasesScreenState extends State<PhasesScreen> {
                         onPressed: () {
                           isSearching.value = !isSearching.value;
                         },
-                        icon: Icon(
-                          Icons.manage_search_outlined,
-                          color: Theme.of(context).primaryColor,
-                          size: context.isTablet ? 40.0 : 32.0,
-                        ),
+                        icon: Icon(Icons.manage_search_outlined),
                       );
               },
             ),
@@ -178,6 +181,7 @@ class _PhasesScreenState extends State<PhasesScreen> {
                   completedIds: state.completedLessonIds,
                 );
               }
+
               return _PhaseList(
                 phases: state.phases,
                 completedIds: state.completedLessonIds,
@@ -193,9 +197,12 @@ class _PhasesScreenState extends State<PhasesScreen> {
               for (final phase in state.phases) {
                 bool isCompleted = true;
                 for (final module in phase.modules) {
-                  for (var day = 1; day <= module.totalDays; day++) {
-                    if (!state.completedLessonIds.contains(
-                      'p${phase.id}_m${module.id}_d$day',
+                  for (final day in module.days) {
+                    if (!isDayCompleted(
+                      phase,
+                      module,
+                      day,
+                      state.completedLessonIds,
                     )) {
                       isCompleted = false;
                       break;
@@ -232,40 +239,43 @@ class _PhaseList extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.screenWidth * 0.03,
+        vertical: context.screenHeight * 0.03,
+      ),
       children: [
         Text(
           StringConstants.phasesTitle,
-          style: theme.textTheme.displayLarge?.copyWith(
+          style: context.responsiveTextTheme.headlineLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,
-            fontSize: 32,
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
           StringConstants.phasesSubtitle,
-          style: theme.textTheme.bodyMedium?.copyWith(
+          style: context.responsiveTextTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 30),
-        context.isTablet
+        SizedBox(height: context.responsiveHeightSpace(0.02)),
+        context.isTablet &&
+                (Orientation.landscape == MediaQuery.of(context).orientation)
             ? TabletPhaseGrid(phasesList: phases, completed: completedIds)
             : Stack(
                 children: [
                   // Vertical timeline line
                   Positioned(
-                    left: MediaQuery.of(context).size.width * 0.05,
+                    left: context.screenWidth * 0.035,
                     top: 16,
-                    bottom: 20,
-                    width: 4,
+                    bottom: context.responsiveHeightSpace(0.02),
+                    width: context.isTablet ? 6 : 4,
                     child: Container(
                       decoration: BoxDecoration(
                         color: colorScheme.outlineVariant.withAlpha(50),
-                        borderRadius: BorderRadius.circular(2),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                   ),
@@ -286,7 +296,9 @@ class _PhaseList extends StatelessWidget {
                       final isCurrent = !isLocked && !isCompleted;
 
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 24),
+                        padding: EdgeInsets.only(
+                          bottom: context.responsiveHeightSpace(0.02),
+                        ),
                         child: PhaseCardNode(
                           phase: phase,
                           isLocked: isLocked,

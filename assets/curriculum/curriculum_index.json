@@ -348,6 +348,27 @@
               ],
               "content_path": "assets/curriculum/phase2/module1/day15.json",
               "custom_route": null
+            },
+            {
+              "phase": 2,
+              "module": 1,
+              "day": 16,
+              "title": "StatefulWidget, State & setState",
+              "description": "Learn how Flutter represents changing UI through StatefulWidget and its companion State object, how mutable state survives widget rebuilds, and how setState tells Flutter that state has changed and the UI needs to rebuild. This is the foundation for interactive Flutter applications and prepares you for later state-management concepts.",
+              "tags": [
+                "StatefulWidget",
+                "State",
+                "setState",
+                "State Management",
+                "Declarative UI",
+                "Widget Rebuilds",
+                "Mutable State",
+                "initState",
+                "dispose",
+                "Ephemeral State"
+              ],
+              "content_path": "assets/curriculum/phase2/module1/day16.json",
+              "custom_route": null
             }
           ]
         }

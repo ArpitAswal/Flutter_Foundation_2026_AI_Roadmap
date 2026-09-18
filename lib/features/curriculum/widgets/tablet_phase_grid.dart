@@ -16,18 +16,42 @@ class TabletPhaseGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Break phases into rows of 2 for the tablet grid.
-    // Using IntrinsicHeight ensures that both cards in a row are perfectly identical in height.
+    // Using IntrinsicHeight ensures that all cards in a row are perfectly identical in height.
+    final int crossAxisCount = 2;
     final List<Widget> rows = [];
-    for (int i = 0; i < phasesList.length; i += 2) {
-      final firstPhase = phasesList[i];
-      final firstIsLocked = isPhaseLockedAt(i, phasesList, completed);
 
-      final secondExists = i + 1 < phasesList.length;
-      final secondPhase = secondExists ? phasesList[i + 1] : null;
-      final secondIsLocked = secondExists
-          ? isPhaseLockedAt(i + 1, phasesList, completed)
-          : false;
+    for (int i = 0; i < phasesList.length; i += crossAxisCount) {
+      final List<Widget> rowChildren = [];
+
+      for (int j = 0; j < crossAxisCount; j++) {
+        final phaseIndex = i + j;
+
+        if (phaseIndex < phasesList.length) {
+          final phase = phasesList[phaseIndex];
+          final isLocked = isPhaseLockedAt(phaseIndex, phasesList, completed);
+
+          rowChildren.add(
+            Expanded(
+              child: PhaseCardNode(
+                phase: phase,
+                isLocked: isLocked,
+                isCompleted: isPhaseCompleted(phase, completed),
+                isCurrent: !isLocked && !isPhaseCompleted(phase, completed),
+                completedModules: completedModulesInPhase(phase, completed),
+                isGridMode: true,
+              ),
+            ),
+          );
+        } else {
+          // Fill remaining space in the row
+          rowChildren.add(const Spacer());
+        }
+
+        // Add spacing between columns, except after the last column
+        if (j < crossAxisCount - 1) {
+          rowChildren.add(const SizedBox(width: 16));
+        }
+      }
 
       rows.add(
         Padding(
@@ -35,42 +59,7 @@ class TabletPhaseGrid extends StatelessWidget {
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: PhaseCardNode(
-                    phase: firstPhase,
-                    isLocked: firstIsLocked,
-                    isCompleted: isPhaseCompleted(firstPhase, completed),
-                    isCurrent:
-                        !firstIsLocked &&
-                        !isPhaseCompleted(firstPhase, completed),
-                    completedModules: completedModulesInPhase(
-                      firstPhase,
-                      completed,
-                    ),
-                    isGridMode: true,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                if (secondExists)
-                  Expanded(
-                    child: PhaseCardNode(
-                      phase: secondPhase!,
-                      isLocked: secondIsLocked,
-                      isCompleted: isPhaseCompleted(secondPhase, completed),
-                      isCurrent:
-                          !secondIsLocked &&
-                          !isPhaseCompleted(secondPhase, completed),
-                      completedModules: completedModulesInPhase(
-                        secondPhase,
-                        completed,
-                      ),
-                      isGridMode: true,
-                    ),
-                  )
-                else
-                  const Spacer(),
-              ],
+              children: rowChildren,
             ),
           ),
         ),

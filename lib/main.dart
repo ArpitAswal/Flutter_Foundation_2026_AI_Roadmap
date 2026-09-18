@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import 'package:google_fonts/google_fonts.dart';
 
 import 'core/constants/app_constants.dart';
 import 'core/di/injection.dart';
@@ -57,6 +56,18 @@ class FlutterAiTutorApp extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
+          iconTheme: IconThemeData(
+            color: Color(0xFF005cad),
+            size: context.responsiveTextTheme.headlineLarge?.fontSize,
+          ),
+          iconButtonTheme: IconButtonThemeData(
+            style: ButtonStyle(
+              foregroundColor: WidgetStatePropertyAll(Color(0xFF005cad)),
+              iconSize: WidgetStatePropertyAll(
+                context.responsiveTextTheme.headlineLarge?.fontSize,
+              ),
+            ),
+          ),
           colorScheme: const ColorScheme(
             brightness: Brightness.light,
             primary: Color(0xFF005cad),
@@ -82,59 +93,6 @@ class FlutterAiTutorApp extends StatelessWidget {
             outline: Color(0xFF717784),
             outlineVariant: Color(0xFFc1c6d5),
           ),
-          textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme)
-              .copyWith(
-                // display-lg
-                displayLarge: GoogleFonts.hankenGrotesk(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w700,
-                  height: 56 / 48,
-                  letterSpacing: -0.02 * 48,
-                  color: const Color(0xFF191c1e), // on-background
-                ),
-                // headline-lg
-                displaySmall: GoogleFonts.hankenGrotesk(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w600,
-                  height: 40 / 32,
-                  color: const Color(0xFF191c1e),
-                ),
-                // headline-lg-mobile
-                titleLarge: GoogleFonts.hankenGrotesk(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  height: 32 / 24,
-                  color: const Color(0xFF191c1e),
-                ),
-                // module-card-title
-                titleMedium: GoogleFonts.hankenGrotesk(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  height: 24 / 18,
-                  color: const Color(0xFF191c1e),
-                ),
-                // body-md
-                bodyMedium: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  height: 26 / 16,
-                  color: const Color(0xFF191c1e),
-                ),
-                // body-sm
-                bodySmall: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  height: 22 / 14,
-                  color: const Color(0xFF191c1e),
-                ),
-                // label-caps
-                labelSmall: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  height: 16 / 12,
-                  letterSpacing: 0.05 * 12, // 0.05em
-                ),
-              ),
         ),
         routerConfig: getIt<AppRouter>().router,
         builder: (context, child) {
