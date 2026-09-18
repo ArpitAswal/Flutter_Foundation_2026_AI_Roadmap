@@ -92,10 +92,17 @@
               ],
               "content_path": "assets/curriculum/phase1/module1/day5.json",
               "custom_route": null
-            },
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Dart Object-Oriented Programming",
+          "subtitle": "Master the core principles of object-oriented programming in Dart, from basic classes and encapsulation to advanced inheritance, interfaces, class modifiers, and composition.",
+          "days": [
             {
               "phase": 1,
-              "module": 1,
+              "module": 2,
               "day": 6,
               "title": "Classes, Objects, Fields, Methods & Constructors",
               "description": "Learn how Dart represents real-world entities through classes and objects, and how constructors initialize those objects with meaningful state and behavior.",
@@ -107,12 +114,12 @@
                 "Constructors",
                 "Methods"
               ],
-              "content_path": "assets/curriculum/phase1/module1/day6.json",
+              "content_path": "assets/curriculum/phase1/module2/day6.json",
               "custom_route": null
             },
             {
               "phase": 1,
-              "module": 1,
+              "module": 2,
               "day": 7,
               "title": "Encapsulation, Getters, Setters & Static Members",
               "description": "Learn how Dart classes protect internal state, control mutation, expose computed properties, distinguish instance and static members, and establish clean boundaries between an object and its consumers.",
@@ -125,12 +132,12 @@
                 "Static",
                 "Classes"
               ],
-              "content_path": "assets/curriculum/phase1/module1/day7.json",
+              "content_path": "assets/curriculum/phase1/module2/day7.json",
               "custom_route": null
             },
             {
               "phase": 1,
-              "module": 1,
+              "module": 2,
               "day": 8,
               "title": "Inheritance, Types of Inheritance, Method Overriding & Polymorphism",
               "description": "Learn how Dart classes establish parent-child relationships, reuse and specialize behavior, understand the different inheritance structures and Dart's single-inheritance model, override inherited members, and use polymorphism through common parent types.",
@@ -144,12 +151,12 @@
                 "super",
                 "Composition"
               ],
-              "content_path": "assets/curriculum/phase1/module1/day8.json",
+              "content_path": "assets/curriculum/phase1/module2/day8.json",
               "custom_route": null
             },
             {
               "phase": 1,
-              "module": 1,
+              "module": 2,
               "day": 9,
               "title": "Abstract Classes, Interfaces & Contracts",
               "description": "Learn how Dart defines abstractions and contracts through abstract classes & members, implicit interfaces, implements, interface classes, and abstract interface classes, and how these mechanisms support polymorphism and production-level separation between application logic and concrete implementations.",
@@ -167,12 +174,12 @@
                 "Polymorphism",
                 "Dependency Inversion"
               ],
-              "content_path": "assets/curriculum/phase1/module1/day9.json",
+              "content_path": "assets/curriculum/phase1/module2/day9.json",
               "custom_route": null
             },
             {
               "phase": 1,
-              "module": 1,
+              "module": 2,
               "day": 10,
               "title": "Dart Class Modifiers",
               "description": "Learn how modern Dart class modifiers control construction, inheritance, interface implementation, mixin usage, subtype boundaries, API evolution, and exhaustive type hierarchies through abstract, base, interface, final, and sealed classes.",
@@ -191,7 +198,155 @@
                 "Pattern Matching",
                 "API Design"
               ],
-              "content_path": "assets/curriculum/phase1/module1/day10.json",
+              "content_path": "assets/curriculum/phase1/module2/day10.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 2,
+              "day": 11,
+              "title": "Dart Mixins, Mixin Classes & Composition",
+              "description": "Learn how Dart reuses behavior across otherwise unrelated class hierarchies through mixins, mixin constraints, mixin classes, and composition, and understand when each approach should be preferred in production Flutter applications.",
+              "tags": [
+                "Dart",
+                "OOP",
+                "Mixins",
+                "Mixin Class",
+                "Mixin Constraints",
+                "with",
+                "on",
+                "Composition",
+                "Code Reuse",
+                "Inheritance",
+                "Flutter"
+              ],
+              "content_path": "assets/curriculum/phase1/module2/day11.json",
+              "custom_route": null
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Dart Design & Dependency Management",
+          "subtitle": "Learn to architect scalable and maintainable Dart applications by applying SOLID principles and mastering dependency management techniques.",
+          "days": [
+            {
+              "phase": 1,
+              "module": 3,
+              "day": 12,
+              "title": "SOLID Principles in Dart & Flutter",
+              "description": "Learn the five SOLID principles as practical engineering guidelines for designing maintainable Dart and Flutter applications: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion. Apply them to real Flutter architecture, identify violations through code review, and understand when applying a principle improves a design versus when it creates unnecessary abstraction.",
+              "tags": [
+                "Dart",
+                "Flutter",
+                "OOP",
+                "SOLID",
+                "Single Responsibility",
+                "Open Closed Principle",
+                "Liskov Substitution",
+                "Interface Segregation",
+                "Dependency Inversion",
+                "Composition",
+                "Abstraction",
+                "Architecture",
+                "Clean Architecture",
+                "Code Review"
+              ],
+              "content_path": "assets/curriculum/phase1/module3/day12.json",
+              "custom_route": null
+            },
+            {
+              "phase": 1,
+              "module": 3,
+              "day": 13,
+              "title": "Dependency Injection / Dependency Management",
+              "description": "Learn how to manage dependencies explicitly in Dart and Flutter applications, with a focus on Dependency Injection as a practical application of the Dependency Inversion Principle learned in Day 12. This day teaches how to identify dependencies, separate dependency usage from dependency construction, inject dependencies through constructors, build dependency graphs, establish composition roots, manage object ownership and lifecycles, and make implementations replaceable for testing and production environments.",
+              "tags": [
+                "Dart",
+                "Flutter",
+                "Dependency Injection",
+                "Dependency Management",
+                "Dependency Inversion Principle",
+                "Constructor Injection",
+                "Dependency Graph",
+                "Composition Root",
+                "Manual Dependency Injection",
+                "Service Locator",
+                "Dependency Boundaries",
+                "Testability",
+                "Composition",
+                "Architecture"
+              ],
+              "content_path": "assets/curriculum/phase1/module3/day13.json",
+              "custom_route": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Flutter Foundation",
+      "description": "Transition from pure Dart to UI development by mastering Flutter's core concepts. Build a strong mental model of widgets, layouts, state management, and declarative UI.",
+      "modules": [
+        {
+          "id": 1,
+          "title": "Flutter Fundamentals",
+          "subtitle": "Dive into the building blocks of Flutter interfaces, understanding the declarative UI model, the widget tree, and fundamental widget composition.",
+          "days": [
+            {
+              "phase": 2,
+              "module": 1,
+              "day": 14,
+              "title": "Flutter Widgets & Widget Tree Fundamentals",
+              "description": "Begin the Flutter-specific part of the curriculum by understanding widgets as the fundamental building blocks of Flutter UI and learning how widgets compose into a widget tree. Learn the role of root, parent, child, and leaf widgets, understand Flutter's declarative UI model, immutable widget configuration, widget composition, build methods, widget identity, and how the widget tree represents the structure of an application's interface. This day establishes the mental model required before learning layout, StatefulWidget, setState, lifecycle, navigation, and advanced Flutter architecture.",
+              "tags": [
+                "Flutter",
+                "Widgets",
+                "Widget Tree",
+                "Widget Composition",
+                "Declarative UI",
+                "Immutable Widgets",
+                "Build Method",
+                "Root Widget",
+                "Parent Widget",
+                "Child Widget",
+                "Leaf Widget",
+                "Widget Identity",
+                "Widget Configuration",
+                "UI Architecture"
+              ],
+              "content_path": "assets/curriculum/phase2/module1/day14.json",
+              "custom_route": null
+            },
+            {
+              "phase": 2,
+              "module": 1,
+              "day": 15,
+              "title": "Flutter Layout & Constraints",
+              "description": "Learn how Flutter determines the size and position of widgets through its constraint-based layout system. Understand the core rule that constraints go down, sizes go up, and parents set positions. Learn how Row, Column, Container, SizedBox, Center, Padding, Expanded, Flexible, and alignment widgets participate in layout, why overflow and unbounded-constraint errors occur, and how to reason about Flutter layouts instead of trial-and-error positioning.",
+              "tags": [
+                "Flutter",
+                "Layout",
+                "Constraints",
+                "BoxConstraints",
+                "Row",
+                "Column",
+                "Container",
+                "SizedBox",
+                "Center",
+                "Padding",
+                "Expanded",
+                "Flexible",
+                "MainAxisAlignment",
+                "CrossAxisAlignment",
+                "Flex",
+                "Overflow",
+                "Unbounded Constraints",
+                "Widget Tree",
+                "Responsive Layout"
+              ],
+              "content_path": "assets/curriculum/phase2/module1/day15.json",
               "custom_route": null
             }
           ]

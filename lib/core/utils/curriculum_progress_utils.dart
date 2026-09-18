@@ -8,8 +8,8 @@ bool isPhaseLockedAt(int index, List<Phase> phases, Set<String> completedIds) {
   if (index == 0) return false;
   final previousPhase = phases[index - 1];
   for (final module in previousPhase.modules) {
-    for (var day = 1; day <= module.totalDays; day++) {
-      final lessonId = 'p${previousPhase.id}_m${module.id}_d$day';
+    for (final day in module.days) {
+      final lessonId = 'p${previousPhase.id}_m${module.id}_d${day.day}';
       if (!completedIds.contains(lessonId)) return true;
     }
   }
@@ -19,8 +19,8 @@ bool isPhaseLockedAt(int index, List<Phase> phases, Set<String> completedIds) {
 /// Checks if a phase is 100% completed by verifying all its lesson days.
 bool isPhaseCompleted(Phase phase, Set<String> completedIds) {
   for (final module in phase.modules) {
-    for (var day = 1; day <= module.totalDays; day++) {
-      final lessonId = 'p${phase.id}_m${module.id}_d$day';
+    for (final day in module.days) {
+      final lessonId = 'p${phase.id}_m${module.id}_d${day.day}';
       if (!completedIds.contains(lessonId)) return false;
     }
   }
@@ -31,8 +31,8 @@ bool isPhaseCompleted(Phase phase, Set<String> completedIds) {
 int completedDaysInPhase(Phase phase, Set<String> completedIds) {
   int count = 0;
   for (final module in phase.modules) {
-    for (var day = 1; day <= module.totalDays; day++) {
-      if (completedIds.contains('p${phase.id}_m${module.id}_d$day')) {
+    for (final day in module.days) {
+      if (completedIds.contains('p${phase.id}_m${module.id}_d${day.day}')) {
         count++;
       }
     }
@@ -59,8 +59,10 @@ bool isModuleLockedAt(Phase phase, int moduleIndex, Set<String> completedIds) {
     return false;
   }
   final previousModule = phase.modules[moduleIndex - 1];
-  for (var day = 1; day <= previousModule.totalDays; day++) {
-    if (!completedIds.contains('p${phase.id}_m${previousModule.id}_d$day')) {
+  for (final day in previousModule.days) {
+    if (!completedIds.contains(
+      'p${phase.id}_m${previousModule.id}_d${day.day}',
+    )) {
       return true;
     }
   }
@@ -73,9 +75,9 @@ bool isModuleCompleted(
   LessonModule module,
   Set<String> completedIds,
 ) {
-  if (module.totalDays == 0) return false;
-  for (var day = 1; day <= module.totalDays; day++) {
-    if (!completedIds.contains('p${phase.id}_m${module.id}_d$day')) {
+  if (module.days.isEmpty) return false;
+  for (final day in module.days) {
+    if (!completedIds.contains('p${phase.id}_m${module.id}_d${day.day}')) {
       return false;
     }
   }
@@ -89,8 +91,8 @@ int completedDaysInModule(
   Set<String> completedIds,
 ) {
   int count = 0;
-  for (var day = 1; day <= module.totalDays; day++) {
-    if (completedIds.contains('p${phase.id}_m${module.id}_d$day')) {
+  for (final day in module.days) {
+    if (completedIds.contains('p${phase.id}_m${module.id}_d${day.day}')) {
       count++;
     }
   }

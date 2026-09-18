@@ -67,7 +67,13 @@ class _LessonView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LessonBloc, LessonState>(
+    return BlocConsumer<LessonBloc, LessonState>(
+      listener: (context, state) {
+        if (state is LessonLoaded) {
+          // Sync global curriculum state AFTER the local hive db has been updated
+          context.read<CurriculumBloc>().add(CurriculumLoadRequested());
+        }
+      },
       builder: (context, state) {
         if (state is LessonLoading) {
           return const Scaffold(body: _LessonLoadingView());
@@ -652,10 +658,8 @@ class _MarkCompleteButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: () {
           final lessonBloc = context.read<LessonBloc>();
-          final curriculumBloc = context.read<CurriculumBloc>();
 
           lessonBloc.add(LessonMarkCompleteRequested());
-          curriculumBloc.add(CurriculumLoadRequested());
 
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -670,7 +674,6 @@ class _MarkCompleteButton extends StatelessWidget {
                 label: 'UNDO',
                 onPressed: () {
                   lessonBloc.add(LessonMarkIncompleteRequested());
-                  curriculumBloc.add(CurriculumLoadRequested());
                 },
               ),
             ),

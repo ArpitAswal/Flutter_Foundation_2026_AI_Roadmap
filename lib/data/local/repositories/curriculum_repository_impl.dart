@@ -34,21 +34,21 @@ class CurriculumRepositoryImpl implements CurriculumRepository {
       throw ArgumentError('Phase $phase not found in index.');
     }
 
-    final targetModule =
-        targetPhase.modules.where((m) => m.id == module).firstOrNull;
+    final targetModule = targetPhase.modules
+        .where((m) => m.id == module)
+        .firstOrNull;
     if (targetModule == null) {
       throw ArgumentError('Module $module not found in phase $phase.');
     }
 
-    // Days are ordered — day 1 maps to index 0.
-    final dayIndex = day - 1;
-    if (dayIndex < 0 || dayIndex >= targetModule.days.length) {
+    final targetDay = targetModule.days.where((d) => d.day == day).firstOrNull;
+    if (targetDay == null) {
       throw ArgumentError(
         'Day $day not found in module $module of phase $phase.',
       );
     }
 
-    return targetModule.days[dayIndex];
+    return targetDay;
   }
 
   @override

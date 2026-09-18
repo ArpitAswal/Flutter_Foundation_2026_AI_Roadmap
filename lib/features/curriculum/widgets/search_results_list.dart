@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_foundation/core/utils/curriculum_progress_utils.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../domain/models/curriculum/lesson_day.dart';
@@ -52,32 +53,10 @@ class SearchResultsList extends StatelessWidget {
             final lessonId = 'p${phase.id}_m${module.id}_d${day.day}';
             final isCompleted = completedIds.contains(lessonId);
 
-            // Simplified locked logic for search results:
-            // In a linear curriculum, a lesson is locked if the PREVIOUS lesson is NOT completed.
-            bool isLocked = false;
-            if (phase.id == 1 && module.id == 1 && day.day == 1) {
-              isLocked = false;
-            } else {
-              // Find previous lesson ID
-              String prevLessonId = '';
-              if (day.day > 1) {
-                prevLessonId = 'p${phase.id}_m${module.id}_d${day.day - 1}';
-              } else if (mIndex > 0) {
-                final prevModule = phase.modules[mIndex - 1];
-                prevLessonId =
-                    'p${phase.id}_m${prevModule.id}_d${prevModule.totalDays}';
-              } else if (phase.id > 1) {
-                final prevPhase = phases.firstWhere(
-                  (p) => p.id == phase.id - 1,
-                );
-                final prevModule = prevPhase.modules.last;
-                prevLessonId =
-                    'p${prevPhase.id}_m${prevModule.id}_d${prevModule.totalDays}';
-              }
-              isLocked =
-                  prevLessonId.isNotEmpty &&
-                  !completedIds.contains(prevLessonId);
-            }
+            // Use robust progress utilities instead of hardcoded day.day - 1 assumptions
+            bool isLocked =
+                isModuleLockedAt(phase, mIndex, completedIds) ||
+                isDayLockedAt(phase, module, dIndex, completedIds);
 
             final isCurrent = !isLocked && !isCompleted;
 

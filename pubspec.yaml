@@ -239,4 +239,7 @@ flutter:
   assets:
     - assets/curriculum/
     - assets/curriculum/phase1/module1/
+    - assets/curriculum/phase1/module2/
+    - assets/curriculum/phase1/module3/
+    - assets/curriculum/phase2/module1/
     - assets/images/
