@@ -142,104 +142,116 @@ class _LessonErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final size = MediaQuery.sizeOf(context);
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 28),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Error Illustration Icon Container
-            Container(
-              width: size.width * 0.3,
-              height: size.width * 0.3,
-              decoration: BoxDecoration(
-                color: colorScheme.errorContainer.withValues(alpha: 0.4),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.auto_stories_outlined,
-                size: size.width * 0.2,
-                color: colorScheme.error,
-              ),
+    return Padding(
+      padding: context.responsivePadding(16, 10).padding,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Error Illustration Icon Container
+          Container(
+            width: context.isTablet ? 200 : 100,
+            height: context.isTablet ? 200 : 100,
+            decoration: BoxDecoration(
+              color: colorScheme.errorContainer.withValues(alpha: 0.4),
+              shape: BoxShape.circle,
             ),
-            const SizedBox(height: 24),
-
-            // Title
-            Text(
-              StringConstants.lessonUnavailable,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
+            alignment: AlignmentGeometry.center,
+            child: Icon(
+              Icons.auto_stories_outlined,
+              color: colorScheme.error,
+              size: context.isTablet ? 140 : 60,
             ),
-            const SizedBox(height: 12),
+          ),
 
-            // Apology Message
-            Text(
-              StringConstants.lessonErrorApology,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                height: 1.6,
-              ),
+          SizedBox(height: context.responsiveHeightSpace(0.01)),
+
+          // Title
+          Text(
+            StringConstants.lessonUnavailable,
+            textAlign: TextAlign.center,
+            style: context.responsiveTextTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
             ),
-            const SizedBox(height: 32),
+          ),
+          SizedBox(height: context.responsiveHeightSpace(0.01)),
 
-            // Navigation and Retry Actions
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: () {
-                    if (context.canPop()) {
-                      context.pop();
-                    } else {
-                      context.go('/roadmap/phases');
-                    }
-                  },
-                  icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                  label: const Text(StringConstants.goBack),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+          // Apology Message
+          Text(
+            StringConstants.lessonErrorApology,
+            textAlign: TextAlign.center,
+            style: context.responsiveTextTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              height: 1.4,
+            ),
+          ),
+          SizedBox(height: context.responsiveHeightSpace(0.02)),
+
+          // Navigation and Retry Actions
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/roadmap/phases');
+                  }
+                },
+                icon: Icon(
+                  Icons.arrow_back_rounded,
+                  size: context.isTablet ? 38 : 21,
+                ),
+                label: Text(
+                  StringConstants.goBack,
+                  style: context.responsiveTextTheme.bodyLarge?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(width: 12),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    context.read<LessonBloc>().add(
-                      LessonLoadRequested(
-                        phase: phaseId,
-                        module: moduleId,
-                        day: day,
-                        again: true,
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.refresh_rounded, size: 18),
-                  label: const Text(StringConstants.tryAgain),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                style: OutlinedButton.styleFrom(
+                  padding: context.responsivePadding(16, 12).padding,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: colorScheme.primary),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              SizedBox(width: context.screenWidth * 0.04),
+              ElevatedButton.icon(
+                onPressed: () {
+                  context.read<LessonBloc>().add(
+                    LessonLoadRequested(
+                      phase: phaseId,
+                      module: moduleId,
+                      day: day,
+                      again: true,
+                    ),
+                  );
+                },
+                icon: Icon(
+                  Icons.refresh_rounded,
+                  size: context.isTablet ? 38 : 21,
+                ),
+                label: Text(
+                  StringConstants.tryAgain,
+                  style: context.responsiveTextTheme.bodyLarge?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding: context.responsivePadding(16, 12).padding,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -313,6 +325,12 @@ class _LessonContentState extends State<_LessonContent> {
     if (_isTransitioning) {
       return const Scaffold(body: _LessonLoadingView());
     }
+    double fabSize;
+    if (context.isTablet) {
+      fabSize = (context.screenHeight * 0.1).clamp(60.0, 120.0);
+    } else {
+      fabSize = (context.screenWidth * 0.12).clamp(40.0, 60.0);
+    }
 
     return Scaffold(
       body: Stack(
@@ -321,18 +339,18 @@ class _LessonContentState extends State<_LessonContent> {
             child: SafeArea(
               child: ListView(
                 controller: _scrollController,
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+                padding: context.responsivePadding(16, 21).padding,
                 children: [
                   // ── Lesson Title ────────────────────────────────────────────────────
                   Text(
                     widget.lesson.title,
-                    style: theme.textTheme.headlineMedium?.copyWith(
+                    style: context.responsiveTextTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurface,
                       fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: context.responsiveHeightSpace(0.01)),
 
                   // ── Last Updated Date Metadata ─────────────────────────────────────
                   if (widget.content.lastUpdated != null &&
@@ -341,51 +359,46 @@ class _LessonContentState extends State<_LessonContent> {
                       children: [
                         Icon(
                           Icons.history_rounded,
-                          size: context.isTablet ? 24 : 14,
+                          size: context.isTablet ? 28 : 16,
                           color: colorScheme.onSurfaceVariant,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 8),
                         Text(
                           '${StringConstants.lastUpdated} ${widget.content.lastUpdated}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: context.responsiveTextTheme.bodySmall
+                              ?.copyWith(color: colorScheme.onSurfaceVariant),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                  ] else
-                    const SizedBox(height: 16),
+                    SizedBox(height: context.responsiveHeightSpace(0.02)),
+                  ],
 
                   // ── Tags ─────────────────────────────────────────────────────────────
                   if (widget.lesson.tags.isNotEmpty) ...[
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: context.isTablet ? 16 : 8,
+                      runSpacing: context.isTablet ? 12 : 8,
                       children: widget.lesson.tags.map((tag) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
+                          padding: context.responsivePadding(12, 6).padding,
                           decoration: BoxDecoration(
                             color: colorScheme.primaryContainer.withValues(
                               alpha: 0.6,
                             ),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(24),
                           ),
                           child: Text(
                             tag,
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: context.responsiveTextTheme.labelSmall
+                                ?.copyWith(
+                                  color: colorScheme.onPrimaryContainer,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: context.responsiveHeightSpace(0.02)),
                   ],
 
                   // ── Prerequisites ────────────────────────────────────────────────────
@@ -393,51 +406,48 @@ class _LessonContentState extends State<_LessonContent> {
                     _PrerequisitesCard(
                       prerequisites: widget.content.prerequisites,
                     ),
-                    const SizedBox(height: 20),
                   ],
-
+                  SizedBox(height: context.responsiveHeightSpace(0.02)),
                   // ── Theory (Markdown) ─────────────────────────────────────────────
-                  if (widget.content.theory.isNotEmpty)
-                    MarkdownBody(
-                      data: widget.content.theory,
-                      styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-                        p: theme.textTheme.bodyMedium?.copyWith(height: 1.7),
-                        h1Padding: const EdgeInsets.only(top: 16),
-                        h1: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: colorScheme.primary,
-                        ),
-                        h2Padding: const EdgeInsets.only(top: 16),
-                        h2: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: colorScheme.primary,
-                        ),
-                        h3Padding: const EdgeInsets.only(top: 16),
-                        h3: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.primary,
-                        ),
-                        blockSpacing: 12,
-                        a: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.primary,
-                          decoration: TextDecoration.underline,
-                        ),
-                        // This targets inline code wrapped in single backticks (e.g., `int`)
-                        code: TextStyle(
-                          fontSize: theme
-                              .textTheme
-                              .bodyMedium
-                              ?.fontSize, // Matches your body text size
-                          color: Colors.black, // High contrast for Light Theme
-                          backgroundColor: Colors
-                              .grey
-                              .shade200, // Very subtle gray background
-                          fontFamily:
-                              'monospace', // Keeps the developer aesthetic
-                        ),
+                  MarkdownBody(
+                    data: widget.content.theory,
+                    styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+                      p: context.responsiveTextTheme.bodyMedium?.copyWith(
+                        height: 1.7,
                       ),
-                      builders: {'pre': CodeElementBuilder(context)},
+                      h1Padding: const EdgeInsets.only(top: 16),
+                      h1: context.responsiveTextTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: colorScheme.primary,
+                      ),
+                      h2Padding: const EdgeInsets.only(top: 16),
+                      h2: context.responsiveTextTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.primary,
+                      ),
+                      h3Padding: const EdgeInsets.only(top: 16),
+                      h3: context.responsiveTextTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.primary,
+                      ),
+                      blockSpacing: 12,
+                      a: context.responsiveTextTheme.bodyMedium?.copyWith(
+                        color: colorScheme.primary,
+                        decoration: TextDecoration.underline,
+                      ),
+                      // This targets inline code wrapped in single backticks (e.g., `int`)
+                      code: TextStyle(
+                        fontSize:
+                            context.responsiveTextTheme.bodyMedium?.fontSize,
+                        color: Colors.black, // High contrast for Light Theme
+                        backgroundColor:
+                            Colors.grey.shade200, // Very subtle gray background
+                        fontFamily:
+                            'monospace', // Keeps the developer aesthetic
+                      ),
                     ),
+                    builders: {'pre': CodeElementBuilder(context)},
+                  ),
 
                   // ── Additional Sections (Accordions) ─────────────────────────────────
                   if (widget.content.hasDeepDives) ...[
@@ -516,24 +526,31 @@ class _LessonContentState extends State<_LessonContent> {
                   AnimatedOpacity(
                     opacity: _showScrollToTop ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 200),
-                    child: FloatingActionButton(
-                      heroTag: 'scrollToTop',
-                      onPressed: () {
-                        if (_showScrollToTop) {
-                          _scrollController.animateTo(
-                            0,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeOutCubic,
-                          );
-                        }
-                      },
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onSecondary,
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                    child: SizedBox(
+                      width: fabSize,
+                      height: fabSize,
+                      child: FloatingActionButton(
+                        heroTag: 'scrollToTop',
+                        onPressed: () {
+                          if (_showScrollToTop) {
+                            _scrollController.animateTo(
+                              0,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeOutCubic,
+                            );
+                          }
+                        },
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onSecondary,
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(fabSize * 0.25),
+                        ),
+                        child: Icon(
+                          Icons.arrow_upward_rounded,
+                          size: fabSize * 0.7,
+                        ),
                       ),
-                      child: const Icon(Icons.arrow_upward_rounded),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -579,26 +596,29 @@ class _PrerequisitesCard extends StatelessWidget {
         .toList();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: context.responsivePadding(16, 12).padding,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: context.responsiveCircularRadius,
         border: Border(left: BorderSide(color: colorScheme.primary, width: 4)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisSize: MainAxisSize.max,
             children: [
               Icon(
                 Icons.task_alt_rounded,
-                size: 20,
                 color: colorScheme.primary,
+                size: context.isTablet ? 36.0 : 22.0,
               ),
               const SizedBox(width: 8),
               Text(
                 StringConstants.prerequisites,
-                style: theme.textTheme.titleSmall?.copyWith(
+                style: context.responsiveTextTheme.titleMedium?.copyWith(
                   color: colorScheme.tertiary,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -606,29 +626,31 @@ class _PrerequisitesCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
           ...items.map(
             (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+              padding: const EdgeInsets.only(top: 8.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    margin: const EdgeInsets.only(top: 6),
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: colorScheme.tertiary,
-                      shape: BoxShape.circle,
+                    width: context.isTablet ? 28.0 : 22.0,
+                    alignment: Alignment.center,
+                    margin: EdgeInsets.only(top: context.isTablet ? 8 : 6),
+                    child: Container(
+                      width: context.isTablet ? 10 : 6,
+                      height: context.isTablet ? 10 : 6,
+                      decoration: BoxDecoration(
+                        color: colorScheme.tertiary,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       item,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      style: context.responsiveTextTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
-                        height: 1.5,
                       ),
                     ),
                   ),
@@ -654,7 +676,7 @@ class _MarkCompleteButton extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      height: 52,
+      height: context.isTablet ? 76 : 48,
       child: ElevatedButton.icon(
         onPressed: () {
           final lessonBloc = context.read<LessonBloc>();
@@ -664,7 +686,12 @@ class _MarkCompleteButton extends StatelessWidget {
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Lesson marked as complete!'),
+              content: Text(
+                'Lesson marked as complete!',
+                style: context.responsiveTextTheme.labelLarge?.copyWith(
+                  color: colorScheme.onPrimary,
+                ),
+              ),
               behavior: SnackBarBehavior.floating,
               width: null,
               shape: RoundedRectangleBorder(
@@ -683,11 +710,14 @@ class _MarkCompleteButton extends StatelessWidget {
           isComplete
               ? Icons.check_circle_rounded
               : Icons.check_circle_outline_rounded,
-          size: context.screenHeight * 0.04,
+          size: context.isTablet ? 42 : 24,
         ),
         label: Text(
           isComplete ? 'Marked as Complete' : 'Mark as Complete',
-          style: const TextStyle(fontWeight: FontWeight.w700),
+          style: context.responsiveTextTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onPrimary,
+          ),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: isComplete
@@ -699,7 +729,9 @@ class _MarkCompleteButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+          padding: context.responsivePadding(12, 8).padding,
           elevation: isComplete ? 0 : 2,
+          alignment: AlignmentGeometry.center,
         ),
       ),
     );

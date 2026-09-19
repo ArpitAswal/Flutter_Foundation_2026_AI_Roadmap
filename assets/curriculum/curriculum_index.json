@@ -8,7 +8,7 @@
         {
           "id": 1,
           "title": "Getting Started with Dart",
-          "subtitle": "Learn the core concepts of Dart before moving into Flutter, ensuring every future topic is built on a solid programming foundation.",
+          "subtitle": "Learn the core concepts of Dart before moving into Flutter, ensuring every future topic is built on a solid programming foundation. It will make you comfortable with the language and its syntax.",
           "days": [
             {
               "phase": 1,
@@ -235,7 +235,7 @@
               "module": 3,
               "day": 12,
               "title": "SOLID Principles in Dart & Flutter",
-              "description": "Learn the five SOLID principles as practical engineering guidelines for designing maintainable Dart and Flutter applications: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion. Apply them to real Flutter architecture, identify violations through code review, and understand when applying a principle improves a design versus when it creates unnecessary abstraction.",
+              "description": "Learn the five SOLID principles as practical engineering guidelines for designing maintainable Dart and Flutter applications. Apply them to real Flutter architecture, identify violations through code review, and understand when applying a principle improves a design versus when it creates unnecessary abstraction.",
               "tags": [
                 "Dart",
                 "Flutter",
@@ -260,7 +260,7 @@
               "module": 3,
               "day": 13,
               "title": "Dependency Injection / Dependency Management",
-              "description": "Learn how to manage dependencies explicitly in Dart and Flutter applications, with a focus on Dependency Injection as a practical application of the Dependency Inversion Principle learned in Day 12. This day teaches how to identify dependencies, separate dependency usage from dependency construction, inject dependencies through constructors, build dependency graphs, establish composition roots, manage object ownership and lifecycles, and make implementations replaceable for testing and production environments.",
+              "description": "Learn how to manage dependencies explicitly in Dart and Flutter applications, with a focus on Dependency Injection as a practical application of the Dependency Inversion Principle learned in Day 12. This day teaches how to identify dependencies, separate dependency usage from dependency construction, inject dependencies through constructors, build dependency graphs & lifecycles, and make implementations replaceable for testing and production environments.",
               "tags": [
                 "Dart",
                 "Flutter",
@@ -299,7 +299,7 @@
               "module": 1,
               "day": 14,
               "title": "Flutter Widgets & Widget Tree Fundamentals",
-              "description": "Begin the Flutter-specific part of the curriculum by understanding widgets as the fundamental building blocks of Flutter UI and learning how widgets compose into a widget tree. Learn the role of root, parent, child, and leaf widgets, understand Flutter's declarative UI model, immutable widget configuration, widget composition, build methods, widget identity, and how the widget tree represents the structure of an application's interface. This day establishes the mental model required before learning layout, StatefulWidget, setState, lifecycle, navigation, and advanced Flutter architecture.",
+              "description": "Begin the Flutter-specific part of the curriculum by understanding widgets as the fundamental building blocks of Flutter UI and learning how widgets compose into a widget tree. Learn the role of root, parent, child, and leaf widgets, understand Flutter's declarative UI model, immutable widget configuration, widget composition, build methods, widget identity, and how the widget tree represents the structure of an application's interface.",
               "tags": [
                 "Flutter",
                 "Widgets",
@@ -324,7 +324,7 @@
               "module": 1,
               "day": 15,
               "title": "Flutter Layout & Constraints",
-              "description": "Learn how Flutter determines the size and position of widgets through its constraint-based layout system. Understand the core rule that constraints go down, sizes go up, and parents set positions. Learn how Row, Column, Container, SizedBox, Center, Padding, Expanded, Flexible, and alignment widgets participate in layout, why overflow and unbounded-constraint errors occur, and how to reason about Flutter layouts instead of trial-and-error positioning.",
+              "description": "Learn how Flutter determines the size and position of widgets through its constraint-based layout system. Understand the core rule that constraints go down, sizes go up, and parents set positions. Learn how Row, Column, Container, SizedBox, Center, Padding, Expanded, Flexible, and alignment widgets participate in layout, why overflow and unbounded-constraint errors occur.",
               "tags": [
                 "Flutter",
                 "Layout",

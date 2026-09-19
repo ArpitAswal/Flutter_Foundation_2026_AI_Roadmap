@@ -42,20 +42,7 @@ class PhaseCardNode extends StatelessWidget {
           child: _buildGridChild(context, node: node),
         ),
       );
-    }
-    // else if (context.isTablet) {
-    //   // Tablet single column mode (fallback if not in grid)
-    //   return CurriculumCard(
-    //     isLocked: isLocked,
-    //     isCompleted: isCompleted,
-    //     isCurrent: isCurrent,
-    //     child: Padding(
-    //       padding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 26.0),
-    //       child: _buildListChild(context, node: node),
-    //     ),
-    //   );
-    // }
-    else {
+    } else {
       // Mobile Timeline layout (node is completely outside on the left)
       return Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -109,10 +96,9 @@ class PhaseCardNode extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context),
+          _buildHeader(context, node: node),
           _buildTitle(context),
           const SizedBox(height: 4),
-          // MaxLines restricts vertical growth, while Spacer pushes footer to the bottom.
           _buildDescription(context, 6),
           const Spacer(),
           _buildProgressAndActions(context, node: node),
@@ -121,7 +107,7 @@ class PhaseCardNode extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, {Widget? node}) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Row(
@@ -139,25 +125,28 @@ class PhaseCardNode extends StatelessWidget {
             letterSpacing: 1.5,
           ),
         ),
-        if (!isLocked)
-          Container(
-            padding: context.responsivePadding(14, 6).padding,
-            decoration: BoxDecoration(
-              color: isCurrent
-                  ? colorScheme.secondaryContainer.withValues(alpha: 0.1)
-                  : colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-              borderRadius: context.responsiveCircularRadius,
-            ),
-            child: Text(
-              '$completedModules/${phase.modules.length}',
-              style: context.responsiveTextTheme.labelSmall?.copyWith(
-                color: isCurrent
-                    ? colorScheme.secondaryContainer
-                    : colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+        (!isLocked)
+            ? Container(
+                padding: context.responsivePadding(14, 6).padding,
+                decoration: BoxDecoration(
+                  color: isCurrent
+                      ? colorScheme.secondaryContainer.withValues(alpha: 0.1)
+                      : colorScheme.surfaceContainerHighest.withValues(
+                          alpha: 0.4,
+                        ),
+                  borderRadius: context.responsiveCircularRadius,
+                ),
+                child: Text(
+                  '$completedModules/${phase.modules.length}',
+                  style: context.responsiveTextTheme.labelSmall?.copyWith(
+                    color: isCurrent
+                        ? colorScheme.secondaryContainer
+                        : colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            : node ?? SizedBox.shrink(),
       ],
     );
   }
@@ -246,12 +235,7 @@ class PhaseCardNode extends StatelessWidget {
   }
 
   Widget _buildProgressAndActions(BuildContext context, {Widget? node}) {
-    if (isLocked && node != null) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 18.0),
-        child: Align(alignment: AlignmentGeometry.centerRight, child: node),
-      );
-    } else if (!isLocked) {
+    if (!isLocked) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -293,11 +277,11 @@ class PhaseCardNode extends StatelessWidget {
     // Slightly smaller node size when in Grid mode to save space, but still prominent
     double width;
     double height;
-    if (context.isTablet) {
-      width = (size.height * 0.07).clamp(40.0, 64.0);
-      height = width;
+    if (context.isTablet && context.orientation == Orientation.landscape) {
+      width = (size.width * 0.1).clamp(40, 80);
+      height = (size.height * 0.08).clamp(40, 60);
     } else {
-      width = (size.width * 0.08).clamp(36.0, 48.0);
+      width = (size.width * 0.08).clamp(30.0, 60.0);
       height = width;
     }
 
@@ -305,9 +289,17 @@ class PhaseCardNode extends StatelessWidget {
       return Container(
         width: width,
         height: height,
+        alignment: AlignmentGeometry.center,
         decoration: BoxDecoration(
           color: colorScheme.primary,
-          shape: BoxShape.circle,
+          shape:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BoxShape.rectangle
+              : BoxShape.circle,
+          borderRadius:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BorderRadius.circular(12)
+              : null,
           border: Border.all(color: colorScheme.onPrimary, width: 3),
           boxShadow: [
             BoxShadow(
@@ -327,9 +319,17 @@ class PhaseCardNode extends StatelessWidget {
       return Container(
         width: width,
         height: height,
+        alignment: AlignmentGeometry.center,
         decoration: BoxDecoration(
           color: colorScheme.secondaryContainer,
-          shape: BoxShape.circle,
+          shape:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BoxShape.rectangle
+              : BoxShape.circle,
+          borderRadius:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BorderRadius.circular(12)
+              : null,
           border: Border.all(color: colorScheme.onPrimary, width: 3),
           boxShadow: [
             BoxShadow(
@@ -349,9 +349,17 @@ class PhaseCardNode extends StatelessWidget {
       return Container(
         width: width,
         height: height,
+        alignment: AlignmentGeometry.center,
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
-          shape: BoxShape.circle,
+          shape:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BoxShape.rectangle
+              : BoxShape.circle,
+          borderRadius:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BorderRadius.circular(12)
+              : null,
           border: Border.all(color: colorScheme.outlineVariant, width: 3),
           boxShadow: [
             BoxShadow(

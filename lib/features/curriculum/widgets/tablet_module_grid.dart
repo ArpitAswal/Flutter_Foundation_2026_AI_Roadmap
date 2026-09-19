@@ -4,6 +4,8 @@ import '../../../core/utils/curriculum_progress_utils.dart';
 import '../../../domain/models/curriculum/phase.dart';
 import 'module_card_node.dart';
 
+import '../../../core/utils/responsive_extension.dart';
+
 class TabletModuleGrid extends StatelessWidget {
   final Phase phase;
   final Set<String> completed;
@@ -16,20 +18,45 @@ class TabletModuleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Break modules into rows of 2 for the tablet grid.
-    // Using IntrinsicHeight ensures that both cards in a row are perfectly identical in height.
+    // Break modules into rows of 1 for portrait tablet or 2 for landscape wide tablet.
+    // Using IntrinsicHeight ensures that all cards in a row are perfectly identical in height.
+    final int crossAxisCount = context.isWideTablet ? 2 : 1;
     final List<Widget> rows = [];
     final modulesList = phase.modules;
 
-    for (int i = 0; i < modulesList.length; i += 2) {
-      final firstModule = modulesList[i];
-      final firstIsLocked = isModuleLockedAt(phase, i, completed);
-
-      final secondExists = i + 1 < modulesList.length;
-      final secondModule = secondExists ? modulesList[i + 1] : null;
-      final secondIsLocked = secondExists
-          ? isModuleLockedAt(phase, i + 1, completed)
-          : false;
+    for (int i = 0; i < modulesList.length; i += crossAxisCount) {
+      final List<Widget> rowChildren = [];
+      
+      for (int j = 0; j < crossAxisCount; j++) {
+        final moduleIndex = i + j;
+        
+        if (moduleIndex < modulesList.length) {
+          final module = modulesList[moduleIndex];
+          final isLocked = isModuleLockedAt(phase, moduleIndex, completed);
+          
+          rowChildren.add(
+            Expanded(
+              child: ModuleCardNode(
+                phaseId: phase.id,
+                module: module,
+                isLocked: isLocked,
+                isCompleted: isModuleCompleted(phase, module, completed),
+                isCurrent: !isLocked && !isModuleCompleted(phase, module, completed),
+                completedDays: completedDaysInModule(phase, module, completed),
+                isGridMode: true,
+              ),
+            ),
+          );
+        } else {
+          // Fill remaining space in the row
+          rowChildren.add(const Spacer());
+        }
+        
+        // Add spacing between columns, except after the last column
+        if (j < crossAxisCount - 1) {
+          rowChildren.add(const SizedBox(width: 16));
+        }
+      }
 
       rows.add(
         Padding(
@@ -37,54 +64,7 @@ class TabletModuleGrid extends StatelessWidget {
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: ModuleCardNode(
-                    phaseId: phase.id,
-                    module: firstModule,
-                    isLocked: firstIsLocked,
-                    isCompleted: isModuleCompleted(
-                      phase,
-                      firstModule,
-                      completed,
-                    ),
-                    isCurrent:
-                        !firstIsLocked &&
-                        !isModuleCompleted(phase, firstModule, completed),
-                    completedDays: completedDaysInModule(
-                      phase,
-                      firstModule,
-                      completed,
-                    ),
-                    isGridMode: true,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                if (secondExists)
-                  Expanded(
-                    child: ModuleCardNode(
-                      phaseId: phase.id,
-                      module: secondModule!,
-                      isLocked: secondIsLocked,
-                      isCompleted: isModuleCompleted(
-                        phase,
-                        secondModule,
-                        completed,
-                      ),
-                      isCurrent:
-                          !secondIsLocked &&
-                          !isModuleCompleted(phase, secondModule, completed),
-                      completedDays: completedDaysInModule(
-                        phase,
-                        secondModule,
-                        completed,
-                      ),
-                      isGridMode: true,
-                    ),
-                  )
-                else
-                  const Spacer(),
-              ],
+              children: rowChildren,
             ),
           ),
         ),

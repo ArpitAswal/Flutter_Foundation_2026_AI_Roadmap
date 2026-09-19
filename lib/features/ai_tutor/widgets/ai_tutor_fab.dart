@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
 import 'ai_tutor_bottom_sheet.dart';
@@ -32,13 +33,26 @@ class AiTutorFab extends StatelessWidget {
       );
     }
 
-    return FloatingActionButton(
-      onPressed: openBottomSheet,
-      backgroundColor: colorScheme.primary,
-      foregroundColor: colorScheme.onSecondary,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: const Icon(Icons.smart_toy_outlined),
+    double fabSize;
+    if (context.isTablet) {
+      fabSize = (context.screenHeight * 0.1).clamp(60.0, 120.0);
+    } else {
+      fabSize = (context.screenWidth * 0.12).clamp(40.0, 60.0);
+    }
+
+    return SizedBox(
+      width: fabSize,
+      height: fabSize,
+      child: FloatingActionButton(
+        onPressed: openBottomSheet,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onSecondary,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(fabSize * 0.25),
+        ),
+        child: Icon(Icons.smart_toy_outlined, size: fabSize * 0.7),
+      ),
     );
   }
 }

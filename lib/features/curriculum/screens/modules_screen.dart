@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 
 import '../../../core/constants/string_constants.dart';
@@ -75,11 +74,11 @@ class _ModulesView extends StatelessWidget {
           backgroundColor: colorScheme.surface,
           appBar: AppBar(
             surfaceTintColor: Colors.transparent,
+            leadingWidth: context.isTablet ? 120.0 : 60.0,
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back_rounded,
                 color: colorScheme.onSurface,
-                size: context.screenWidth * (context.isTablet ? 0.03 : 0.06),
               ),
               onPressed: () => context.pop(),
             ),
@@ -87,41 +86,43 @@ class _ModulesView extends StatelessWidget {
             centerTitle: true,
           ),
           body: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.screenWidth * 0.03,
+              vertical: context.screenHeight * 0.03,
+            ),
             children: [
               // Header
               Text(
                 StringConstants.modulesTitle,
-                style: theme.textTheme.displaySmall?.copyWith(
+                style: context.responsiveTextTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
-                  fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
                 ),
                 textAlign: TextAlign.left,
               ),
               const SizedBox(height: 8),
               Text(
                 StringConstants.modulesSubtitle,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style: context.responsiveTextTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.left,
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: context.responsiveHeightSpace(0.02)),
               // Progress Bar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     StringConstants.progressLabel,
-                    style: theme.textTheme.labelSmall?.copyWith(
+                    style: context.responsiveTextTheme.labelSmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     '${(phaseProgress * 100).toInt()}%',
-                    style: theme.textTheme.labelSmall?.copyWith(
+                    style: context.responsiveTextTheme.labelSmall?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
@@ -130,12 +131,15 @@ class _ModulesView extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               CurriculumProgressBar(
+                height: context.responsiveHeightSpace(0.008),
                 fraction: phaseProgress,
                 isCurrent: true, // Header progress always colored
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: context.responsiveHeightSpace(0.02)),
               // Modules List
-              context.isTablet
+              context.isTablet &&
+                      (Orientation.landscape ==
+                          MediaQuery.of(context).orientation)
                   ? TabletModuleGrid(
                       phase: phase,
                       completed: state.completedLessonIds,
@@ -163,7 +167,9 @@ class _ModulesView extends StatelessWidget {
                         );
 
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
+                          padding: EdgeInsets.only(
+                            bottom: context.responsiveHeightSpace(0.02),
+                          ),
                           child: ModuleCardNode(
                             phaseId: phase.id,
                             module: module,

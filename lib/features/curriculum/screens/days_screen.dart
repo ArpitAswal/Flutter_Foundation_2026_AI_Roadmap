@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 
 import '../../../core/constants/string_constants.dart';
@@ -76,42 +75,51 @@ class _DaysView extends StatelessWidget {
           backgroundColor: colorScheme.surface,
           appBar: AppBar(
             surfaceTintColor: Colors.transparent,
+            leadingWidth: context.isTablet ? 120.0 : 60.0,
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back_rounded,
                 color: colorScheme.onSurface,
-                size: context.screenWidth * (context.isTablet ? 0.03 : 0.06),
               ),
               onPressed: () => context.pop(),
             ),
-            title: Text(module.title),
+            title: Text(module.title,
+              style: context.responsiveTextTheme.headlineMedium
+                  ?.copyWith(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.w500,
+              )),
             centerTitle: true,
           ),
           body: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.screenWidth * 0.03,
+              vertical: context.screenHeight * 0.03,
+            ),
             children: [
               // Header
               Text(
                 StringConstants.daysTitle,
-                style: theme.textTheme.displaySmall?.copyWith(
+                style: context.responsiveTextTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
-                  fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 StringConstants.daysSubtitle,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style: context.responsiveTextTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: context.responsiveHeightSpace(0.02)),
 
               // Content
-              context.isTablet
+              context.isTablet &&
+                      (Orientation.landscape ==
+                          MediaQuery.of(context).orientation)
                   ? TabletDayGrid(
                       phase: phase,
                       module: module,
@@ -120,13 +128,14 @@ class _DaysView extends StatelessWidget {
                   : Stack(
                       children: [
                         Positioned(
-                          left: MediaQuery.of(context).size.width * 0.04,
+                          left: context.screenWidth * 0.035,
                           top: 16,
-                          bottom: 20,
-                          width: 4,
+                          bottom: context.responsiveHeightSpace(0.02),
+                          width: context.isTablet ? 6 : 4,
                           child: Container(
                             decoration: BoxDecoration(
                               color: colorScheme.outlineVariant.withAlpha(50),
+                              borderRadius: BorderRadius.circular(4),
                             ),
                           ),
                         ),
@@ -149,7 +158,9 @@ class _DaysView extends StatelessWidget {
                             final isCurrent = !isLocked && !isCompleted;
 
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: 24),
+                              padding: EdgeInsets.only(
+                                bottom: context.responsiveHeightSpace(0.02),
+                              ),
                               child: DayCardNode(
                                 phaseId: phase.id,
                                 moduleId: module.id,

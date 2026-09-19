@@ -5,6 +5,8 @@ import '../../../domain/models/curriculum/lesson_module.dart';
 import '../../../domain/models/curriculum/phase.dart';
 import 'day_card_node.dart';
 
+import '../../../core/utils/responsive_extension.dart';
+
 class TabletDayGrid extends StatelessWidget {
   final Phase phase;
   final LessonModule module;
@@ -19,68 +21,53 @@ class TabletDayGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Break days into rows of 2 for the tablet grid.
+    // Break modules into rows of 1 for portrait tablet or 2 for landscape wide tablet.
+    // Using IntrinsicHeight ensures that all cards in a row are perfectly identical in height.
+    final int crossAxisCount = context.isWideTablet ? 2 : 1;
     final List<Widget> rows = [];
     final daysList = module.days;
 
-    for (int i = 0; i < daysList.length; i += 2) {
-      final firstDay = daysList[i];
-      final firstIsLocked = isDayLockedAt(phase, module, i, completed);
-
-      final secondExists = i + 1 < daysList.length;
-      final secondDay = secondExists ? daysList[i + 1] : null;
-      final secondIsLocked = secondExists
-          ? isDayLockedAt(phase, module, i + 1, completed)
-          : false;
+    for (int i = 0; i < daysList.length; i += crossAxisCount) {
+      final List<Widget> rowChildren = [];
+      
+      for (int j = 0; j < crossAxisCount; j++) {
+        final dayIndex = i + j;
+        
+        if (dayIndex < daysList.length) {
+          final day = daysList[dayIndex];
+          final isLocked = isDayLockedAt(phase, module, dayIndex, completed);
+          
+          rowChildren.add(
+            Expanded(
+              child: DayCardNode(
+                phaseId: phase.id,
+                moduleId: module.id,
+                day: day,
+                isLocked: isLocked,
+                isCompleted: isDayCompleted(phase, module, day, completed),
+                isCurrent: !isLocked && !isDayCompleted(phase, module, day, completed),
+                isGridMode: true,
+              ),
+            ),
+          );
+        } else {
+          // Fill remaining space in the row
+          rowChildren.add(const Spacer());
+        }
+        
+        // Add spacing between columns, except after the last column
+        if (j < crossAxisCount - 1) {
+          rowChildren.add(const SizedBox(width: 16));
+        }
+      }
 
       rows.add(
         Padding(
-          padding: const EdgeInsets.only(bottom: 32.0),
+          padding: const EdgeInsets.only(bottom: 24.0),
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: DayCardNode(
-                    phaseId: phase.id,
-                    moduleId: module.id,
-                    day: firstDay,
-                    isLocked: firstIsLocked,
-                    isCompleted: isDayCompleted(
-                      phase,
-                      module,
-                      firstDay,
-                      completed,
-                    ),
-                    isCurrent:
-                        !firstIsLocked &&
-                        !isDayCompleted(phase, module, firstDay, completed),
-                    isGridMode: true,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                if (secondExists)
-                  Expanded(
-                    child: DayCardNode(
-                      phaseId: phase.id,
-                      moduleId: module.id,
-                      day: secondDay!,
-                      isLocked: secondIsLocked,
-                      isCompleted: isDayCompleted(
-                        phase,
-                        module,
-                        secondDay,
-                        completed,
-                      ),
-                      isCurrent:
-                          !secondIsLocked &&
-                          !isDayCompleted(phase, module, secondDay, completed),
-                      isGridMode: true,
-                    ),
-                  )
-                else
-                  const Spacer(),
-              ],
+              children: rowChildren,
             ),
           ),
         ),

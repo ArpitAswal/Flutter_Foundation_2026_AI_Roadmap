@@ -19,6 +19,9 @@ extension ResponsiveExtension on BuildContext {
   /// Returns true if the device is a wide tablet/landscape iPad (width >= 1024px)
   bool get isWideTablet => screenWidth >= 1024;
 
+  /// Returns the current device orientation
+  Orientation get orientation => MediaQuery.of(this).orientation;
+
   /// Provides a scaled Padding based on the current device dimensions.
   Padding responsivePadding(double x, double y) {
     double getResponsiveVerticalPadding(double value) {

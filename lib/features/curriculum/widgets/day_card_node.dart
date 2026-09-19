@@ -38,17 +38,18 @@ class DayCardNode extends StatelessWidget {
         isCurrent: isCurrent,
         onTap: _getOnTap(context),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 26.0),
+          padding: context.responsivePadding(18, 16).padding,
           child: _buildGridChild(context),
         ),
       );
     }
 
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildStatusNode(context),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         Expanded(
           child: CurriculumCard(
             isLocked: isLocked,
@@ -56,10 +57,7 @@ class DayCardNode extends StatelessWidget {
             isCurrent: isCurrent,
             onTap: _getOnTap(context),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 12.0,
-                horizontal: 20.0,
-              ),
+              padding: context.responsivePadding(16, 8).padding,
               child: _buildContent(context),
             ),
           ),
@@ -93,14 +91,12 @@ class DayCardNode extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           children: [
             Expanded(child: _buildHeader(context)),
-            if (!isLocked) ...[
-              const SizedBox(width: 12),
+            if (context.orientation == Orientation.landscape)
+              _buildStatusNode(context)
+            else
               _buildChevron(context),
-            ],
-            // _buildStatusNode(context),
           ],
         ),
-        const SizedBox(height: 8),
         _buildTitle(context),
         const SizedBox(height: 4),
         _buildDescription(context, 6),
@@ -120,10 +116,9 @@ class DayCardNode extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(child: _buildHeader(context)),
-            if (!isLocked) ...[_buildChevron(context)],
+            _buildChevron(context),
           ],
         ),
-        const SizedBox(height: 4),
         _buildTitle(context),
         const SizedBox(height: 4),
         _buildDescription(context, null),
@@ -135,8 +130,11 @@ class DayCardNode extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Icon(
       Icons.chevron_right_rounded,
-      color: isCompleted ? colorScheme.primary : colorScheme.secondaryContainer,
-      size: (context.isTablet) ? 40 : 20,
+      color: isCompleted
+          ? colorScheme.primary
+          : isCurrent
+          ? colorScheme.secondaryContainer
+          : colorScheme.outlineVariant,
     );
   }
 
@@ -147,12 +145,12 @@ class DayCardNode extends StatelessWidget {
       isCurrent
           ? '${StringConstants.dayPrefix} ${day.day} • ${StringConstants.currentLabel}'
           : '${StringConstants.dayPrefix} ${day.day}',
-      style: theme.textTheme.labelSmall?.copyWith(
+      style: context.responsiveTextTheme.labelLarge?.copyWith(
         color: isCurrent
             ? colorScheme.secondaryContainer
             : (isLocked ? colorScheme.onSurfaceVariant : colorScheme.primary),
         fontWeight: FontWeight.bold,
-        letterSpacing: 1.2,
+        letterSpacing: 1.5,
       ),
     );
   }
@@ -162,9 +160,9 @@ class DayCardNode extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     return Text(
       day.title,
-      style: theme.textTheme.titleMedium?.copyWith(
+      style: context.responsiveTextTheme.titleSmall?.copyWith(
         fontWeight: FontWeight.bold,
-        color: colorScheme.onSurface,
+        color: isLocked ? colorScheme.onSurfaceVariant : colorScheme.onSurface,
         fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
       ),
     );
@@ -177,9 +175,8 @@ class DayCardNode extends StatelessWidget {
       day.description,
       maxLines: maxLines,
       overflow: maxLines == null ? null : TextOverflow.ellipsis,
-      style: theme.textTheme.bodySmall?.copyWith(
-        color: colorScheme.onSurfaceVariant,
-        fontSize: 12
+      style: context.responsiveTextTheme.labelSmall?.copyWith(
+        color: isLocked ? colorScheme.outline : colorScheme.onSurfaceVariant,
       ),
     );
   }
@@ -189,21 +186,29 @@ class DayCardNode extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     double width;
     double height;
-    if (context.isTablet) {
-      width = size.height * 0.08;
-      height = size.height * 0.08;
+    if (context.isTablet && context.orientation == Orientation.landscape) {
+      width = (size.width * 0.1).clamp(40, 80);
+      height = (size.height * 0.08).clamp(40, 60);
     } else {
-      width = size.width * 0.08;
-      height = size.width * 0.08;
+      width = (size.width * 0.08).clamp(30.0, 60.0);
+      height = width;
     }
 
     if (isCompleted) {
       return Container(
         width: width,
         height: height,
+        alignment: AlignmentGeometry.center,
         decoration: BoxDecoration(
           color: colorScheme.primary,
-          shape: BoxShape.circle,
+          shape:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BoxShape.rectangle
+              : BoxShape.circle,
+          borderRadius:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BorderRadius.circular(12)
+              : null,
           border: Border.all(color: colorScheme.onPrimary, width: 3),
           boxShadow: [
             BoxShadow(
@@ -223,9 +228,17 @@ class DayCardNode extends StatelessWidget {
       return Container(
         width: width,
         height: height,
+        alignment: AlignmentGeometry.center,
         decoration: BoxDecoration(
           color: colorScheme.secondaryContainer,
-          shape: BoxShape.circle,
+          shape:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BoxShape.rectangle
+              : BoxShape.circle,
+          borderRadius:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BorderRadius.circular(12)
+              : null,
           border: Border.all(color: colorScheme.onPrimary, width: 3),
           boxShadow: [
             BoxShadow(
@@ -245,9 +258,17 @@ class DayCardNode extends StatelessWidget {
       return Container(
         width: width,
         height: height,
+        alignment: AlignmentGeometry.center,
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
-          shape: BoxShape.circle,
+          shape:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BoxShape.rectangle
+              : BoxShape.circle,
+          borderRadius:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? BorderRadius.circular(12)
+              : null,
           border: Border.all(color: colorScheme.outlineVariant, width: 3),
           boxShadow: [
             BoxShadow(

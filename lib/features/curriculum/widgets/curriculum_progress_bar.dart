@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 
 class CurriculumProgressBar extends StatelessWidget {
   final double fraction;
@@ -22,14 +23,14 @@ class CurriculumProgressBar extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(context.screenWidth * 0.04),
       ),
       child: FractionallySizedBox(
         alignment: Alignment.centerLeft,
         widthFactor: fraction.clamp(0.0, 1.0),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(context.screenWidth * 0.04),
             gradient: isCurrent
                 ? LinearGradient(
                     colors: [
