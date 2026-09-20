@@ -1,22 +1,31 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../core/constants/string_constants.dart';
 import '../../../core/error/failure.dart';
+import '../../../domain/models/ai_chat_turn.dart';
 import '../../../domain/usecases/ask_ai_tutor_use_case.dart';
 import '../models/chat_message.dart';
 import 'ai_tutor_event.dart';
 import 'ai_tutor_state.dart';
 
 /// Manages the state of the AI Tutor chat interface.
+///
+/// Scoped as an app-lifecycle @LazySingleton so that conversations are preserved
+/// in-memory across different screens during the app session without database persistence.
 @LazySingleton()
 class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
   final AskAiTutorUseCase _askAiTutorUseCase;
+  StreamSubscription<String>? _streamSubscription;
 
   AiTutorBloc(this._askAiTutorUseCase) : super(const AiTutorInitial([])) {
     on<AiTutorInitialized>(_onInitialized);
     on<AiTutorMessageSent>(_onMessageSent);
+    on<AiTutorStopRequested>(_onStopRequested);
+    on<AiTutorNewChatRequested>(_onNewChatRequested);
+    on<AiTutorRetryRequested>(_onRetryRequested);
   }
 
   void _onInitialized(AiTutorInitialized event, Emitter<AiTutorState> emit) {
@@ -39,16 +48,39 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
     AiTutorMessageSent event,
     Emitter<AiTutorState> emit,
   ) async {
-    // Prevent multiple requests at once
-    if (state is AiTutorLoading || state is AiTutorResponseStreaming) return;
+    // Prevent overlapping requests
+    if (state.isStreaming) return;
 
-    // Add user message and a placeholder for AI
+    // Convert existing completed messages to domain ChatTurns for bounded context
+    final history = <ChatTurn>[];
+    for (int i = 0; i < state.messages.length; i++) {
+      final msg = state.messages[i];
+      if (msg.text.trim().isNotEmpty && !msg.isLoading) {
+        history.add(
+          ChatTurn(
+            id: 'turn_$i',
+            role: msg.isUser ? ChatRole.user : ChatRole.assistant,
+            text: msg.text,
+            timestamp: DateTime.now(),
+            isError: msg.isError,
+          ),
+        );
+      }
+    }
+
+    // Add user message and placeholder for assistant
     final currentMessages = List<ChatMessage>.from(state.messages);
     currentMessages.add(ChatMessage(text: event.message, isUser: true));
     currentMessages.add(
       const ChatMessage(text: '', isUser: false, isLoading: true),
     );
-    emit(AiTutorLoading(currentMessages));
+
+    emit(AiTutorLoading(currentMessages, lastUserMessage: event.message));
+
+    final buffer = StringBuffer();
+    final completer = Completer<void>();
+    DateTime lastEmitTime = DateTime.fromMillisecondsSinceEpoch(0);
+    bool hasError = false;
 
     try {
       final responseStream = _askAiTutorUseCase.execute(
@@ -56,41 +88,43 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
         currentLesson: event.currentLesson,
         currentContent: event.currentContent,
         model: event.model,
+        history: history,
       );
 
-      final buffer = StringBuffer();
-
-      bool hasError = false;
-
-      // Listen to the stream and emit chunks sequentially
-      await emit.forEach<String>(
-        responseStream,
-        onData: (chunk) {
+      _streamSubscription?.cancel();
+      _streamSubscription = responseStream.listen(
+        (chunk) {
           buffer.write(chunk);
+          final now = DateTime.now();
 
-          final messages = List<ChatMessage>.from(state.messages);
-          if (messages.isNotEmpty) {
-            messages.last = ChatMessage(text: buffer.toString(), isUser: false);
+          // Throttle UI emissions to 80ms interval to keep frame rate smooth
+          if (now.difference(lastEmitTime).inMilliseconds >= 80) {
+            lastEmitTime = now;
+            final partial = buffer.toString();
+            final messages = List<ChatMessage>.from(state.messages);
+            if (messages.isNotEmpty) {
+              messages.last = ChatMessage(text: partial, isUser: false);
+            }
+            emit(
+              AiTutorResponseStreaming(
+                messages,
+                partialResponse: partial,
+                lastUserMessage: event.message,
+              ),
+            );
           }
-
-          return AiTutorResponseStreaming(
-            messages,
-            partialResponse: buffer.toString(),
-          );
         },
         onError: (error, stackTrace) {
           hasError = true;
-          debugPrint('AiTutorBloc: Error during stream - $error');
+          debugPrint('AiTutorBloc stream error: $error');
           final messages = List<ChatMessage>.from(state.messages);
 
-          // Determine if the error is a known Failure (e.g. AppException mapping) or a generic error.
           final errorMessage = error is Failure
               ? error.message
               : StringConstants.aiTutorUnexpectedError;
 
           if (messages.isNotEmpty) {
             final currentText = messages.last.text;
-            // Append the error string to the current chunk state and mark it as an error message.
             messages.last = ChatMessage(
               text: currentText.isEmpty
                   ? errorMessage
@@ -100,38 +134,44 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
             );
           }
 
-          return AiTutorError(messages, message: errorMessage);
+          emit(
+            AiTutorError(
+              messages,
+              message: errorMessage,
+              lastUserMessage: event.message,
+            ),
+          );
+          completer.complete();
         },
+        onDone: () {
+          if (!hasError && !completer.isCompleted) {
+            final fullText = buffer.toString();
+            final messages = List<ChatMessage>.from(state.messages);
+            if (messages.isNotEmpty) {
+              messages.last = ChatMessage(text: fullText, isUser: false);
+            }
+            emit(
+              AiTutorResponseComplete(
+                messages,
+                fullResponse: fullText,
+                lastUserMessage: event.message,
+              ),
+            );
+            completer.complete();
+          }
+        },
+        cancelOnError: true,
       );
 
-      if (!hasError) {
-        final finalMessages = List<ChatMessage>.from(state.messages);
-        if (finalMessages.isNotEmpty) {
-          finalMessages.last = ChatMessage(
-            text: buffer.toString(),
-            isUser: false,
-          );
-        }
-
-        // Once the stream completes without error, emit the final state
-        emit(
-          AiTutorResponseComplete(
-            finalMessages,
-            fullResponse: buffer.toString(),
-          ),
-        );
-      }
+      await completer.future;
     } catch (e) {
       final messages = List<ChatMessage>.from(state.messages);
-
-      // Catch all other unexpected initialization errors.
       final errorMessage = e is Failure
           ? e.message
           : StringConstants.aiTutorGenericError;
 
       if (messages.isNotEmpty) {
         final currentText = messages.last.text;
-        // Inject the error message directly into the chat UI so the user can read it.
         messages.last = ChatMessage(
           text: currentText.isEmpty
               ? errorMessage
@@ -141,7 +181,101 @@ class AiTutorBloc extends Bloc<AiTutorEvent, AiTutorState> {
         );
       }
 
-      emit(AiTutorError(messages, message: errorMessage));
+      emit(
+        AiTutorError(
+          messages,
+          message: errorMessage,
+          lastUserMessage: event.message,
+        ),
+      );
     }
+  }
+
+  void _onStopRequested(
+    AiTutorStopRequested event,
+    Emitter<AiTutorState> emit,
+  ) {
+    if (_streamSubscription != null) {
+      _streamSubscription?.cancel();
+      _streamSubscription = null;
+
+      // Finalize the partial response as complete
+      final messages = List<ChatMessage>.from(state.messages);
+      if (messages.isNotEmpty) {
+        if (messages.last.isLoading) {
+          if (messages.last.text.trim().isNotEmpty) {
+            messages.last = ChatMessage(
+              text: messages.last.text,
+              isUser: false,
+            );
+          } else {
+            messages.removeLast();
+          }
+        }
+      }
+      emit(
+        AiTutorResponseComplete(
+          messages,
+          fullResponse: messages.isNotEmpty ? messages.last.text : '',
+          lastUserMessage: state.lastUserMessage,
+        ),
+      );
+    }
+  }
+
+  void _onNewChatRequested(
+    AiTutorNewChatRequested event,
+    Emitter<AiTutorState> emit,
+  ) {
+    _streamSubscription?.cancel();
+    _streamSubscription = null;
+
+    final text = event.contextText != null
+        ? StringConstants.aiTutorGreetingContext.replaceAll(
+            '{context}',
+            event.contextText!,
+          )
+        : StringConstants.aiTutorGreetingGeneric;
+
+    final messages = [
+      ChatMessage(text: text, isUser: false, suggestions: event.suggestions),
+    ];
+    emit(AiTutorInitial(messages));
+  }
+
+  void _onRetryRequested(
+    AiTutorRetryRequested event,
+    Emitter<AiTutorState> emit,
+  ) {
+    final lastMessage = state.lastUserMessage;
+    if (lastMessage == null || lastMessage.isEmpty) return;
+
+    // Remove the trailing error/loading message
+    final messages = List<ChatMessage>.from(state.messages);
+    if (messages.isNotEmpty &&
+        (messages.last.isError || messages.last.isLoading)) {
+      messages.removeLast();
+    }
+    // Also remove the previous user question bubble because _onMessageSent will re-add it
+    if (messages.isNotEmpty && messages.last.isUser) {
+      messages.removeLast();
+    }
+
+    emit(AiTutorInitial(messages));
+
+    add(
+      AiTutorMessageSent(
+        message: lastMessage,
+        currentLesson: event.currentLesson,
+        currentContent: event.currentContent,
+        model: event.model,
+      ),
+    );
+  }
+
+  @override
+  Future<void> close() {
+    _streamSubscription?.cancel();
+    return super.close();
   }
 }

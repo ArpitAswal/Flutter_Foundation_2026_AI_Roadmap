@@ -24,18 +24,7 @@ class AiAssistantSettingsLocalDataSource {
   Future<AiModel> readSelectedModel() async {
     final prefs = await SharedPreferences.getInstance();
     final rawValue = prefs.getString(_selectedModelKey);
-
-    if (rawValue == null) {
-      return AiModel.geminiFlash;
-    }
-
-    for (final model in AiModel.values) {
-      if (model.name == rawValue) {
-        return model;
-      }
-    }
-
-    return AiModel.geminiFlash;
+    return AiModel.fromStoredName(rawValue);
   }
 
   Future<void> saveSelectedModel(AiModel model) async {
@@ -83,7 +72,7 @@ class AiAssistantSettingsLocalDataSource {
   String _storageKeyForModel(AiModel model) {
     return switch (model) {
       AiModel.geminiFlash => _geminiApiKey,
-      AiModel.gpt4oMini => _openAiApiKey,
+      AiModel.gpt5Mini => _openAiApiKey,
       AiModel.claudeHaiku => _anthropicApiKey,
     };
   }

@@ -42,7 +42,7 @@ APPLICATION META-CONTEXT (How this Flutter AI Tutor app is engineered):
 - Local Database: Hive (with hive_flutter, hive_generator, @HiveType, @HiveField annotations)
 - Navigation: go_router (declarative URL routing)
 - Networking: Dio (HTTP client with Repository pattern)
-- AI Integration: google_generative_ai SDK with user-selectable models (gemini-1.5-flash / gemini-1.5-pro)
+- AI Integration: Multi-model BYOK supporting Google Gemini (gemini-3.5-flash), OpenAI (gpt-5-mini), and Anthropic Claude (claude-3-5-haiku-20241022)
 - Architecture: Clean Architecture with feature-based vertical slices and get_it / injectable DI.
 
 Important:

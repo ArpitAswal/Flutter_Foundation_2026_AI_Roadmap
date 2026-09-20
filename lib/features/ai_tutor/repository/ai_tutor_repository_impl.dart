@@ -4,6 +4,7 @@ import '../../../core/constants/string_constants.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/error/failure.dart';
 import '../../../data/remote/sources/ai_data_source_factory.dart';
+import '../../../domain/models/ai_chat_turn.dart';
 import '../../../domain/models/ai_model.dart';
 import '../../../domain/repositories/ai_tutor_repository.dart';
 
@@ -19,6 +20,7 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
     required String systemPrompt,
     required String userMessage,
     required AiModel model,
+    List<ChatTurn> history = const [],
   }) async* {
     try {
       final dataSource = _dataSourceFactory.getDataSource(model);
@@ -26,6 +28,7 @@ class AiTutorRepositoryImpl implements AiTutorRepository {
         systemPrompt: systemPrompt,
         userMessage: userMessage,
         model: model,
+        history: history,
       )) {
         yield chunk;
       }

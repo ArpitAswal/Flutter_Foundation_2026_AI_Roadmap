@@ -1,3 +1,4 @@
+import '../models/ai_chat_turn.dart';
 import '../models/ai_model.dart';
 
 /// Abstract repository interface for the AI Tutor feature.
@@ -7,9 +8,11 @@ abstract class AiTutorRepository {
   /// [systemPrompt] Assembled system instructions containing guardrails, Meta-Context, and Lesson-Context.
   /// [userMessage] The raw query from the user.
   /// [model] The user-selected AI model (defaults to AiModel.geminiFlash).
+  /// [history] Recent bounded turns from the current app session.
   Stream<String> askQuestion({
     required String systemPrompt,
     required String userMessage,
     required AiModel model,
+    List<ChatTurn> history = const [],
   });
 }

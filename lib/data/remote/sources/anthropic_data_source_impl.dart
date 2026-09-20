@@ -4,7 +4,9 @@ import 'package:injectable/injectable.dart';
 
 import '../../../core/constants/string_constants.dart';
 import '../../../core/error/app_exception.dart';
+import '../../../domain/models/ai_chat_turn.dart';
 import '../../../domain/models/ai_model.dart';
+import '../../../domain/models/key_validation_result.dart';
 import '../../local/sources/ai_assistant_settings_local_data_source.dart';
 import 'ai_remote_data_source.dart';
 
@@ -22,6 +24,7 @@ class AnthropicDataSourceImpl implements AiRemoteDataSource {
     required String systemPrompt,
     required String userMessage,
     required AiModel model,
+    List<ChatTurn> history = const [],
   }) async* {
     final apiKey = await _settingsLocalDataSource.readProviderKey(model);
     if (apiKey == null || apiKey.isEmpty) {
@@ -29,13 +32,19 @@ class AnthropicDataSourceImpl implements AiRemoteDataSource {
     }
 
     try {
+      final messages = <Map<String, String>>[];
+      for (final turn in history) {
+        final role = turn.role == ChatRole.assistant ? 'assistant' : 'user';
+        messages.add({'role': role, 'content': turn.text});
+      }
+      messages.add({'role': 'user', 'content': userMessage});
+
       final response = await _dio.post<ResponseBody>(
         'https://api.anthropic.com/v1/messages',
         options: Options(
           headers: {
             'x-api-key': apiKey,
             'anthropic-version': '2023-06-01',
-            'anthropic-beta': 'prompt-caching-2024-07-31',
             'content-type': 'application/json',
           },
           responseType: ResponseType.stream,
@@ -43,16 +52,8 @@ class AnthropicDataSourceImpl implements AiRemoteDataSource {
         data: {
           'model': model.modelName,
           'max_tokens': 1024,
-          'system': [
-            {
-              "type": "text",
-              "text": systemPrompt,
-              "cache_control": {"type": "ephemeral"},
-            },
-          ],
-          'messages': [
-            {'role': 'user', 'content': userMessage},
-          ],
+          'system': systemPrompt,
+          'messages': messages,
           'stream': true,
         },
       );
@@ -110,7 +111,7 @@ class AnthropicDataSourceImpl implements AiRemoteDataSource {
   }
 
   @override
-  Future<bool> isValidKey(String apiKey, AiModel model) async {
+  Future<KeyValidationResult> validateKey(String apiKey, AiModel model) async {
     try {
       final response = await _dio.post(
         'https://api.anthropic.com/v1/messages',
@@ -120,6 +121,7 @@ class AnthropicDataSourceImpl implements AiRemoteDataSource {
             'anthropic-version': '2023-06-01',
             'content-type': 'application/json',
           },
+          validateStatus: (status) => true,
         ),
         data: {
           'model': model.modelName,
@@ -129,11 +131,31 @@ class AnthropicDataSourceImpl implements AiRemoteDataSource {
           ],
         },
       );
-      return response.statusCode == 200;
+
+      final status = response.statusCode ?? 0;
+      if (status == 200) {
+        return KeyValidationResult.valid;
+      } else if (status == 401) {
+        return KeyValidationResult.unauthorized;
+      } else if (status == 429) {
+        return KeyValidationResult.rateLimited;
+      } else if (status == 403 || status == 404) {
+        return KeyValidationResult.modelUnavailable;
+      }
+      return KeyValidationResult.unauthorized;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        return KeyValidationResult.networkUnavailable;
+      }
+      final status = e.response?.statusCode;
+      if (status == 401) return KeyValidationResult.unauthorized;
+      if (status == 429) return KeyValidationResult.rateLimited;
+      return KeyValidationResult.unknown;
     } catch (_) {
-      // If it throws DioException for 401 Unauthorized, it's invalid.
-      // Other errors might indicate network issues, but for simplicity we return false.
-      return false;
+      return KeyValidationResult.unknown;
     }
   }
 }

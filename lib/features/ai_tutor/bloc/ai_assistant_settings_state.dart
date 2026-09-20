@@ -9,6 +9,9 @@ class AiAssistantSettingsState extends Equatable {
   final AiModel? savingKeyModel;
   final AiModel selectedModel;
   final Map<AiModel, bool> keyAvailability;
+
+  /// Holds non-reversible masked representations of keys (e.g. AIza••••••••0XYZ).
+  /// Raw secrets are NEVER stored or exposed in presentation state.
   final Map<AiModel, String> savedKeys;
   final String? errorMessage;
 
@@ -30,12 +33,12 @@ class AiAssistantSettingsState extends Equatable {
       selectedModel: AiModel.geminiFlash,
       keyAvailability: {
         AiModel.geminiFlash: false,
-        AiModel.gpt4oMini: false,
+        AiModel.gpt5Mini: false,
         AiModel.claudeHaiku: false,
       },
       savedKeys: {
         AiModel.geminiFlash: '',
-        AiModel.gpt4oMini: '',
+        AiModel.gpt5Mini: '',
         AiModel.claudeHaiku: '',
       },
       errorMessage: null,

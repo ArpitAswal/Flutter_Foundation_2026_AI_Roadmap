@@ -69,14 +69,17 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          title: const Text(StringConstants.settingsTitle),
-          surfaceTintColor: Colors.transparent,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: colorScheme.onSurface,
-              size: context.screenWidth * (context.isTablet ? 0.03 : 0.06),
+          title: Text(
+            StringConstants.settingsTitle,
+            style: context.responsiveTextTheme.headlineMedium?.copyWith(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.w500,
             ),
+          ),
+          surfaceTintColor: Colors.transparent,
+          leadingWidth: context.isTablet ? 120.0 : 60.0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_rounded, color: colorScheme.onSurface),
             onPressed: () => context.pop(),
           ),
           centerTitle: true,
@@ -134,26 +137,34 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
               }
               return Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 680),
+                  constraints: BoxConstraints(
+                    maxWidth:
+                        (context.isTablet &&
+                            context.orientation == Orientation.landscape)
+                        ? context.screenWidth * 0.75
+                        : double.infinity,
+                  ),
                   child: ListView(
-                    padding: const EdgeInsets.all(20),
+                    padding: context.responsivePadding(16, 25).padding,
                     children: [
                       _buildHeroCard(context, state),
-                      const SizedBox(height: 20),
+                      SizedBox(height: context.responsiveHeightSpace(0.02)),
                       _buildModelSection(context, state),
-                      const SizedBox(height: 20),
+                      SizedBox(height: context.responsiveHeightSpace(0.02)),
                       _buildProviderSection(
                         context,
                         state,
                         model: AiModel.geminiFlash,
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: context.responsiveHeightSpace(0.02)),
+
                       _buildProviderSection(
                         context,
                         state,
-                        model: AiModel.gpt4oMini,
+                        model: AiModel.gpt5Mini,
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: context.responsiveHeightSpace(0.02)),
+
                       _buildProviderSection(
                         context,
                         state,
@@ -172,37 +183,36 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
 
   Widget _buildHeroCard(BuildContext context, AiAssistantSettingsState state) {
     final colorScheme = Theme.of(context).colorScheme;
-    final size = MediaQuery.of(context).size;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: context.responsivePadding(12, 12).padding,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [colorScheme.primary, colorScheme.primaryContainer],
         ),
-        borderRadius: BorderRadius.circular(
-          context.screenWidth * (context.isTablet ? 0.02 : 0.04),
-        ),
+        borderRadius: context.responsiveCircularRadius,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            width: size.width * (context.isTablet ? 0.08 : 0.15),
-            height: size.width * (context.isTablet ? 0.08 : 0.15),
+            width: context.isTablet ? 120 : 50,
+            height: context.isTablet ? 120 : 50,
             decoration: BoxDecoration(
               color: colorScheme.onPrimary.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(
-                context.screenWidth * (context.isTablet ? 0.01 : 0.02),
+              borderRadius: BorderRadiusGeometry.circular(
+                context.isTablet ? 18 : 8,
               ),
             ),
             child: Icon(
               state.isAssistantLocked ? Icons.lock_rounded : Icons.key_rounded,
               color: colorScheme.onPrimary,
-              size: context.screenWidth * (context.isTablet ? 0.06 : 0.1),
+              size: context.isTablet ? 80 : 30,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: context.screenWidth * 0.03),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,18 +222,18 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                   state.isAssistantLocked
                       ? StringConstants.settingsAssistantLocked
                       : StringConstants.settingsAssistantReady,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: context.responsiveTextTheme.titleMedium?.copyWith(
                     color: colorScheme.onPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
                 Text(
                   // Show description corresponding to the lock state.
                   state.isAssistantLocked
                       ? StringConstants.settingsUnlockPrompt
                       : StringConstants.settingsKeysSaved,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onPrimary.withValues(alpha: 0.88),
+                  style: context.responsiveTextTheme.labelLarge?.copyWith(
+                    color: colorScheme.onPrimary.withValues(alpha: 0.7),
+                    height: 1.4,
                   ),
                 ),
               ],
@@ -241,7 +251,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: context.responsivePadding(20, 14).padding,
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
@@ -252,12 +262,12 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
         children: [
           Text(
             StringConstants.settingsDefaultModelTitle,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: context.responsiveTextTheme.titleMedium,
           ),
           const SizedBox(height: 8),
           Text(
             StringConstants.settingsDefaultModelDesc,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: context.responsiveTextTheme.bodySmall,
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<AiModel>(
@@ -293,7 +303,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
     final savedKey = state.savedKeys[model] ?? '';
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: context.responsivePadding(20, 14).padding,
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
@@ -305,22 +315,25 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
           Row(
             children: [
               Expanded(
-                child: Text(model.label, style: theme.textTheme.titleMedium),
+                child: Text(
+                  model.label,
+                  style: context.responsiveTextTheme.titleMedium,
+                ),
               ),
               _buildStatusChip(context, hasKey),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.responsiveHeightSpace(0.008)),
           Text(
             StringConstants.settingsSecureStorageDesc,
-            style: theme.textTheme.bodySmall,
+            style: context.responsiveTextTheme.bodySmall,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: context.responsiveHeightSpace(0.008)),
 
           // If a key is saved, display the masked key string box and ONLY the Remove button.
           if (hasKey && savedKey.isNotEmpty) ...[
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: context.responsivePadding(14, 12).padding,
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHighest.withValues(
                   alpha: 0.5,
@@ -340,7 +353,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                   Expanded(
                     child: Text(
                       _maskApiKey(savedKey),
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      style: context.responsiveTextTheme.bodyMedium?.copyWith(
                         fontFamily: 'monospace',
                         letterSpacing: 1.1,
                         color: colorScheme.onSurface,
@@ -356,7 +369,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.responsiveHeightSpace(0.02)),
             OutlinedButton.icon(
               onPressed: state.savingKeyModel == model
                   ? null
@@ -370,24 +383,38 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                     },
               icon: state.savingKeyModel == model
                   ? const SizedBox.shrink()
-                  : const Icon(Icons.key_off_outlined, size: 18),
+                  : Icon(
+                      Icons.key_off_outlined,
+                      size: context.isTablet ? 32 : 16,
+                    ),
               label: state.savingKeyModel == model
                   ? const SizedBox(
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text(StringConstants.settingsRemoveBtn),
+                  : Text(
+                      StringConstants.settingsRemoveBtn,
+                      style: context.responsiveTextTheme.bodySmall?.copyWith(
+                        color: colorScheme.primary,
+                      ),
+                    ),
               style: ButtonStyle(
                 backgroundColor: WidgetStatePropertyAll(
                   colorScheme.onSecondary,
                 ),
                 shape: WidgetStatePropertyAll(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(24)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(context.isTablet ? 36 : 24),
+                    ),
+                    side: BorderSide(color: colorScheme.primary),
                   ),
                 ),
                 foregroundColor: WidgetStatePropertyAll(colorScheme.primary),
+                padding: WidgetStatePropertyAll(
+                  context.responsivePadding(14, 6).padding,
+                ),
               ),
             ),
           ] else ...[
@@ -400,11 +427,13 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                     '${model.label} ${StringConstants.settingsApiKeySuffix}',
                 hintText: StringConstants.settingsPasteHint,
                 border: const OutlineInputBorder(),
+                contentPadding: context.responsivePadding(14, 12).padding,
                 suffixIcon: IconButton(
                   icon: Icon(
                     (_obscureText[model] ?? true)
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
+                    size: context.isTablet ? 32 : 16,
                   ),
                   onPressed: () {
                     setState(() {
@@ -416,7 +445,8 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
               enableSuggestions: false,
               autocorrect: false,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.responsiveHeightSpace(0.02)),
+
             FilledButton.icon(
               onPressed: state.savingKeyModel == model
                   ? null
@@ -442,20 +472,22 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                     },
               icon: state.savingKeyModel == model
                   ? const SizedBox.shrink()
-                  : const Icon(Icons.save_outlined, size: 18),
+                  : Icon(Icons.save_outlined, size: context.isTablet ? 32 : 16),
               label: state.savingKeyModel == model
                   ? const SizedBox(
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text(StringConstants.settingsSaveKeyBtn),
+                  : Text(
+                      StringConstants.settingsSaveKeyBtn,
+                      style: context.responsiveTextTheme.bodySmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                      ),
+                    ),
               style: ButtonStyle(
                 padding: WidgetStatePropertyAll(
-                  EdgeInsets.symmetric(
-                    horizontal: (context.isTablet) ? 24 : 16,
-                    vertical: (context.isTablet) ? 12 : 8,
-                  ),
+                  context.responsivePadding(14, 6).padding,
                 ),
               ),
             ),
@@ -468,7 +500,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
   Widget _buildStatusChip(BuildContext context, bool hasKey) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: context.responsivePadding(14, 6).padding,
       decoration: BoxDecoration(
         color: hasKey
             ? colorScheme.primaryContainer
@@ -479,7 +511,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
         hasKey
             ? StringConstants.settingsSavedChip
             : StringConstants.settingsMissingChip,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        style: context.responsiveTextTheme.labelSmall?.copyWith(
           color: hasKey ? colorScheme.onPrimaryContainer : colorScheme.error,
         ),
       ),

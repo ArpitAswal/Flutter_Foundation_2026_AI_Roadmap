@@ -50,3 +50,35 @@ final class AiTutorMessageSent extends AiTutorEvent {
   @override
   List<Object?> get props => [message, currentLesson, currentContent, model];
 }
+
+/// Dispatched when the user requests to cancel an in-flight streamed response.
+final class AiTutorStopRequested extends AiTutorEvent {
+  const AiTutorStopRequested();
+}
+
+/// Dispatched when the user taps "New Chat" to reset the in-memory conversation.
+final class AiTutorNewChatRequested extends AiTutorEvent {
+  final String? contextText;
+  final List<String>? suggestions;
+
+  const AiTutorNewChatRequested({this.contextText, this.suggestions});
+
+  @override
+  List<Object?> get props => [contextText, suggestions];
+}
+
+/// Dispatched when the user requests to retry the last failed question.
+final class AiTutorRetryRequested extends AiTutorEvent {
+  final LessonDay? currentLesson;
+  final LessonContent? currentContent;
+  final AiModel model;
+
+  const AiTutorRetryRequested({
+    this.currentLesson,
+    this.currentContent,
+    this.model = AiModel.geminiFlash,
+  });
+
+  @override
+  List<Object?> get props => [currentLesson, currentContent, model];
+}

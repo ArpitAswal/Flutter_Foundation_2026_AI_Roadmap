@@ -25,6 +25,12 @@ class AiTutorFab extends StatelessWidget {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
+        constraints: BoxConstraints(
+          maxWidth:
+              (context.isTablet && context.orientation == Orientation.landscape)
+              ? context.screenWidth * 0.75
+              : double.infinity,
+        ),
         builder: (_) => AiTutorBottomSheet(
           contextTitle: contextTitle,
           contextLesson: contextLesson,

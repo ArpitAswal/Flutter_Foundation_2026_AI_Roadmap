@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 
 import '../../../domain/models/ai_model.dart';
+import '../../../domain/models/key_validation_result.dart';
 import 'ai_remote_data_source.dart';
 
 /// Factory responsible for providing the correct data source implementation
@@ -22,16 +23,16 @@ class AiDataSourceFactory {
     switch (model) {
       case AiModel.geminiFlash:
         return _geminiDataSource;
-      case AiModel.gpt4oMini:
+      case AiModel.gpt5Mini:
         return _openAiDataSource;
       case AiModel.claudeHaiku:
         return _anthropicDataSource;
     }
   }
 
-  /// Verifies if the [apiKey] is valid for the given [model].
-  Future<bool> validateKey(AiModel model, String apiKey) async {
+  /// Verifies if the [apiKey] is valid for the given [model] and returns a typed [KeyValidationResult].
+  Future<KeyValidationResult> validateKey(AiModel model, String apiKey) async {
     final dataSource = getDataSource(model);
-    return dataSource.isValidKey(apiKey, model);
+    return dataSource.validateKey(apiKey, model);
   }
 }

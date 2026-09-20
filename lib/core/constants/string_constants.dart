@@ -43,6 +43,19 @@ class StringConstants {
       'Hello! I see you are learning about **{context}**. What would you like to know?';
   static const String aiTutorGreetingGeneric =
       'Hello! I am your AI Tutor. What would you like to learn today?';
+  static const String aiTutorRefusalMessage =
+      'I can help with Flutter, Dart, and mobile-development concepts related to Flutter. I cannot help with that request, but you can ask me how the same idea applies to a Flutter app.';
+  static const String aiTutorClarificationMessage =
+      'Could you please specify which Flutter feature, widget, or mobile development topic you would like help with?';
+  static const String aiTutorSuggestionExample =
+      'Explain this lesson with a simple example';
+  static const String aiTutorSuggestionCompare =
+      'Compare this with native Android/iOS';
+  static const String aiTutorSuggestionQuiz = 'Quiz me on this concept';
+  static const String aiTutorStop = 'Stop';
+  static const String aiTutorNewChat = 'New chat';
+  static const String aiTutorRetry = 'Retry';
+  static const String aiTutorJumpToLatest = 'Jump to latest';
   static const String aiTutorUnexpectedError =
       'An unexpected error occurred while communicating with the AI Tutor.';
   static const String aiTutorGenericError =
@@ -57,6 +70,14 @@ class StringConstants {
       'Unable to remove the saved API key.';
   static const String aiAssistantInvalidKey =
       'The provided API key is invalid. Please check and try again.';
+  static const String aiAssistantUnauthorizedKey =
+      'The API key was rejected by the provider (Unauthorized). Please check your key.';
+  static const String aiAssistantRateLimited =
+      'Provider rate limit or quota exceeded. Please try again later.';
+  static const String aiAssistantModelUnavailable =
+      'The requested model is currently unavailable for this key.';
+  static const String aiAssistantNetworkUnavailable =
+      'Unable to reach the provider. Please check your internet connection.';
 
   // API Key Errors
   static const String missingGeminiKey =
