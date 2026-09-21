@@ -1,9 +1,11 @@
-# 📘 Day 3: Operators, Expressions & Control Flow
+# 📘 Day 03: Operators, Expressions & Control Flow
+
+**Module 01:** [Getting Started with Dart](../README.md) • **Phase 01:** [Dart Programming Foundation](../../README.md)
 
 > [!NOTE]
-> **Summary:** Learn how Dart performs calculations, comparisons, decision making, and repetition using operators and control flow statements.
+> **Lesson Objective:** Learn how Dart performs calculations, comparisons, decision making, and repetition using operators and control flow statements.
 
-**Tags:** `Dart`, `Operators`, `Expressions`, `Control Flow`, `if`, `switch`, `Loops`
+**Tags:** `Dart` `Operators` `Expressions` `Control Flow` `if` `switch` `Loops`
 
 ---
 
@@ -18,15 +20,15 @@ An operand is simply the value on which an operator performs its work.
 Example:
 
 ## 📚 Topics Covered
-* **What is an Operator?**: ### Definition
-* **Why Do We Need Operators?**: Imagine an e-commerce application.
-* **Real-world Examples**: Shopping Cart
+* **What is an Operator?**: An operator is a special symbol that instructs Dart to perform an operation on one or more operands.
+* **Why Do We Need Operators?**: Prices cannot be added.
+* **Real-world Examples**: Almost every business feature depends on operators.
 * **Definition**: Arithmetic operators perform mathematical calculations.
 * **Definition**: An expression is a combination of values, variables, operators and function calls that produces a single value.
 * **Definition**: Assignment operators assign values to variables.
-* **Prefix Increment**: Output
-* **Postfix Increment**: Output
-* **Definition**: Relational operators compare two values and always return a boolean (`true` or `false`). They are primarily used in conditions, filtering, searchin...
+* **Prefix Increment**: The value is incremented before it is used.
+* **Postfix Increment**: The current value is used first, then incremented.
+* **Definition**: Relational operators compare two values and always return a boolean (`true` or `false`). They are primarily used in conditions, filtering...
 * **Logical AND (&&)**: Both expressions must be true.
 * **Logical OR (||)**: At least one condition must be true.
 * **Logical NOT (!)**: Reverses the boolean value.
@@ -35,7 +37,7 @@ Example:
 * **is Operator**: Checks whether an object belongs to a particular type.
 * **is! Operator**: Checks whether an object does NOT belong to a type.
 * **as Operator**: Performs explicit type casting.
-* **Ternary Operator**: ### Definition
+* **Ternary Operator**: Provides a concise way to choose between two values.
 * **Null Coalescing Operator (??)**: Returns the right-hand value if the left-hand value is null.
 * **Definition**: The cascade operator (`..`) allows multiple operations to be performed on the same object without repeatedly referencing it.
 * **Null-aware Cascade**: Only executes if the object is not null.
@@ -45,15 +47,23 @@ Example:
 * **if Statement**: Executes a block only when the condition is true.
 * **if-else**
 * **else-if Ladder**: Used when multiple mutually exclusive conditions exist.
-* **switch Statement**: ### Definition
-* **if vs switch**: Use **if** when conditions involve:
-* **Why Do We Need Loops?**: Imagine displaying 10,000 products.
-* **Understanding Every Part**: Initialization
+* **switch Statement**: The `switch` statement is used when a single expression needs to be compared against multiple possible values. Compared to writing long `...
+* **if vs switch**: Complex logical expressions
+* **Why Do We Need Loops?**: Loops automate repetition.
+* **Understanding Every Part**: Checked before every iteration.
 
-## 💡 Additional Materials Included
-* **5 Interview Questions** included
-* **Common Mistakes & Optimizations** included
-* **Architecture Implementation Notes** included
+## 💡 Deep-Dive Materials Included
+
+* **5 Interview Prep Scenarios** included
+* **Common Pitfalls & Optimizations** included
+* **Architecture & Production Patterns** included
+
+---
+
+## 🧭 Navigation
+
+[⬅️ Day 02: Variables, Data Types, Type Inference & Null Safety](../Day-02/README.md) | [📂 Module Index](../README.md) | [Day 04: Functions, Parameters, Return Values & Functional Concepts ➡️](../Day-04/README.md)
 
 > [!TIP]
-> **Deep Dive:** To read the full theory, view detailed code implementations, architectures, and common interview questions, open this lesson interactively inside the **Flutter AI Tutor App**!
+> **Interactive Experience:** To run code interactively, view full theoretical breakdowns, test interview questions, and chat with the AI Tutor, launch the **Flutter AI Tutor App**!
+
