@@ -82,6 +82,9 @@ class ModuleCardNode extends StatelessWidget {
     if (context.isTablet && context.orientation == Orientation.landscape) {
       width = (size.width * 0.1).clamp(40, 80);
       height = (size.height * 0.08).clamp(40, 60);
+    } else if (context.isSmallPhone) {
+      width = (size.width * 0.07).clamp(20, 50);
+      height = width;
     } else {
       width = (size.width * 0.08).clamp(30.0, 60.0);
       height = width;
@@ -102,7 +105,10 @@ class ModuleCardNode extends StatelessWidget {
               (context.isTablet && context.orientation == Orientation.landscape)
               ? BorderRadius.circular(12)
               : null,
-          border: Border.all(color: colorScheme.onPrimary, width: 3),
+          border: Border.all(
+            color: colorScheme.onPrimary,
+            width: (context.isSmallPhone) ? 2 : 3,
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.primary.withValues(alpha: 0.3),
@@ -132,7 +138,10 @@ class ModuleCardNode extends StatelessWidget {
               (context.isTablet && context.orientation == Orientation.landscape)
               ? BorderRadius.circular(12)
               : null,
-          border: Border.all(color: colorScheme.onPrimary, width: 3),
+          border: Border.all(
+            color: colorScheme.onPrimary,
+            width: (context.isSmallPhone) ? 2 : 3,
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.secondaryContainer.withValues(alpha: 0.3),
@@ -162,7 +171,10 @@ class ModuleCardNode extends StatelessWidget {
               (context.isTablet && context.orientation == Orientation.landscape)
               ? BorderRadius.circular(12)
               : null,
-          border: Border.all(color: colorScheme.outlineVariant, width: 3),
+          border: Border.all(
+            color: colorScheme.outlineVariant,
+            width: (context.isSmallPhone) ? 2 : 3,
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.surfaceContainerHighest,
@@ -266,7 +278,9 @@ class ModuleCardNode extends StatelessWidget {
                   ? 0.0
                   : completedDays / module.totalDays,
               isCurrent: isCurrent,
-              height: context.responsiveHeightSpace(0.008),
+              height: context.responsiveHeightSpace(
+                  context.isSmallPhone ? 0.015 : 0.008
+              ),
             ),
           ),
           SizedBox(width: 12.0),

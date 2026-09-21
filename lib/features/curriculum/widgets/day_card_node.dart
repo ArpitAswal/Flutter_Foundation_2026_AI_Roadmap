@@ -175,7 +175,7 @@ class DayCardNode extends StatelessWidget {
       day.description,
       maxLines: maxLines,
       overflow: maxLines == null ? null : TextOverflow.ellipsis,
-      style: context.responsiveTextTheme.labelSmall?.copyWith(
+      style: context.responsiveTextTheme.labelMedium?.copyWith(
         color: isLocked ? colorScheme.outline : colorScheme.onSurfaceVariant,
       ),
     );
@@ -189,6 +189,9 @@ class DayCardNode extends StatelessWidget {
     if (context.isTablet && context.orientation == Orientation.landscape) {
       width = (size.width * 0.1).clamp(40, 80);
       height = (size.height * 0.08).clamp(40, 60);
+    } else if (context.isSmallPhone) {
+      width = (size.width * 0.07).clamp(20, 50);
+      height = width;
     } else {
       width = (size.width * 0.08).clamp(30.0, 60.0);
       height = width;
@@ -209,7 +212,10 @@ class DayCardNode extends StatelessWidget {
               (context.isTablet && context.orientation == Orientation.landscape)
               ? BorderRadius.circular(12)
               : null,
-          border: Border.all(color: colorScheme.onPrimary, width: 3),
+          border: Border.all(
+            color: colorScheme.onPrimary,
+            width: (context.isSmallPhone) ? 2 : 3,
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.primary.withValues(alpha: 0.3),
@@ -239,7 +245,10 @@ class DayCardNode extends StatelessWidget {
               (context.isTablet && context.orientation == Orientation.landscape)
               ? BorderRadius.circular(12)
               : null,
-          border: Border.all(color: colorScheme.onPrimary, width: 3),
+          border: Border.all(
+            color: colorScheme.onPrimary,
+            width: (context.isSmallPhone) ? 2 : 3,
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.secondaryContainer.withValues(alpha: 0.3),
@@ -269,7 +278,10 @@ class DayCardNode extends StatelessWidget {
               (context.isTablet && context.orientation == Orientation.landscape)
               ? BorderRadius.circular(12)
               : null,
-          border: Border.all(color: colorScheme.outlineVariant, width: 3),
+          border: Border.all(
+            color: colorScheme.outlineVariant,
+            width: (context.isSmallPhone) ? 2 : 3,
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.surfaceContainerHighest,

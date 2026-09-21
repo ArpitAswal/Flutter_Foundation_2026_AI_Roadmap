@@ -131,60 +131,54 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
         padding: EdgeInsets.only(bottom: bottomInset),
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeOutCubic,
-        child: SafeArea(
-          bottom: false,
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: (mediaQuery.size.height * 0.88) - bottomInset,
-              maxWidth: mediaQuery.size.width,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(context.isTablet ? 40 : 24),
-              ),
-            ),
-            child:
-                BlocBuilder<AiAssistantSettingsCubit, AiAssistantSettingsState>(
-                  builder: (context, settingsState) {
-                    return (settingsState.isAssistantLocked)
-                        ? _buildLockState(context)
-                        : Padding(
-                            padding: EdgeInsetsGeometry.symmetric(
-                              horizontal: context.isTablet ? 24 : 16,
-                              vertical: context.isTablet ? 18 : 12,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildHeader(context, settingsState),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0,
-                                  ),
-                                  child: const Divider(
-                                    height: 1,
-                                    color: Color(0xFFEEEEEE),
-                                  ),
-                                ),
-                                Flexible(
-                                  child: _buildChatBody(context, settingsState),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0,
-                                  ),
-                                  child: _buildInputArea(
-                                    context,
-                                    settingsState,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                  },
-                ),
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: (mediaQuery.size.height * 0.88) - bottomInset,
+            maxWidth: mediaQuery.size.width,
           ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(context.isTablet ? 40 : 24),
+            ),
+          ),
+          child:
+              BlocBuilder<AiAssistantSettingsCubit, AiAssistantSettingsState>(
+                builder: (context, settingsState) {
+                  return (settingsState.isAssistantLocked)
+                      ? _buildLockState(context)
+                      : Padding(
+                          padding: EdgeInsetsGeometry.symmetric(
+                            horizontal: context.isTablet ? 24 : 16,
+                            vertical: context.isTablet ? 18 : 12,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildHeader(context, settingsState),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                ),
+                                child: const Divider(
+                                  height: 1,
+                                  color: Color(0xFFEEEEEE),
+                                ),
+                              ),
+                              Flexible(
+                                child: _buildChatBody(context, settingsState),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                ),
+                                child: _buildInputArea(context, settingsState),
+                              ),
+                            ],
+                          ),
+                        );
+                },
+              ),
         ),
       ),
     );
@@ -205,8 +199,16 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: context.isTablet ? 80 : 40,
-              height: context.isTablet ? 80 : 40,
+              width: context.isTablet
+                  ? 80
+                  : (context.isSmallPhone)
+                  ? 30
+                  : 40,
+              height: context.isTablet
+                  ? 80
+                  : (context.isSmallPhone)
+                  ? 30
+                  : 40,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [colorScheme.primary, colorScheme.primaryContainer],
@@ -216,7 +218,11 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
               child: Icon(
                 Icons.smart_toy_rounded,
                 color: Colors.white,
-                size: context.isTablet ? 50 : 25,
+                size: context.isTablet
+                    ? 50
+                    : context.isSmallPhone
+                    ? 20
+                    : 25,
               ),
             ),
             SizedBox(width: context.screenWidth * 0.02),
@@ -279,7 +285,11 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
               },
               icon: Icon(
                 Icons.add_comment_outlined,
-                size: context.isTablet ? 40 : 22,
+                size: context.isTablet
+                    ? 40
+                    : context.isSmallPhone
+                    ? 16
+                    : 22,
               ),
             ),
             IconButton(
@@ -290,7 +300,11 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
               },
               icon: Icon(
                 Icons.settings_outlined,
-                size: context.isTablet ? 46 : 24,
+                size: context.isTablet
+                    ? 40
+                    : context.isSmallPhone
+                    ? 16
+                    : 22,
               ),
             ),
           ],
@@ -561,26 +575,42 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
           ),
         ),
         if (isError)
-          Padding(
-            padding: const EdgeInsets.only(top: 8, left: 16),
-            child: OutlinedButton.icon(
-              icon: const Icon(Icons.refresh_rounded, size: 16),
-              label: const Text(StringConstants.aiTutorRetry),
-              onPressed: () {
-                final model =
-                    settingsState?.selectedModel ??
-                    context
-                        .read<AiAssistantSettingsCubit>()
-                        .state
-                        .selectedModel;
-                _aiTutorBloc.add(
-                  AiTutorRetryRequested(
-                    currentLesson: widget.contextLesson,
-                    currentContent: widget.contextContent,
-                    model: model,
+          Align(
+            alignment: AlignmentGeometry.topRight,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 4.0,
+                horizontal: 8.0,
+              ),
+              child: GestureDetector(
+                child: CircleAvatar(
+                  radius: context.isTablet
+                      ? 16
+                      : context.isSmallPhone
+                      ? 10
+                      : 12,
+                  backgroundColor: colorScheme.outlineVariant,
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    size: context.responsiveTextTheme.bodySmall?.fontSize,
                   ),
-                );
-              },
+                ),
+                onTap: () {
+                  final model =
+                      settingsState?.selectedModel ??
+                      context
+                          .read<AiAssistantSettingsCubit>()
+                          .state
+                          .selectedModel;
+                  _aiTutorBloc.add(
+                    AiTutorRetryRequested(
+                      currentLesson: widget.contextLesson,
+                      currentContent: widget.contextContent,
+                      model: model,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         if (suggestions != null && suggestions.isNotEmpty)
@@ -633,7 +663,9 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
         color: colorScheme.onPrimary,
         border: const Border(top: BorderSide(color: Color(0xFFEEEEEE))),
       ),
-      padding: EdgeInsetsGeometry.only(top: 16),
+      padding: EdgeInsetsGeometry.only(
+        top: context.responsiveHeightSpace(0.015),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -660,80 +692,85 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
                 ],
               ),
             ),
-          Container(
-            decoration: BoxDecoration(
-              color: colorScheme.outlineVariant.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                color: colorScheme.surfaceContainerHighest,
-                width: 2,
-              ),
-            ),
-            padding: context.responsivePadding(8, 0).padding,
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _textController,
-                    enabled: !isDisabled,
-                    minLines: 1,
-                    maxLines: 3,
-                    textInputAction: TextInputAction.done,
-                    onTap: () {
-                      _scheduleScrollToBottom(animated: true);
-                    },
-                    decoration: InputDecoration(
-                      contentPadding: context.responsivePadding(12, 16).padding,
-                      hintText: settingsState.isSelectedModelLocked
-                          ? StringConstants.bottomSheetHintLocked
-                          : StringConstants.bottomSheetHintAsk,
-                      hintStyle: context.responsiveTextTheme.bodyMedium
-                          ?.copyWith(
-                            color: Colors.black38,
-                            fontWeight: FontWeight.w500,
-                          ),
-                      border: InputBorder.none,
-                    ),
-                    // onSubmitted: (_) => _sendMessage(context, settingsState),
-                  ),
-                ),
-                BlocBuilder<AiTutorBloc, AiTutorState>(
-                  builder: (context, tutorState) {
-                    final isStreaming = tutorState.isStreaming;
-
-                    return Container(
-                      height: context.isTablet ? 54 : 32,
-                      width: context.isTablet ? 54 : 32,
-                      decoration: BoxDecoration(
-                        color: isStreaming
-                            ? colorScheme.error
-                            : (isDisabled
-                                  ? colorScheme.outlineVariant
-                                  : colorScheme.primary),
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          isStreaming ? Icons.stop_rounded : Icons.arrow_upward,
-                          color: Colors.white,
-                          size: context.isTablet ? 38 : 20,
-                        ),
-                        tooltip: isStreaming
-                            ? StringConstants.aiTutorStop
-                            : StringConstants.bottomSheetHintAsk,
-                        onPressed: isStreaming
-                            ? () =>
-                                  _aiTutorBloc.add(const AiTutorStopRequested())
-                            : (isDisabled
-                                  ? null
-                                  : () => _sendMessage(context, settingsState)),
-                        padding: EdgeInsets.zero,
-                      ),
-                    );
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _textController,
+                  enabled: !isDisabled,
+                  minLines: 1,
+                  maxLines: 3,
+                  textInputAction: TextInputAction.done,
+                  onTap: () {
+                    _scheduleScrollToBottom(animated: true);
                   },
+                  style: context.responsiveTextTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.primary,
+                  ),
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                    hintText: settingsState.isSelectedModelLocked
+                        ? StringConstants.bottomSheetHintLocked
+                        : StringConstants.bottomSheetHintAsk,
+                    hintStyle: context.responsiveTextTheme.titleSmall?.copyWith(
+                      color: Colors.black38,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(999),
+                      borderSide: BorderSide(
+                        color: colorScheme.surfaceContainerHighest,
+                        width: 2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(999),
+                      borderSide: BorderSide(
+                        color: colorScheme.surfaceContainerHighest,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  // onSubmitted: (_) => _sendMessage(context, settingsState),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(width: 4),
+              BlocBuilder<AiTutorBloc, AiTutorState>(
+                builder: (context, tutorState) {
+                  final isStreaming = tutorState.isStreaming;
+
+                  return Container(
+                    height: context.isTablet ? 54 : 32,
+                    width: context.isTablet ? 54 : 32,
+                    decoration: BoxDecoration(
+                      color: isStreaming
+                          ? colorScheme.error
+                          : (isDisabled
+                                ? colorScheme.outlineVariant
+                                : colorScheme.primary),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        isStreaming ? Icons.stop_rounded : Icons.arrow_upward,
+                        color: Colors.white,
+                        size: context.isTablet ? 38 : 20,
+                      ),
+                      tooltip: isStreaming
+                          ? StringConstants.aiTutorStop
+                          : StringConstants.bottomSheetHintAsk,
+                      onPressed: isStreaming
+                          ? () => _aiTutorBloc.add(const AiTutorStopRequested())
+                          : (isDisabled
+                                ? null
+                                : () => _sendMessage(context, settingsState)),
+                      padding: EdgeInsets.zero,
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),
@@ -744,20 +781,32 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: context.responsivePadding(20, 40).padding,
+      padding: context.responsivePadding(20, 30).padding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: context.isTablet ? 120 : 64,
-            height: context.isTablet ? 120 : 64,
+            width: context.isTablet
+                ? 120
+                : (context.isSmallPhone)
+                ? 44
+                : 64,
+            height: context.isTablet
+                ? 120
+                : (context.isSmallPhone)
+                ? 44
+                : 64,
             decoration: BoxDecoration(
               color: colorScheme.errorContainer,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.lock_rounded,
-              size: context.isTablet ? 90 : 44,
+              size: context.isTablet
+                  ? 90
+                  : context.isSmallPhone
+                  ? 28
+                  : 44,
               color: colorScheme.error,
             ),
           ),
@@ -775,16 +824,20 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
             textAlign: TextAlign.center,
             style: context.responsiveTextTheme.bodyMedium,
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: context.responsiveHeightSpace(0.02)),
           FilledButton.icon(
             onPressed: () => _openSettings(context),
             icon: Icon(
               Icons.settings_outlined,
-              size: context.isTablet ? 36 : 20,
+              size: context.isTablet
+                  ? 36
+                  : context.isSmallPhone
+                  ? 16
+                  : 20,
             ),
             label: Text(
               StringConstants.bottomSheetOpenSettings,
-              style: context.responsiveTextTheme.titleSmall?.copyWith(
+              style: context.responsiveTextTheme.titleMedium?.copyWith(
                 color: colorScheme.onPrimary,
                 fontWeight: FontWeight.w500,
               ),

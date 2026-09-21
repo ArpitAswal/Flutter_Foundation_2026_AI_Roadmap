@@ -131,7 +131,9 @@ class _ModulesView extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               CurriculumProgressBar(
-                height: context.responsiveHeightSpace(0.008),
+                height: context.responsiveHeightSpace(
+                  context.isSmallPhone ? 0.015 : 0.008
+                ),
                 fraction: phaseProgress,
                 isCurrent: true, // Header progress always colored
               ),

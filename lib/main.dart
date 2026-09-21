@@ -58,7 +58,7 @@ class FlutterAiTutorApp extends StatelessWidget {
           ),
           iconTheme: IconThemeData(
             color: Color(0xFF005cad),
-            size: context.responsiveTextTheme.headlineLarge?.fontSize,
+            size: context.responsiveTextTheme.headlineMedium?.fontSize,
           ),
           iconButtonTheme: IconButtonThemeData(
             style: ButtonStyle(

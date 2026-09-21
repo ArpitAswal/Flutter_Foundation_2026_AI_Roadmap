@@ -67,7 +67,13 @@ class CurriculumCard extends StatelessWidget {
                 left: 0,
                 top: 0,
                 bottom: 0,
-                width: (context.isTablet) ? 12 : 6,
+                width:
+                    (context.isTablet &&
+                        context.orientation == Orientation.landscape)
+                    ? 12
+                    : (context.isSmallPhone)
+                    ? 4
+                    : 7,
                 child: Container(
                   decoration: BoxDecoration(
                     color: colorScheme.primary,
@@ -83,7 +89,13 @@ class CurriculumCard extends StatelessWidget {
                 left: 0,
                 top: 0,
                 bottom: 0,
-                width: (context.isTablet) ? 12 : 6,
+                width:
+                    (context.isTablet &&
+                        context.orientation == Orientation.landscape)
+                    ? 12
+                    : (context.isSmallPhone)
+                    ? 4
+                    : 7,
                 child: Container(
                   decoration: BoxDecoration(
                     color: colorScheme.secondaryContainer,

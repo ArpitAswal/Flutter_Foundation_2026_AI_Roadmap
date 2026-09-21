@@ -68,42 +68,30 @@ class PhaseCardNode extends StatelessWidget {
 
   /// The standard list-based layout (used in Mobile and single-column tablet views)
   Widget _buildListChild(BuildContext context, {Widget? node}) {
-    return InkWell(
-      onTap: () => context.goNamed(
-        'modules',
-        pathParameters: {'phaseId': '${phase.id}'},
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context),
-          _buildTitle(context),
-          const SizedBox(height: 4),
-          _buildDescription(context, null),
-          _buildProgressAndActions(context, node: node),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildHeader(context),
+        _buildTitle(context),
+        const SizedBox(height: 4),
+        _buildDescription(context, null),
+        _buildProgressAndActions(context, node: node),
+      ],
     );
   }
 
   /// The optimized Grid layout (used exclusively in Tablet Grid View)
   Widget _buildGridChild(BuildContext context, {required Widget node}) {
-    return InkWell(
-      onTap: () => context.goNamed(
-        'modules',
-        pathParameters: {'phaseId': '${phase.id}'},
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context, node: node),
-          _buildTitle(context),
-          const SizedBox(height: 4),
-          _buildDescription(context, 6),
-          const Spacer(),
-          _buildProgressAndActions(context, node: node),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildHeader(context, node: node),
+        _buildTitle(context),
+        const SizedBox(height: 4),
+        _buildDescription(context, 6),
+        const Spacer(),
+        _buildProgressAndActions(context, node: node),
+      ],
     );
   }
 
@@ -180,54 +168,74 @@ class PhaseCardNode extends StatelessWidget {
   Widget _buildActionButton(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     if (isCompleted) {
-      return OutlinedButton.icon(
-        onPressed: () => context.goNamed(
-          'modules',
-          pathParameters: {'phaseId': '${phase.id}'},
-        ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: colorScheme.primary,
-          side: BorderSide(color: colorScheme.primary),
-          padding: context.responsivePadding(12, 8).padding,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(8),
+      return SizedBox(
+        height:
+            (context.isTablet &&
+                context.orientation == MediaQuery.of(context).orientation)
+            ? 60
+            : context.isSmallPhone
+            ? 28
+            : 36,
+        child: OutlinedButton.icon(
+          onPressed: () => context.goNamed(
+            'modules',
+            pathParameters: {'phaseId': '${phase.id}'},
           ),
-        ),
-        icon: Icon(
-          Icons.arrow_forward_rounded,
-          size: context.responsiveTextTheme.headlineSmall?.fontSize,
-        ),
-        label: Text(
-          StringConstants.reviewPhase,
-          style: context.responsiveTextTheme.bodySmall?.copyWith(
-            color: colorScheme.primary,
-            fontWeight: FontWeight.w600,
+          style: OutlinedButton.styleFrom(
+            alignment: AlignmentGeometry.center,
+            foregroundColor: colorScheme.primary,
+            side: BorderSide(color: colorScheme.primary),
+            padding: context.responsivePadding(12, 8).padding,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(8),
+            ),
+          ),
+          icon: Icon(
+            Icons.arrow_forward_rounded,
+            size: context.responsiveTextTheme.headlineSmall?.fontSize,
+          ),
+          label: Text(
+            StringConstants.reviewPhase,
+            style: context.responsiveTextTheme.bodySmall?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       );
     } else {
-      return ElevatedButton.icon(
-        onPressed: () => context.goNamed(
-          'modules',
-          pathParameters: {'phaseId': '${phase.id}'},
-        ),
-        icon: Icon(
-          Icons.arrow_forward_rounded,
-          size: context.responsiveTextTheme.headlineSmall?.fontSize,
-        ),
-        label: Text(
-          StringConstants.continueLearning,
-          style: context.responsiveTextTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onPrimary,
+      return SizedBox(
+        height:
+            (context.isTablet &&
+                context.orientation == MediaQuery.of(context).orientation)
+            ? 60
+            : context.isSmallPhone
+            ? 28
+            : 36,
+        child: ElevatedButton.icon(
+          onPressed: () => context.goNamed(
+            'modules',
+            pathParameters: {'phaseId': '${phase.id}'},
           ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.secondaryContainer,
-          foregroundColor: colorScheme.onPrimary,
-          padding: context.responsivePadding(12, 8).padding,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(8),
+          icon: Icon(
+            Icons.arrow_forward_rounded,
+            size: context.responsiveTextTheme.headlineSmall?.fontSize,
+          ),
+          label: Text(
+            StringConstants.continueLearning,
+            style: context.responsiveTextTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onPrimary,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            alignment: AlignmentGeometry.center,
+            backgroundColor: colorScheme.secondaryContainer,
+            foregroundColor: colorScheme.onPrimary,
+            padding: context.responsivePadding(12, 8).padding,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(8),
+            ),
           ),
         ),
       );
@@ -246,7 +254,9 @@ class PhaseCardNode extends StatelessWidget {
                   ? 0.0
                   : completedModules / phase.modules.length,
               isCurrent: isCurrent,
-              height: context.responsiveHeightSpace(0.008),
+              height: context.responsiveHeightSpace(
+                context.isSmallPhone ? 0.015 : 0.008,
+              ),
             ),
           ),
           SizedBox(
@@ -280,6 +290,9 @@ class PhaseCardNode extends StatelessWidget {
     if (context.isTablet && context.orientation == Orientation.landscape) {
       width = (size.width * 0.1).clamp(40, 80);
       height = (size.height * 0.08).clamp(40, 60);
+    } else if (context.isSmallPhone) {
+      width = (size.width * 0.07).clamp(20, 50);
+      height = width;
     } else {
       width = (size.width * 0.08).clamp(30.0, 60.0);
       height = width;
@@ -300,7 +313,10 @@ class PhaseCardNode extends StatelessWidget {
               (context.isTablet && context.orientation == Orientation.landscape)
               ? BorderRadius.circular(12)
               : null,
-          border: Border.all(color: colorScheme.onPrimary, width: 3),
+          border: Border.all(
+            color: colorScheme.onPrimary,
+            width: (context.isSmallPhone) ? 2 : 3,
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.primary.withValues(alpha: 0.3),
@@ -330,7 +346,10 @@ class PhaseCardNode extends StatelessWidget {
               (context.isTablet && context.orientation == Orientation.landscape)
               ? BorderRadius.circular(12)
               : null,
-          border: Border.all(color: colorScheme.onPrimary, width: 3),
+          border: Border.all(
+            color: colorScheme.onPrimary,
+            width: (context.isSmallPhone) ? 2 : 3,
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.secondaryContainer.withValues(alpha: 0.3),
@@ -360,7 +379,10 @@ class PhaseCardNode extends StatelessWidget {
               (context.isTablet && context.orientation == Orientation.landscape)
               ? BorderRadius.circular(12)
               : null,
-          border: Border.all(color: colorScheme.outlineVariant, width: 3),
+          border: Border.all(
+            color: colorScheme.outlineVariant,
+            width: (context.isSmallPhone) ? 2 : 3,
+          ),
           boxShadow: [
             BoxShadow(
               color: colorScheme.surfaceContainerHighest,

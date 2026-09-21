@@ -264,12 +264,12 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
             StringConstants.settingsDefaultModelTitle,
             style: context.responsiveTextTheme.titleMedium,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: context.responsiveHeightSpace(0.008)),
           Text(
             StringConstants.settingsDefaultModelDesc,
             style: context.responsiveTextTheme.bodySmall,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: context.responsiveHeightSpace(0.015)),
           DropdownButtonFormField<AiModel>(
             initialValue: state.selectedModel,
             decoration: const InputDecoration(border: OutlineInputBorder()),
@@ -328,8 +328,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
             StringConstants.settingsSecureStorageDesc,
             style: context.responsiveTextTheme.bodySmall,
           ),
-          SizedBox(height: context.responsiveHeightSpace(0.008)),
-
+          SizedBox(height: context.responsiveHeightSpace(0.015)),
           // If a key is saved, display the masked key string box and ONLY the Remove button.
           if (hasKey && savedKey.isNotEmpty) ...[
             Container(
@@ -483,6 +482,7 @@ class _AiAssistantSettingsScreenState extends State<AiAssistantSettingsScreen> {
                       StringConstants.settingsSaveKeyBtn,
                       style: context.responsiveTextTheme.bodySmall?.copyWith(
                         color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
               style: ButtonStyle(

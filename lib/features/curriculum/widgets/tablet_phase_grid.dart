@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/curriculum_progress_utils.dart';
 import '../../../domain/models/curriculum/phase.dart';
@@ -32,13 +33,21 @@ class TabletPhaseGrid extends StatelessWidget {
 
           rowChildren.add(
             Expanded(
-              child: PhaseCardNode(
-                phase: phase,
-                isLocked: isLocked,
-                isCompleted: isPhaseCompleted(phase, completed),
-                isCurrent: !isLocked && !isPhaseCompleted(phase, completed),
-                completedModules: completedModulesInPhase(phase, completed),
-                isGridMode: true,
+              child: GestureDetector(
+                onTap: () => (isLocked)
+                    ? null
+                    : context.goNamed(
+                        'modules',
+                        pathParameters: {'phaseId': '${phase.id}'},
+                      ),
+                child: PhaseCardNode(
+                  phase: phase,
+                  isLocked: isLocked,
+                  isCompleted: isPhaseCompleted(phase, completed),
+                  isCurrent: !isLocked && !isPhaseCompleted(phase, completed),
+                  completedModules: completedModulesInPhase(phase, completed),
+                  isGridMode: true,
+                ),
               ),
             ),
           );

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/asset_constants.dart';
 import '../../../core/constants/string_constants.dart';
@@ -268,7 +269,9 @@ class _PhaseList extends StatelessWidget {
                 children: [
                   // Vertical timeline line
                   Positioned(
-                    left: context.screenWidth * 0.035,
+                    left: (context.isSmallPhone)
+                        ? context.screenWidth * 0.03
+                        : context.screenWidth * 0.035,
                     top: 16,
                     bottom: context.responsiveHeightSpace(0.02),
                     width: context.isTablet ? 6 : 4,
@@ -299,13 +302,21 @@ class _PhaseList extends StatelessWidget {
                         padding: EdgeInsets.only(
                           bottom: context.responsiveHeightSpace(0.02),
                         ),
-                        child: PhaseCardNode(
-                          phase: phase,
-                          isLocked: isLocked,
-                          isCompleted: isCompleted,
-                          isCurrent: isCurrent,
-                          completedModules: completedModules,
-                          isGridMode: false,
+                        child: GestureDetector(
+                          onTap: () => (isLocked)
+                              ? null
+                              : context.goNamed(
+                                  'modules',
+                                  pathParameters: {'phaseId': '${phase.id}'},
+                                ),
+                          child: PhaseCardNode(
+                            phase: phase,
+                            isLocked: isLocked,
+                            isCompleted: isCompleted,
+                            isCurrent: isCurrent,
+                            completedModules: completedModules,
+                            isGridMode: false,
+                          ),
                         ),
                       );
                     }).toList(),

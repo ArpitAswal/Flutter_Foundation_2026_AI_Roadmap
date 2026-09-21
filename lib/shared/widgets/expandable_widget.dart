@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
 import 'code_element_builder.dart';
@@ -75,12 +76,12 @@ class _ExpandableWidgetState extends State<ExpandableWidget> {
               widget.onExpansionChanged?.call(expanded);
             }
           },
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          tilePadding: context.responsivePadding(16, 0).padding,
+          childrenPadding: context.responsivePadding(16, 0).padding,
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
           title: Text(
             widget.title,
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -90,14 +91,14 @@ class _ExpandableWidgetState extends State<ExpandableWidget> {
             MarkdownBody(
               data: widget.markdownContent,
               styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-                p: theme.textTheme.bodyMedium?.copyWith(height: 1.6),
+                p: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
                 h1Padding: const EdgeInsets.only(top: 16),
-                h1: theme.textTheme.titleLarge?.copyWith(
+                h1: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: theme.colorScheme.primary,
                 ),
                 h2Padding: const EdgeInsets.only(top: 16),
-                h2: theme.textTheme.titleMedium?.copyWith(
+                h2: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.primary,
                 ),

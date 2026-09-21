@@ -328,6 +328,8 @@ class _LessonContentState extends State<_LessonContent> {
     double fabSize;
     if (context.isTablet) {
       fabSize = (context.screenHeight * 0.1).clamp(60.0, 120.0);
+    } else if (context.isSmallPhone) {
+      fabSize = (context.screenWidth * 0.09).clamp(20.0, 40.0);
     } else {
       fabSize = (context.screenWidth * 0.12).clamp(40.0, 60.0);
     }
@@ -365,7 +367,7 @@ class _LessonContentState extends State<_LessonContent> {
                         const SizedBox(width: 8),
                         Text(
                           '${StringConstants.lastUpdated} ${widget.content.lastUpdated}',
-                          style: context.responsiveTextTheme.bodySmall
+                          style: context.responsiveTextTheme.bodyMedium
                               ?.copyWith(color: colorScheme.onSurfaceVariant),
                         ),
                       ],
@@ -389,7 +391,7 @@ class _LessonContentState extends State<_LessonContent> {
                           ),
                           child: Text(
                             tag,
-                            style: context.responsiveTextTheme.labelSmall
+                            style: context.responsiveTextTheme.labelMedium
                                 ?.copyWith(
                                   color: colorScheme.onPrimaryContainer,
                                   fontWeight: FontWeight.w600,
@@ -613,7 +615,11 @@ class _PrerequisitesCard extends StatelessWidget {
               Icon(
                 Icons.task_alt_rounded,
                 color: colorScheme.primary,
-                size: context.isTablet ? 36.0 : 22.0,
+                size: context.isTablet
+                    ? 36.0
+                    : context.isSmallPhone
+                    ? 16
+                    : 22.0,
               ),
               const SizedBox(width: 8),
               Text(
@@ -649,7 +655,7 @@ class _PrerequisitesCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item,
-                      style: context.responsiveTextTheme.bodySmall?.copyWith(
+                      style: context.responsiveTextTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),
@@ -676,7 +682,11 @@ class _MarkCompleteButton extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      height: context.isTablet ? 76 : 48,
+      height: context.isTablet
+          ? 64
+          : context.isSmallPhone
+          ? 36
+          : 48,
       child: ElevatedButton.icon(
         onPressed: () {
           final lessonBloc = context.read<LessonBloc>();
@@ -710,7 +720,11 @@ class _MarkCompleteButton extends StatelessWidget {
           isComplete
               ? Icons.check_circle_rounded
               : Icons.check_circle_outline_rounded,
-          size: context.isTablet ? 42 : 24,
+          size: context.isTablet
+              ? 42
+              : context.isSmallPhone
+              ? 18
+              : 24,
         ),
         label: Text(
           isComplete ? 'Marked as Complete' : 'Mark as Complete',
@@ -729,7 +743,6 @@ class _MarkCompleteButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          padding: context.responsivePadding(12, 8).padding,
           elevation: isComplete ? 0 : 2,
           alignment: AlignmentGeometry.center,
         ),

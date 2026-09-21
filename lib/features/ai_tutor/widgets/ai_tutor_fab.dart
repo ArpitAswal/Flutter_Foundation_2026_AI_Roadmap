@@ -31,17 +31,21 @@ class AiTutorFab extends StatelessWidget {
               ? context.screenWidth * 0.75
               : double.infinity,
         ),
-        builder: (_) => AiTutorBottomSheet(
-          contextTitle: contextTitle,
-          contextLesson: contextLesson,
-          contextContent: contextContent,
+        builder: (_) => SafeArea(
+          child: AiTutorBottomSheet(
+            contextTitle: contextTitle,
+            contextLesson: contextLesson,
+            contextContent: contextContent,
+          ),
         ),
       );
     }
 
     double fabSize;
     if (context.isTablet) {
-      fabSize = (context.screenHeight * 0.1).clamp(60.0, 120.0);
+      fabSize = (context.screenHeight * 0.1).clamp(60.0, 100.0);
+    } else if (context.isSmallPhone) {
+      fabSize = (context.screenWidth * 0.09).clamp(20.0, 40.0);
     } else {
       fabSize = (context.screenWidth * 0.12).clamp(40.0, 60.0);
     }

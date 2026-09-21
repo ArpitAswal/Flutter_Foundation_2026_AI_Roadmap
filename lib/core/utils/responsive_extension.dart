@@ -32,7 +32,7 @@ extension ResponsiveExtension on BuildContext {
       } else if (isTablet) {
         return value + 4;
       } else if (isSmallPhone) {
-        return value - 4;
+        return value;
       } else {
         return value;
       }
@@ -47,7 +47,7 @@ extension ResponsiveExtension on BuildContext {
       } else if (isTablet) {
         return value + 6.0;
       } else if (isSmallPhone) {
-        return value - 4.0;
+        return value;
       } else {
         return value;
       }
@@ -121,46 +121,46 @@ extension ResponsiveExtension on BuildContext {
 
       // Headline
       headlineLarge: theme.headlineLarge?.copyWith(
-        fontSize: getResponsiveSize(28, 34, 22),
+        fontSize: getResponsiveSize(28, 34, 28),
       ),
       headlineMedium: theme.headlineMedium?.copyWith(
-        fontSize: getResponsiveSize(24, 28, 20),
+        fontSize: getResponsiveSize(24, 28, 26),
       ),
       headlineSmall: theme.headlineSmall?.copyWith(
-        fontSize: getResponsiveSize(20, 24, 18),
+        fontSize: getResponsiveSize(20, 24, 22),
       ),
 
       // Title
       titleLarge: theme.titleLarge?.copyWith(
-        fontSize: getResponsiveSize(24, 28, 20),
+        fontSize: getResponsiveSize(24, 28, 28),
       ),
       titleMedium: theme.titleMedium?.copyWith(
-        fontSize: getResponsiveSize(18, 22, 16),
+        fontSize: getResponsiveSize(20, 22, 24),
       ),
       titleSmall: theme.titleSmall?.copyWith(
-        fontSize: getResponsiveSize(16, 18, 14),
+        fontSize: getResponsiveSize(16, 18, 22),
       ),
 
       // Body
       bodyLarge: theme.bodyLarge?.copyWith(
-        fontSize: getResponsiveSize(18, 20, 16),
+        fontSize: getResponsiveSize(18, 20, 20),
       ),
       bodyMedium: theme.bodyMedium?.copyWith(
-        fontSize: getResponsiveSize(16, 18, 14),
+        fontSize: getResponsiveSize(16, 18, 18),
       ),
       bodySmall: theme.bodySmall?.copyWith(
-        fontSize: getResponsiveSize(14, 16, 12),
+        fontSize: getResponsiveSize(14, 16, 16),
       ),
 
       // Label
       labelLarge: theme.labelLarge?.copyWith(
-        fontSize: getResponsiveSize(14, 16, 12),
+        fontSize: getResponsiveSize(14, 16, 18),
       ),
       labelMedium: theme.labelMedium?.copyWith(
-        fontSize: getResponsiveSize(12, 14, 10),
+        fontSize: getResponsiveSize(12, 14, 16),
       ),
       labelSmall: theme.labelSmall?.copyWith(
-        fontSize: getResponsiveSize(12, 14, 10),
+        fontSize: getResponsiveSize(12, 14, 14),
       ),
     );
   }
