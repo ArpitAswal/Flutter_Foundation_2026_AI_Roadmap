@@ -10,7 +10,8 @@
 ---
 
 ## 🚦 Prerequisites
-Day 14: Flutter Widgets & Widget Tree Fundamentals; Day 15: Flutter Layout & Constraints; Day 16: StatefulWidget, State & setState. You should understand widget composition, build methods, immutability, parent-child relationships, and the separation of StatefulWidget from State.
+Flutter Widgets, Widget Tree Fundamentals, Flutter Layout & Constraints, StatefulWidget, State & setState. 
+ You should understand widget composition, build methods, immutability, parent-child relationships, and the separation of StatefulWidget from State.
 
 ## 📖 Overview
 When a Flutter developer writes:

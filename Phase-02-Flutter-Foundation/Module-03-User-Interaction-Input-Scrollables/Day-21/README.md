@@ -10,7 +10,8 @@
 ---
 
 ## 🚦 Prerequisites
-Day 14: Flutter Widgets & Widget Tree Fundamentals; Day 17: BuildContext & The Three Trees (Widget, Element, RenderObject); Day 20: Text Input, Focus Management & Form Validation. You should understand how widgets delegate to RenderObjects and how element hit testing relates to touch event dispatching.
+Flutter Widgets & Widget Tree Fundamentals, BuildContext & The Three Trees (Widget, Element, RenderObject), Text Input, Focus Management & Form Validation. 
+ You should understand how widgets delegate to RenderObjects and how element hit testing relates to touch event dispatching.
 
 ## 📖 Overview
 When a user touches a mobile screen, the physical digitizer generates raw hardware interrupt signals. The operating system kernel packages these signals into low-level pointer packets, which the Flutter Engine forwards to the Dart framework.

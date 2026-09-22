@@ -10,7 +10,8 @@
 ---
 
 ## 🚦 Prerequisites
-Day 16: StatefulWidget, State & setState; Day 17: BuildContext & The Three Trees (Widget, Element, RenderObject); Day 18: Widget Keys & State Preservation. You should understand StatefulWidget lifecycle, State disposal, and how GlobalKey<FormState> queries child State.
+StatefulWidget, State & setState, BuildContext & The Three Trees (Widget, Element, RenderObject), Widget Keys & State Preservation. 
+ You should understand StatefulWidget lifecycle, State disposal, and how GlobalKey<FormState> queries child State.
 
 ## 📖 Overview
 Handling user text input in mobile and desktop applications is significantly more complex than rendering static text. A production input system must seamlessly coordinate:

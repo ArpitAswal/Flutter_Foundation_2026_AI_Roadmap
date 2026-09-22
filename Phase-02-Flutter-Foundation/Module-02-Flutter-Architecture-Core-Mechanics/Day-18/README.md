@@ -10,7 +10,8 @@
 ---
 
 ## 🚦 Prerequisites
-Day 16: StatefulWidget, State & setState; Day 17: BuildContext & The Three Trees (Widget, Element, RenderObject). You should understand how the Element Tree reconciles widgets using canUpdate, how State objects live in StatefulElement, and why widgets are discarded during rebuilds.
+StatefulWidget, State & setState, BuildContext & The Three Trees (Widget, Element, RenderObject). 
+ You should understand how the Element Tree reconciles widgets using canUpdate, how State objects live in StatefulElement, and why widgets are discarded during rebuilds.
 
 ## 📖 Overview
 Imagine you have a list of two colorful tiles. Each tile is a `StatefulWidget` that picks a random color when initialized in `initState()`, and displays a label: *Tile A* and *Tile B*.
@@ -358,7 +359,7 @@ class _StatefulColorTileState extends State<StatefulColorTile> {
 
 ## 🧭 Navigation
 
-[⬅️ Day 17: BuildContext & The Three Trees (Widget, Element, RenderObject)](../Day-17/README.md) | [📂 Module Index](../README.md) | [Day 19: InheritedWidget & Scoped Data Propagation ➡️](../Day-19/README.md)
+[⬅️ Day 17: BuildContext & The Three Trees (Widget, Element, RenderObject)](../Day-17/README.md) | [📂 Module Index](../README.md) | [Day 19: InheritedWidget & InheritedModel: Scoped Data Propagation & Aspect Subscriptions ➡️](../Day-19/README.md)
 
 > [!TIP]
 > **Interactive Experience:** To run code interactively, view full theoretical breakdowns, test interview questions, and chat with the AI Tutor, launch the **Flutter AI Tutor App**!

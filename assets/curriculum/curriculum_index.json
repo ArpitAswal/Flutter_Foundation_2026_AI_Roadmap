@@ -62,7 +62,7 @@
               "module": 1,
               "day": 4,
               "title": "Functions, Parameters, Return Values & Functional Concepts",
-              "description": "Learn how to divide Dart programs into reusable functions, pass data safely, return results, and use functions as values—the foundation for clean, reusable Flutter application logic.",
+              "description": "Learn how to divide Dart programs into reusable functions, pass data safely, return results, and use functions as values\u2014the foundation for clean, reusable Flutter application logic.",
               "tags": [
                 "Dart",
                 "Functions",
@@ -382,7 +382,7 @@
               "module": 2,
               "day": 17,
               "title": "BuildContext & The Three Trees (Widget, Element, RenderObject)",
-              "description": "Understand Flutter's internal runtime architecture by mastering the Three Trees: Widget Tree (declarative configuration), Element Tree (persistent runtime identity & lifecycle manager), and RenderObject Tree (layout, painting & hit testing). Learn what BuildContext actually is—a handle to the underlying Element—and how it enables ancestor lookups, theme resolution, navigation, and safe async operations via context.mounted.",
+              "description": "Understand Flutter's internal runtime architecture by mastering the Three Trees: Widget Tree (declarative configuration), Element Tree (persistent runtime identity & lifecycle manager), and RenderObject Tree (layout, painting & hit testing). Learn what BuildContext actually is\u2014a handle to the underlying Element\u2014and how it enables ancestor lookups, theme resolution, navigation, and safe async operations via context.mounted.",
               "tags": [
                 "Flutter",
                 "BuildContext",
@@ -422,11 +422,13 @@
               "phase": 2,
               "module": 2,
               "day": 19,
-              "title": "InheritedWidget & Scoped Data Propagation",
-              "description": "Master Flutter's built-in mechanism for ambient data sharing down the widget tree without constructor prop-drilling. Learn how InheritedWidget works under the hood, how updateShouldNotify selectively triggers rebuilds of dependent elements, the difference between dependOnInheritedWidgetOfExactType and getInheritedWidgetOfExactType, how Theme, MediaQuery, and Directionality are implemented, and why InheritedWidget is the foundational pillar for Provider, Riverpod, and BLoC.",
+              "title": "InheritedWidget & InheritedModel: Scoped Data Propagation & Aspect Subscriptions",
+              "description": "Master Flutter's built-in mechanism for ambient data sharing down the widget tree without constructor prop-drilling. Learn how InheritedWidget works under the hood, how updateShouldNotify selectively triggers rebuilds of dependent elements, the difference between dependOnInheritedWidgetOfExactType and getInheritedWidgetOfExactType, how InheritedModel enables aspect-based conditional rebuilds with updateShouldNotifyDependent, and why InheritedWidget is the foundational pillar for Provider, Riverpod, and BLoC.",
               "tags": [
                 "Flutter",
                 "InheritedWidget",
+                "InheritedModel",
+                "Aspects",
                 "Prop Drilling",
                 "Scoped Data",
                 "updateShouldNotify",
@@ -436,7 +438,9 @@
                 "State Propagation"
               ],
               "content_path": "assets/curriculum/phase2/module2/day19.json",
-              "custom_route": null
+              "custom_route": [
+                "assets/curriculum/phase2/module2/day19/inherited_model.json"
+              ]
             }
           ]
         },
@@ -503,6 +507,234 @@
                 "Performance Optimization"
               ],
               "content_path": "assets/curriculum/phase2/module3/day22.json",
+              "custom_route": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "State Management & Asynchronous Architecture",
+      "description": "Master asynchronous Dart, reactive streams, concurrency with isolates, and scalable Flutter state management architectures from foundational primitives to production-grade BLoC patterns.",
+      "modules": [
+        {
+          "id": 1,
+          "title": "Asynchronous Dart & Concurrency",
+          "subtitle": "Master Dart's asynchronous runtime model: the single-threaded event loop, microtasks, Futures, async/await mechanics, reactive Streams, async generators, and true multithreading via Dart Isolates.",
+          "days": [
+            {
+              "phase": 3,
+              "module": 1,
+              "day": 23,
+              "title": "Futures, Async/Await & The Event Loop",
+              "description": "Understand how Dart executes asynchronous tasks on a single thread through the Event Loop, Microtask Queue, and Event Queue. Master Future states and chaining, non-blocking async/await syntax, robust error handling, and Flutter's FutureBuilder with safe mounted checks.",
+              "tags": [
+                "Dart",
+                "Flutter",
+                "Futures",
+                "async/await",
+                "Event Loop",
+                "Microtask Queue",
+                "Event Queue",
+                "FutureBuilder",
+                "Async Architecture"
+              ],
+              "content_path": "assets/curriculum/phase3/module1/day23.json",
+              "custom_route": null
+            },
+            {
+              "phase": 3,
+              "module": 1,
+              "day": 24,
+              "title": "Streams, Sinks & Reactive Programming",
+              "description": "Master reactive data pipelines in Dart using Streams and StreamControllers. Learn the difference between single-subscription and broadcast streams, how to transform streams using map/where/distinct, build asynchronous generator sequences with async* and yield, and bind dynamic streams to Flutter UI via StreamBuilder without memory leaks.",
+              "tags": [
+                "Dart",
+                "Flutter",
+                "Streams",
+                "StreamController",
+                "Sink",
+                "async*",
+                "yield",
+                "StreamBuilder",
+                "Reactive Programming",
+                "Broadcast Stream"
+              ],
+              "content_path": "assets/curriculum/phase3/module1/day24.json",
+              "custom_route": null
+            },
+            {
+              "phase": 3,
+              "module": 1,
+              "day": 25,
+              "title": "Concurrency, Multithreading & Dart Isolates",
+              "description": "Learn how Dart achieves true multithreading through its shared-nothing memory isolate model. Master Isolate.run for one-off CPU-intensive tasks, understand Flutter's compute function, build long-running worker isolates with ReceivePort and SendPort message passing, and keep UI frame rates at a steady 60/120 FPS during heavy computations.",
+              "tags": [
+                "Dart",
+                "Flutter",
+                "Concurrency",
+                "Isolates",
+                "Multithreading",
+                "Isolate.run",
+                "compute",
+                "SendPort",
+                "ReceivePort",
+                "Performance Optimization"
+              ],
+              "content_path": "assets/curriculum/phase3/module1/day25.json",
+              "custom_route": null
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "State Management Foundations, Scoped State & Reactive Paradigms",
+          "subtitle": "Master Flutter state management from first principles: ephemeral vs app state, ChangeNotifier and ListenableBuilder, surgical UI updates with ValueNotifier, scoped dependency injection with Provider, and modern declarative and micro-framework reactive paradigms with Riverpod and GetX.",
+          "days": [
+            {
+              "phase": 3,
+              "module": 2,
+              "day": 26,
+              "title": "Ephemeral vs App State, ChangeNotifier & ListenableBuilder",
+              "description": "Understand the architectural boundary between ephemeral (widget-local) state and shared application state. Master ChangeNotifier as Flutter's fundamental observable model, learn how ListenableBuilder minimizes rebuild scopes without boilerplate, and architect clean separation between UI presentation and business logic.",
+              "tags": [
+                "Flutter",
+                "State Management",
+                "ChangeNotifier",
+                "ListenableBuilder",
+                "Ephemeral State",
+                "App State",
+                "Listenable",
+                "Reactivity"
+              ],
+              "content_path": "assets/curriculum/phase3/module2/day26.json",
+              "custom_route": null
+            },
+            {
+              "phase": 3,
+              "module": 2,
+              "day": 27,
+              "title": "Surgical Rebuilds with ValueNotifier & ValueListenableBuilder",
+              "description": "Master micro-optimizations and surgical widget rebuilds using ValueNotifier and ValueListenableBuilder. Learn how ValueNotifier encapsulates single mutable values with equality checks, prevents full-tree build passes, orchestrates high-frequency UI updates like animations and counters, and binds lightweight reactive state with zero third-party dependencies.",
+              "tags": [
+                "Flutter",
+                "State Management",
+                "ValueNotifier",
+                "ValueListenableBuilder",
+                "Performance",
+                "Surgical Rebuilds",
+                "Micro-Reactivity"
+              ],
+              "content_path": "assets/curriculum/phase3/module2/day27.json",
+              "custom_route": null
+            },
+            {
+              "phase": 3,
+              "module": 2,
+              "day": 28,
+              "title": "Scoped State & Dependency Injection with Provider",
+              "description": "Master scoped state management and dependency injection using Provider. Understand how InheritedNotifier powers ChangeNotifierProvider under the hood, how to consume state with context.watch, context.read, and context.select, how Consumer and Selector widgets surgically isolate widget tree rebuilds, and how MultiProvider organizes scalable enterprise dependency trees.",
+              "tags": [
+                "Flutter",
+                "State Management",
+                "Provider",
+                "ChangeNotifierProvider",
+                "Consumer",
+                "Selector",
+                "InheritedNotifier",
+                "Dependency Injection"
+              ],
+              "content_path": "assets/curriculum/phase3/module2/day28.json",
+              "custom_route": null
+            },
+            {
+              "phase": 3,
+              "module": 2,
+              "day": 29,
+              "title": "Modern Declarative & Micro-Framework Reactive State",
+              "description": "Explore and contrast modern Flutter reactive state management paradigms: Riverpod's compile-time safe, tree-independent declarative model versus GetX's micro-framework service-locator reactive ecosystem. Evaluate architectural trade-offs, boilerplate, testability, lifecycle management, and production scalability.",
+              "tags": [
+                "Flutter",
+                "State Management",
+                "Riverpod",
+                "GetX",
+                "Reactive Programming",
+                "Dependency Injection",
+                "Compile-Time Safety",
+                "Service Locator"
+              ],
+              "content_path": "assets/curriculum/phase3/module2/day29.json",
+              "custom_route": [
+                "assets/curriculum/phase3/module2/day29/riverpod.json",
+                "assets/curriculum/phase3/module2/day29/getx.json"
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Enterprise State Management: BLoC & Cubit Architecture",
+          "subtitle": "Master enterprise-grade, stream-driven state management using Cubit and the BLoC pattern. Understand predictable state mutations without boilerplate, strict event-driven architecture, event queuing and transformers (droppable, restartable), flutter_bloc presentation widgets, and synthesize trade-offs across all Flutter state architectures.",
+          "days": [
+            {
+              "phase": 3,
+              "module": 3,
+              "day": 30,
+              "title": "Predictable State Mutation with Cubit & Flutter Bloc Widgets",
+              "description": "Master Cubit as a lightweight, streamlined subset of the BLoC pattern. Learn how Cubit eliminates event boilerplate by exposing direct functions that emit immutable states, how to inject Cubits using BlocProvider, how to handle UI rendering with BlocBuilder and BlocSelector, and how to execute side effects like dialogs and snackbars with BlocListener and BlocConsumer.",
+              "tags": [
+                "Flutter",
+                "State Management",
+                "Cubit",
+                "flutter_bloc",
+                "BlocProvider",
+                "BlocBuilder",
+                "BlocListener",
+                "BlocConsumer",
+                "BlocSelector"
+              ],
+              "content_path": "assets/curriculum/phase3/module3/day30.json",
+              "custom_route": null
+            },
+            {
+              "phase": 3,
+              "module": 3,
+              "day": 31,
+              "title": "Enterprise Event-Driven Architecture with BLoC & Concurrency Transformers",
+              "description": "Master the full BLoC pattern for mission-critical enterprise applications. Learn how BLoC decouples UI events from state transitions through strict event-driven architecture, how the event queue processes incoming actions, how to use bloc_concurrency transformers (droppable, restartable, sequential, concurrent) to handle race conditions and rapid user interactions, and how to build deterministic state machines with Equatable.",
+              "tags": [
+                "Flutter",
+                "State Management",
+                "BLoC",
+                "flutter_bloc",
+                "bloc_concurrency",
+                "Event-Driven",
+                "State Machine",
+                "Equatable",
+                "Transformers"
+              ],
+              "content_path": "assets/curriculum/phase3/module3/day31.json",
+              "custom_route": null
+            },
+            {
+              "phase": 3,
+              "module": 3,
+              "day": 32,
+              "title": "State Management Architectural Synthesis & Multi-Engine Decision Matrix",
+              "description": "Synthesize and evaluate all Flutter state management paradigms learned across Phase 3: Built-in Primitives (setState, InheritedWidget, ValueNotifier), Scoped State (Provider), Declarative Tree-Independent (Riverpod), Micro-Framework (GetX), and Enterprise Event-Driven (Cubit & BLoC). Analyze real-world architectural trade-offs, testability, boilerplate, team scalability, and benchmarks to make decisive architectural choices for production applications.",
+              "tags": [
+                "Flutter",
+                "State Management",
+                "Architecture",
+                "Decision Matrix",
+                "Benchmarks",
+                "BLoC",
+                "Riverpod",
+                "Provider",
+                "Clean Architecture"
+              ],
+              "content_path": "assets/curriculum/phase3/module3/day32.json",
               "custom_route": null
             }
           ]

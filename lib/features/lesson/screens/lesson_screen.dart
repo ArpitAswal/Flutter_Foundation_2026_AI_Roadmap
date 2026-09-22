@@ -403,6 +403,15 @@ class _LessonContentState extends State<_LessonContent> {
                     SizedBox(height: context.responsiveHeightSpace(0.02)),
                   ],
 
+                  // ── Sub-Lesson Navigation Section ─────────────────────────────
+                  if (widget.lesson.hasSubLessons) ...[
+                    _SubLessonNavigationSection(
+                      lesson: widget.lesson,
+                      subLessonPaths: widget.lesson.customRoute!,
+                    ),
+                    SizedBox(height: context.responsiveHeightSpace(0.02)),
+                  ],
+
                   // ── Prerequisites ────────────────────────────────────────────────────
                   if (widget.content.prerequisites.isNotEmpty) ...[
                     _PrerequisitesCard(
@@ -746,6 +755,109 @@ class _MarkCompleteButton extends StatelessWidget {
           elevation: isComplete ? 0 : 2,
           alignment: AlignmentGeometry.center,
         ),
+      ),
+    );
+  }
+}
+
+class _SubLessonNavigationSection extends StatelessWidget {
+  final LessonDay lesson;
+  final List<String> subLessonPaths;
+
+  const _SubLessonNavigationSection({
+    required this.lesson,
+    required this.subLessonPaths,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: context.responsivePadding(16, 14).padding,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.primary),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.alt_route_rounded,
+                size: context.isTablet ? 28 : 20,
+                color: colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                StringConstants.exploreApproaches,
+                style: context.responsiveTextTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: context.isTablet ? 16 : 10,
+            runSpacing: context.isTablet ? 14 : 10,
+            children: subLessonPaths.map((path) {
+              final label = LessonDay.subLessonLabel(path);
+              return InkWell(
+                onTap: () {
+                  context.pushNamed(
+                    'subLesson',
+                    pathParameters: {
+                      'phaseId': lesson.phase.toString(),
+                      'moduleId': lesson.module.toString(),
+                      'day': lesson.day.toString(),
+                      'subLessonPath': Uri.encodeComponent(path),
+                    },
+                    queryParameters: {'parentTitle': lesson.title},
+                  );
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: context.responsivePadding(14, 10).padding,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.article_outlined,
+                        size: context.isTablet ? 22 : 16,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        label,
+                        style: context.responsiveTextTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: context.isTablet ? 16 : 12,
+                        color: colorScheme.outlineVariant,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }

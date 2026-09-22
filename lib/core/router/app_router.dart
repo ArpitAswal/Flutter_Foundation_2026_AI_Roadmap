@@ -7,6 +7,7 @@ import '../../features/curriculum/screens/days_screen.dart';
 import '../../features/curriculum/screens/modules_screen.dart';
 import '../../features/curriculum/screens/phases_screen.dart';
 import '../../features/lesson/screens/lesson_screen.dart';
+import '../../features/lesson/screens/sub_lesson_screen.dart';
 
 /// Central GoRouter configuration for the Flutter AI Tutor app.
 ///
@@ -15,11 +16,12 @@ import '../../features/lesson/screens/lesson_screen.dart';
 ///
 /// Route tree:
 /// ```
-/// /phases                                           → PhasesScreen
-/// /phases/:phaseId/modules                          → ModulesScreen
-/// /phases/:phaseId/modules/:moduleId/days           → DaysScreen
-/// /phases/:phaseId/modules/:moduleId/days/:day      → LessonScreen
-/// /ai-assistant/settings                            → AiAssistantSettingsScreen
+/// /phases                                                     → PhasesScreen
+/// /phases/:phaseId/modules                                    → ModulesScreen
+/// /phases/:phaseId/modules/:moduleId/days                     → DaysScreen
+/// /phases/:phaseId/modules/:moduleId/days/:day                → LessonScreen
+/// /phases/:phaseId/modules/:moduleId/days/:day/sub/:subLessonPath → SubLessonScreen
+/// /ai-assistant/settings                                      → AiAssistantSettingsScreen
 /// ```
 @singleton
 class AppRouter {
@@ -73,6 +75,26 @@ class AppRouter {
                         ),
                       );
                     },
+                    routes: [
+                      GoRoute(
+                        path: 'sub/:subLessonPath',
+                        name: 'subLesson',
+                        pageBuilder: (context, state) {
+                          final subLessonPath = Uri.decodeComponent(
+                            state.pathParameters['subLessonPath']!,
+                          );
+                          final parentTitle =
+                              state.uri.queryParameters['parentTitle'] ?? '';
+                          return _slide(
+                            state,
+                            child: SubLessonScreen(
+                              assetPath: subLessonPath,
+                              parentTitle: parentTitle,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),

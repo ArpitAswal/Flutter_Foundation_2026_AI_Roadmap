@@ -10,7 +10,7 @@
 ---
 
 ## 🚦 Prerequisites
-Flutter widgets, widget tree, widget composition, declarative UI, immutable widget configuration, build methods, StatelessWidget, parent-child widget relationships, and the basic distinction between widget configuration and the underlying Flutter rendering structures from Day 14.
+Flutter widgets, widget tree, widget composition, declarative UI, immutable widget configuration, build methods, StatelessWidget, parent-child widget relationships, and the basic distinction between widget configuration.
 
 ## 📖 Overview
 Layout is the process by which Flutter determines how large widgets should be and where they should appear within their parent.

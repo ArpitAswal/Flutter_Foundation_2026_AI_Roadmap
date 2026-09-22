@@ -171,6 +171,12 @@ dependencies:
   # isar_flutter_libs: Bundles Isar native binaries for Flutter.
   # Role: CURRICULUM ONLY — required companion to the isar package on device.
   isar_flutter_libs: ^3.1.0+1
+
+  # ── [CURRICULUM] State Management — taught in roadmap lessons ────────────
+  # get: All-in-one micro-framework for reactive state and dependency injection.
+  # Role: CURRICULUM ONLY — taught in state management lessons.
+  # NOT used for app infrastructure (Bloc is used instead).
+  get: ^4.7.3
   # ── [APP INFRASTRUCTURE] UI Styling & Syntax Highlighting ─────────────────
   # google_fonts: Access to the Google Fonts catalog natively.
   # Role: Used for application-wide typography without downloading TTF files.
@@ -244,4 +250,9 @@ flutter:
     - assets/curriculum/phase2/module1/
     - assets/curriculum/phase2/module2/
     - assets/curriculum/phase2/module3/
+    - assets/curriculum/phase2/module2/day19/
+    - assets/curriculum/phase3/module1/
+    - assets/curriculum/phase3/module2/
+    - assets/curriculum/phase3/module2/day29/
+    - assets/curriculum/phase3/module3/
     - assets/images/

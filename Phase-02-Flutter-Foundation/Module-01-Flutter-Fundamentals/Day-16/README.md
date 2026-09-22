@@ -10,7 +10,8 @@
 ---
 
 ## 🚦 Prerequisites
-Day 14: Flutter Widgets & Widget Tree Fundamentals; Day 15: Flutter Layout & Constraints. You should understand widget composition, widget immutability, the widget tree, build(), parent-child relationships, and Flutter's constraint-based layout model.
+Flutter Widgets, Widget Tree Fundamentals, Flutter Layout & Constraints. 
+ You should understand widget composition, widget immutability, the widget tree, build(), parent-child relationships, and Flutter's constraint-based layout model.
 
 ## 📖 Overview
 A StatefulWidget is a Flutter widget whose associated State object can hold mutable data that changes during the widget's lifetime.

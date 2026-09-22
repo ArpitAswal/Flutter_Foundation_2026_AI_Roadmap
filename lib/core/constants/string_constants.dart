@@ -37,6 +37,8 @@ class StringConstants {
   static const String relatedTags = 'Related Tags';
   static const String prerequisites = 'Prerequisites';
   static const String lastUpdated = 'Last updated:';
+  static const String exploreApproaches = 'Explore Approaches';
+  static const String subLessonBackToOverview = 'Back to Overview';
 
   // AI Tutor
   static const String aiTutorGreetingContext =

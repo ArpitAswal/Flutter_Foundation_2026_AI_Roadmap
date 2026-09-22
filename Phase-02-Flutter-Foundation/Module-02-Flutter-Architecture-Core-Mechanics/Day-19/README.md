@@ -1,16 +1,17 @@
-# 📘 Day 19: InheritedWidget & Scoped Data Propagation
+# 📘 Day 19: InheritedWidget & InheritedModel: Scoped Data Propagation & Aspect Subscriptions
 
 **Module 02:** [Flutter Architecture & Core Mechanics](../README.md) • **Phase 02:** [Flutter Foundation](../../README.md)
 
 > [!NOTE]
-> **Lesson Objective:** Master Flutter's built-in mechanism for ambient data sharing down the widget tree without constructor prop-drilling. Learn how InheritedWidget works under the hood, how updateShouldNotify selectively triggers rebuilds of dependent elements, the difference between dependOnInheritedWidgetOfExactType and getInheritedWidgetOfExactType, how Theme, MediaQuery, and Directionality are implemented, and why InheritedWidget is the foundational pillar for Provider, Riverpod, and BLoC.
+> **Lesson Objective:** Master Flutter's built-in mechanism for ambient data sharing down the widget tree without constructor prop-drilling. Learn how InheritedWidget works under the hood, how updateShouldNotify selectively triggers rebuilds of dependent elements, the difference between dependOnInheritedWidgetOfExactType and getInheritedWidgetOfExactType, how InheritedModel enables aspect-based conditional rebuilds with updateShouldNotifyDependent, and why InheritedWidget is the foundational pillar for Provider, Riverpod, and BLoC.
 
-**Tags:** `Flutter` `InheritedWidget` `Prop Drilling` `Scoped Data` `updateShouldNotify` `dependOnInheritedWidgetOfExactType` `Theme.of` `MediaQuery.of` `State Propagation`
+**Tags:** `Flutter` `InheritedWidget` `InheritedModel` `Aspects` `Prop Drilling` `Scoped Data` `updateShouldNotify` `dependOnInheritedWidgetOfExactType` `Theme.of` `MediaQuery.of` `State Propagation`
 
 ---
 
 ## 🚦 Prerequisites
-Day 14: Flutter Widgets & Widget Tree Fundamentals; Day 16: StatefulWidget, State & setState; Day 17: BuildContext & The Three Trees (Widget, Element, RenderObject). You should understand BuildContext navigation, immutable widgets vs mutable elements, and the separation of configuration from state.
+Flutter Widgets & Widget Tree Fundamentals, StatefulWidget, State & setState, BuildContext & The Three Trees (Widget, Element, RenderObject). 
+ You should understand BuildContext navigation, immutable widgets vs mutable elements, and the separation of configuration from state.
 
 ## 📖 Overview
 As Flutter applications grow beyond trivial single-screen prototypes, a fundamental architectural challenge arises: **data sharing across distant widgets**.

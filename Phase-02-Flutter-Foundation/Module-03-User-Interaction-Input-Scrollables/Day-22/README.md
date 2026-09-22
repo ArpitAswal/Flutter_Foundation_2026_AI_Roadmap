@@ -10,7 +10,8 @@
 ---
 
 ## 🚦 Prerequisites
-Day 14: Flutter Widgets & Widget Tree Fundamentals; Day 15: Flutter Layout & Constraints; Day 17: BuildContext & The Three Trees (Widget, Element, RenderObject); Day 21: Gestures, Touch Feedback & The Gesture Arena. You should understand BoxConstraints, how RenderBoxes measure layouts, and how DragGestureRecognizers drive scroll physics.
+Flutter Widgets & Widget Tree Fundamentals, Flutter Layout & Constraints, BuildContext & The Three Trees (Widget, Element, RenderObject), Gestures, Touch Feedback & The Gesture Arena. 
+ You should understand BoxConstraints, how RenderBoxes measure layouts, and how DragGestureRecognizers drive scroll physics.
 
 ## 📖 Overview
 Scrolling in Flutter is not simply an overflow container with a scrollbar; it is an orchestrated pipeline composed of three distinct architectural layers:

@@ -41,7 +41,7 @@ Master Flutter's underlying runtime mechanics: the Three Trees (Widget, Element,
 
 - **[Day 17: BuildContext & The Three Trees (Widget, Element, RenderObject)](Module-02-Flutter-Architecture-Core-Mechanics/Day-17/README.md)** `Flutter` `BuildContext` `Three Trees`
 - **[Day 18: Widget Keys & State Preservation](Module-02-Flutter-Architecture-Core-Mechanics/Day-18/README.md)** `Flutter` `Keys` `ValueKey`
-- **[Day 19: InheritedWidget & Scoped Data Propagation](Module-02-Flutter-Architecture-Core-Mechanics/Day-19/README.md)** `Flutter` `InheritedWidget` `Prop Drilling`
+- **[Day 19: InheritedWidget & InheritedModel: Scoped Data Propagation & Aspect Subscriptions](Module-02-Flutter-Architecture-Core-Mechanics/Day-19/README.md)** `Flutter` `InheritedWidget` `InheritedModel`
 
 [Explore Module 02 Roadmap ➔](Module-02-Flutter-Architecture-Core-Mechanics/README.md)
 

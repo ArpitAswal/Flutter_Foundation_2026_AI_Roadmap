@@ -15,7 +15,7 @@
 | :---: | :--- | :--- | :--- |
 | **Day 17** | [BuildContext & The Three Trees (Widget, Element, RenderObject)](Day-17/README.md) | `Flutter` `BuildContext` `Three Trees` | Build a comprehensive, interactive diagnostic application... |
 | **Day 18** | [Widget Keys & State Preservation](Day-18/README.md) | `Flutter` `Keys` `ValueKey` | Build an interactive, side-by-side demonstration proving ... |
-| **Day 19** | [InheritedWidget & Scoped Data Propagation](Day-19/README.md) | `Flutter` `InheritedWidget` `Prop Drilling` | Build a clean, robust scoped state management architectur... |
+| **Day 19** | [InheritedWidget & InheritedModel: Scoped Data Propagation & Aspect Subscriptions](Day-19/README.md) | `Flutter` `InheritedWidget` `InheritedModel` | Build a clean, robust scoped state management architectur... |
 
 ---
 
@@ -41,11 +41,11 @@ Learn how Flutter preserves, moves, and manages widget state across rebuilds usi
 
 ---
 
-### [Day 19: InheritedWidget & Scoped Data Propagation](Day-19/README.md)
+### [Day 19: InheritedWidget & InheritedModel: Scoped Data Propagation & Aspect Subscriptions](Day-19/README.md)
 
-Master Flutter's built-in mechanism for ambient data sharing down the widget tree without constructor prop-drilling. Learn how InheritedWidget works under the hood, how updateShouldNotify selectively triggers rebuilds of dependent elements, the difference between dependOnInheritedWidgetOfExactType and getInheritedWidgetOfExactType, how Theme, MediaQuery, and Directionality are implemented, and why InheritedWidget is the foundational pillar for Provider, Riverpod, and BLoC.
+Master Flutter's built-in mechanism for ambient data sharing down the widget tree without constructor prop-drilling. Learn how InheritedWidget works under the hood, how updateShouldNotify selectively triggers rebuilds of dependent elements, the difference between dependOnInheritedWidgetOfExactType and getInheritedWidgetOfExactType, how InheritedModel enables aspect-based conditional rebuilds with updateShouldNotifyDependent, and why InheritedWidget is the foundational pillar for Provider, Riverpod, and BLoC.
 
-**Tags:** `Flutter` `InheritedWidget` `Prop Drilling` `Scoped Data` `updateShouldNotify` `dependOnInheritedWidgetOfExactType` `Theme.of` `MediaQuery.of` `State Propagation`
+**Tags:** `Flutter` `InheritedWidget` `InheritedModel` `Aspects` `Prop Drilling` `Scoped Data` `updateShouldNotify` `dependOnInheritedWidgetOfExactType` `Theme.of` `MediaQuery.of` `State Propagation`
 
 [Start Day 19 Lesson ➔](Day-19/README.md)
 
