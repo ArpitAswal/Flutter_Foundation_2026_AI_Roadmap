@@ -126,18 +126,6 @@ dependencies:
   # Role: Used alongside path_provider when constructing file paths.
   path: ^1.9.1
 
-  # ── [CURRICULUM] Networking — taught in roadmap lessons ───────────────────
-  # http: Simple HTTP client from the Dart/Flutter team.
-  # Role: CURRICULUM ONLY — taught in networking lessons as the entry-level
-  #       HTTP package before Dio is introduced.
-  # NOT used for app infrastructure networking.
-  http: ^1.6.0
-
-  # graphql_flutter: GraphQL client for Flutter.
-  # Role: CURRICULUM ONLY — taught in advanced networking lessons.
-  # NOT used for app infrastructure.
-  graphql_flutter: ^5.3.0
-
   # ── [CURRICULUM] Local Storage — taught in roadmap lessons ────────────────
   # shared_preferences: Simple key-value persistence using platform storage.
   # Role: CURRICULUM ONLY — taught as the first local storage lesson,
@@ -145,38 +133,6 @@ dependencies:
   # NOT used for app infrastructure (Hive is used instead).
   shared_preferences: ^2.5.5
 
-  # sqflite: SQLite plugin for Flutter.
-  # Role: CURRICULUM ONLY — taught in the local database lessons for
-  #       understanding raw SQL and relational data in Flutter.
-  # NOT used for app infrastructure.
-  sqflite: ^2.4.2+1
-
-  # sqlite3_flutter_libs: Bundles the SQLite3 native library.
-  # Role: CURRICULUM ONLY — required companion to sqflite for bundling
-  #       the native SQLite library on Android/iOS/Desktop.
-  sqlite3_flutter_libs: ^0.5.4
-
-  # drift: Type-safe SQLite ORM / reactive database library for Dart.
-  # Role: CURRICULUM ONLY — taught as an advanced local database lesson
-  #       after sqflite, demonstrating the ORM pattern and reactive queries.
-  # NOT used for app infrastructure.
-  drift: ^2.15.0
-
-  # isar: Fast, cross-platform NoSQL database with type-safe queries.
-  # Role: CURRICULUM ONLY — taught as an alternative to Hive when complex
-  #       querying and indexing are required. Students compare Hive vs Isar.
-  # NOT used for app infrastructure (Hive is the primary database).
-  isar: ^3.1.0+1
-
-  # isar_flutter_libs: Bundles Isar native binaries for Flutter.
-  # Role: CURRICULUM ONLY — required companion to the isar package on device.
-  isar_flutter_libs: ^3.1.0+1
-
-  # ── [CURRICULUM] State Management — taught in roadmap lessons ────────────
-  # get: All-in-one micro-framework for reactive state and dependency injection.
-  # Role: CURRICULUM ONLY — taught in state management lessons.
-  # NOT used for app infrastructure (Bloc is used instead).
-  get: ^4.7.3
   # ── [APP INFRASTRUCTURE] UI Styling & Syntax Highlighting ─────────────────
   # google_fonts: Access to the Google Fonts catalog natively.
   # Role: Used for application-wide typography without downloading TTF files.
@@ -227,13 +183,7 @@ dev_dependencies:
   #       is present (curriculum package), due to conflicting dart_style / source_gen constraints.
   injectable_generator: ^2.4.2
 
-  # drift_dev: Code generator for the Drift ORM (CURRICULUM use only).
-  # Generates DAO and table query classes from Drift table definitions.
-  drift_dev: ^2.15.0
 
-  # isar_generator: Generates Isar collection code (CURRICULUM use only).
-  # Generates *.g.dart files for @Collection annotated Isar classes.
-  isar_generator: ^3.1.0+1
 
 # ─────────────────────────────────────────────────────────────────────────────
 # FLUTTER SECTION
@@ -255,4 +205,11 @@ flutter:
     - assets/curriculum/phase3/module2/
     - assets/curriculum/phase3/module2/day29/
     - assets/curriculum/phase3/module3/
+    - assets/curriculum/phase4/module1/
+    - assets/curriculum/phase4/module1/day35/
+    - assets/curriculum/phase4/module2/
+    - assets/curriculum/phase4/module2/day36/
+    - assets/curriculum/phase5/module1/
+    - assets/curriculum/phase5/module1/day41/
     - assets/images/
+

@@ -740,6 +740,224 @@
           ]
         }
       ]
+    },
+    {
+      "id": 4,
+      "title": "Networking, REST APIs & Data Persistence",
+      "description": "Master mobile client-server architecture, HTTP protocols with Dio, real-time WebSocket streams, declarative GraphQL queries, and offline-first local persistence using SharedPreferences, FlutterSecureStorage, Hive, and SQLite.",
+      "modules": [
+        {
+          "id": 1,
+          "title": "RESTful APIs, HTTP Protocols & Networking Architecture",
+          "subtitle": "Learn how Flutter applications communicate with remote backends over HTTP, from core verbs and JSON serialization with isolates, to enterprise Dio client interceptors, and real-time WebSockets and GraphQL communication.",
+          "days": [
+            {
+              "phase": 4,
+              "module": 1,
+              "day": 33,
+              "title": "HTTP Networking Fundamentals, REST Protocols & JSON Serialization",
+              "description": "Master client-server communication over HTTP in Flutter. Learn how the HTTP protocol operates, how to leverage the http package with persistent sockets, how to deserialize JSON safely using defensive fromJson factory patterns, how to offload heavy JSON parsing using compute() to maintain 120 FPS, and how to implement robust network error handling.",
+              "tags": [
+                "Flutter",
+                "Dart",
+                "HTTP",
+                "REST",
+                "JSON",
+                "compute",
+                "Serialization",
+                "Networking"
+              ],
+              "content_path": "assets/curriculum/phase4/module1/day33.json",
+              "custom_route": null
+            },
+            {
+              "phase": 4,
+              "module": 1,
+              "day": 34,
+              "title": "Enterprise Network Client Architecture with Dio",
+              "description": "Master enterprise HTTP networking with package:dio. Learn how to configure global BaseOptions, implement request and error interceptors, build automated JWT token refresh engines with QueuedInterceptor to prevent race conditions, handle file transfers with real-time progress callbacks, and physically abort network requests using CancelToken.",
+              "tags": [
+                "Flutter",
+                "Networking",
+                "Dio",
+                "Interceptors",
+                "Token Refresh",
+                "CancelToken",
+                "File Transfer",
+                "JWT"
+              ],
+              "content_path": "assets/curriculum/phase4/module1/day34.json",
+              "custom_route": null
+            },
+            {
+              "phase": 4,
+              "module": 1,
+              "day": 35,
+              "title": "Real-Time & Query-Based API Communication: WebSockets & GraphQL",
+              "description": "Explore communication paradigms beyond REST. Compare full-duplex real-time streaming against client-driven declarative graph queries. Master WebSocketChannel with automated heartbeat watchdog mechanisms and exponential backoff, and learn declarative GraphQL queries, mutations, and normalized caching with graphql_flutter.",
+              "tags": [
+                "Flutter",
+                "WebSockets",
+                "GraphQL",
+                "Real-Time",
+                "Streaming",
+                "Normalized Cache",
+                "Architecture"
+              ],
+              "content_path": "assets/curriculum/phase4/module1/day35.json",
+              "custom_route": [
+                "assets/curriculum/phase4/module1/day35/websockets.json",
+                "assets/curriculum/phase4/module1/day35/graphql.json"
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Local Persistence & Offline-First Architecture",
+          "subtitle": "Master local data storage in Flutter across unencrypted key-value preferences, hardware-encrypted vaults, high-speed pure-Dart NoSQL boxes, relational SQLite databases, and offline-first repository patterns.",
+          "days": [
+            {
+              "phase": 4,
+              "module": 2,
+              "day": 36,
+              "title": "Local Key-Value, Secure & NoSQL Storage Engines",
+              "description": "Explore the multi-tiered local storage landscape in Flutter. Learn how SharedPreferences provides synchronous in-memory read caching for UI settings, how FlutterSecureStorage protects JWTs and API keys in hardware-backed iOS Keychain and Android KeyStore, and how Hive provides ultra-fast pure-Dart binary NoSQL box persistence with custom TypeAdapters and box encryption.",
+              "tags": [
+                "Flutter",
+                "Storage",
+                "SharedPreferences",
+                "FlutterSecureStorage",
+                "Hive",
+                "NoSQL",
+                "Keychain",
+                "Security"
+              ],
+              "content_path": "assets/curriculum/phase4/module2/day36.json",
+              "custom_route": [
+                "assets/curriculum/phase4/module2/day36/shared_preferences.json",
+                "assets/curriculum/phase4/module2/day36/secure_storage.json",
+                "assets/curriculum/phase4/module2/day36/hive.json"
+              ]
+            },
+            {
+              "phase": 4,
+              "module": 2,
+              "day": 37,
+              "title": "Relational SQL Persistence with SQLite & Drift",
+              "description": "Master relational database architecture in Flutter using SQLite and Drift. Learn how to configure Write-Ahead Logging (WAL mode), enforce foreign key constraints and cascading deletes, execute multi-table joins, implement atomic ACID transactions for financial ledgers, and manage safe incremental schema migrations across app releases.",
+              "tags": [
+                "Flutter",
+                "Database",
+                "SQLite",
+                "sqflite",
+                "Drift",
+                "SQL",
+                "Relational",
+                "ACID",
+                "Migrations"
+              ],
+              "content_path": "assets/curriculum/phase4/module2/day37.json",
+              "custom_route": null
+            },
+            {
+              "phase": 4,
+              "module": 2,
+              "day": 38,
+              "title": "Offline-First Repository Pattern, Caching & Data Sync",
+              "description": "Master the Single Source of Truth (SSOT) offline-first architectural pattern. Learn how the repository coordinates local database caching with background remote network synchronization, how to persist offline mutation queues, how to handle network recovery with exponential backoff, and how to execute optimistic UI updates with automated rollback.",
+              "tags": [
+                "Flutter",
+                "Offline-First",
+                "Repository Pattern",
+                "Caching",
+                "Data Sync",
+                "Optimistic UI",
+                "Architecture",
+                "Clean Architecture"
+              ],
+              "content_path": "assets/curriculum/phase4/module2/day38.json",
+              "custom_route": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Navigation, Declarative Routing & Deep Linking",
+      "description": "Master complete navigation architecture in Flutter across imperative push/pop stacks, declarative URL-driven routing with go_router, nested tab shells, navigation guards, OS ingress with Android App Links and iOS Universal Links, and compile-time code-generated routing with AutoRoute.",
+      "modules": [
+        {
+          "id": 1,
+          "title": "Navigation Mechanics, Declarative Routing & Navigation Guards",
+          "subtitle": "Master full-spectrum Flutter navigation from Navigator 1.0 imperative stacks and Hero animations to go_router declarative routes, StatefulShellRoute tab navigation, authentication guards, deep link OS ingress, and compile-time AutoRoute architecture.",
+          "days": [
+            {
+              "phase": 5,
+              "module": 1,
+              "day": 39,
+              "title": "Imperative Navigation Mechanics, Transitions & Hero Animations",
+              "description": "Master Flutter's Navigator 1.0 imperative stack model, custom PageRoute transitions with Curves, modal bottom sheets and dialog barrier dismissals, will-pop scoped guards, and Hero animations with custom flight shaders and border morphing.",
+              "tags": [
+                "Flutter",
+                "Navigation",
+                "Navigator",
+                "Transitions",
+                "Hero",
+                "Animations",
+                "Modal",
+                "Routes"
+              ],
+              "content_path": "assets/curriculum/phase5/module1/day39.json",
+              "custom_route": null
+            },
+            {
+              "phase": 5,
+              "module": 1,
+              "day": 40,
+              "title": "Declarative Routing with go_router: ShellRoutes & Navigation Guards",
+              "description": "Master declarative URL-driven routing with go_router. Learn path/query parameter parsing, multi-tab persistent navigation with StatefulShellRoute.indexedStack, authentication guards with dynamic redirect resolution and refreshListenable, and customized error handling.",
+              "tags": [
+                "Flutter",
+                "Navigation",
+                "go_router",
+                "Declarative",
+                "ShellRoute",
+                "Guards",
+                "Redirect",
+                "Deep Linking",
+                "Architecture"
+              ],
+              "content_path": "assets/curriculum/phase5/module1/day40.json",
+              "custom_route": null
+            },
+            {
+              "phase": 5,
+              "module": 1,
+              "day": 41,
+              "title": "Advanced Routing Architectures: Deep Linking & AutoRoute",
+              "description": "Explore the high-level taxonomy of enterprise routing systems. Understand the strategic role of operating system ingress via verified Universal Links and App Links, alongside compile-time strongly typed code-generated navigation using AutoRoute.",
+              "tags": [
+                "Flutter",
+                "Navigation",
+                "Deep Linking",
+                "Universal Links",
+                "App Links",
+                "AutoRoute",
+                "Code Generation",
+                "Guards",
+                "Architecture"
+              ],
+              "content_path": "assets/curriculum/phase5/module1/day41.json",
+              "custom_route": [
+                "assets/curriculum/phase5/module1/day41/deep_linking.json",
+                "assets/curriculum/phase5/module1/day41/auto_route.json"
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

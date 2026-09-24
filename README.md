@@ -1,5 +1,17 @@
 # 🚀 Flutter AI Tutor — Flutter Foundation Roadmap App
 
+<a href="https://github.com/ArpitAswal/Flutter_Foundation_2026_AI_Roadmap/releases/download/v1.0.0/app-arm64-v8a-release.apk">
+  <img align="left" src="assets/images/logo.png" alt="App Logo" width="120" height="120" />
+</a>
+<br/>
+&nbsp;&nbsp;&nbsp; 📱 Try the App!<br/>
+&nbsp;&nbsp;&nbsp; Tap the logo on the left to download the latest v1.0.0 Android APK directly to your device.<br/>
+&nbsp;&nbsp;&nbsp; The download release build is (app-arm64-v8a-release.apk). For others, goes to ReleaseMode.
+
+<br clear="left"/>
+
+---
+
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Feature--First-blueviolet?style=for-the-badge)

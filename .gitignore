@@ -77,9 +77,15 @@ Thumbs.db
 !/App_Summary.md
 !Phase-*/**/*.md
 !Phase-*/README.md
+!.agents/**/*.md
+!docs/**/*.md
 
 *.json
 !ios/**/Contents.json
 !macosx/**/Contents.json
 !assets/curriculum/**/*.json
 !assets/curriculum/*.json
+
+# Debug Symbols
+debug_symbols/
+*debug_symbols*
