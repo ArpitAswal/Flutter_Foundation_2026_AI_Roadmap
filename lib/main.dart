@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'core/constants/app_constants.dart';
 import 'core/di/injection.dart';
 import 'core/router/app_router.dart';
+import 'core/services/curriculum_cache_service.dart';
 import 'data/local/adapters/hive_adapters.dart';
 import 'data/local/models/user_progress_record.dart';
 import 'features/ai_tutor/bloc/ai_assistant_settings_cubit.dart';
@@ -26,6 +27,9 @@ void main() async {
 
   // 2. Configure Dependency Injection (get_it + injectable)
   await configureDependencies();
+
+  // Preload curriculum structure and pre-build roadmap skeleton in memory
+  await getIt<CurriculumCacheService>().initialize();
 
   // Preload AI assistant settings before the UI renders.
   await getIt<AiAssistantSettingsCubit>().loadSettings();

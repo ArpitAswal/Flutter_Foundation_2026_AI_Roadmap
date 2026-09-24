@@ -6,6 +6,8 @@ import '../../domain/models/curriculum/phase.dart';
 import '../constants/ai_constants.dart';
 import '../constants/app_constants.dart';
 
+import '../services/curriculum_cache_service.dart';
+
 /// Pure Dart utility for assembling the complete system prompt for the AI Tutor.
 @singleton
 class AiContextBuilder {
@@ -13,12 +15,14 @@ class AiContextBuilder {
   /// 1. Stable tutor guardrails and pedagogical guidelines.
   /// 2. Verification disclaimer and official documentation guidance.
   /// 3. App meta-context (architecture).
-  /// 4. Current active lesson summary & bounded theory text.
-  /// 5. Up to 3 relevant roadmap items matching active lesson tags/keywords.
-  /// 6. Minimal progress summary (completed & current unlocked IDs).
+  /// 4. Global curriculum roadmap (phases, modules, days, and sub-lessons).
+  /// 5. Current active lesson summary & bounded theory text.
+  /// 6. Up to 3 relevant roadmap items matching active lesson tags/keywords.
+  /// 7. Minimal progress summary (completed & current unlocked IDs).
   String buildSystemPrompt({
     required List<Phase> phases,
     required Set<String> completedLessonIds,
+    String? roadmapSkeleton,
     LessonDay? currentLesson,
     LessonContent? currentContent,
     List<LessonDay> historicalLessons = const [],
@@ -46,27 +50,32 @@ class AiContextBuilder {
     buffer.writeln(AiConstants.kAppMetaContext);
     buffer.writeln();
 
-    // 4. Current Lesson Context (Highest priority dynamic context)
+    // 4. Global Curriculum Roadmap (Injected from cache skeleton or generated)
+    final skeleton = (roadmapSkeleton != null && roadmapSkeleton.isNotEmpty)
+        ? roadmapSkeleton
+        : CurriculumCacheService.formatRoadmapSkeleton(phases);
+    if (skeleton.isNotEmpty) {
+      buffer.writeln(AiConstants.kGlobalCurriculumHeader);
+      buffer.writeln(skeleton);
+      buffer.writeln();
+    }
+
+    // 5. Current Lesson Context (Highest priority dynamic context)
     if (currentLesson != null) {
       buffer.writeln(AiConstants.kLessonContextHeader);
       buffer.writeln(
         '- Phase ${currentLesson.phase}, Module ${currentLesson.module}, Day ${currentLesson.day}: ${currentLesson.title} (ID: ${currentLesson.lessonId})',
       );
+      if (currentLesson.description.isNotEmpty) {
+        buffer.writeln('  DESCRIPTION: ${currentLesson.description}');
+      }
       if (currentLesson.tags.isNotEmpty) {
         buffer.writeln('  TAGS: ${currentLesson.tags.join(', ')}');
-      }
-      if (currentContent != null && currentContent.theory.isNotEmpty) {
-        // Bound theory to 1500 chars to protect context budget
-        final theoryText = currentContent.theory.length > 1500
-            ? '${currentContent.theory.substring(0, 1500)}...\n[Truncated for brevity]'
-            : currentContent.theory;
-        buffer.writeln('LESSON THEORY SUMMARY:');
-        buffer.writeln(theoryText);
       }
       buffer.writeln();
     }
 
-    // 5. Relevant Roadmap Items (Priority tags & keyword match, max 3)
+    // 6. Relevant Roadmap Items (Priority tags & keyword match, max 3)
     final relevantLessons = _findRelevantLessons(
       phases: phases,
       currentLesson: currentLesson,
@@ -83,7 +92,7 @@ class AiContextBuilder {
       buffer.writeln();
     }
 
-    // 6. Dynamic User Progress Status
+    // 7. Dynamic User Progress Status
     buffer.writeln(AiConstants.kUserProgressHeader);
     buffer.writeln('COMPLETED LESSON IDs: [${completedLessonIds.join(", ")}]');
 

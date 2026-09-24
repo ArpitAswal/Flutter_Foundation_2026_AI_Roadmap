@@ -35,7 +35,12 @@ A production-grade, interactive mobile application designed to guide developers 
 ## 🌟 Key Features
 
 ### 📚 1. Structured 3-Tier Learning Roadmap
-- **Phases → Modules → Days**: Progress linearly through carefully crafted phases covering Dart, Flutter Framework, State Management, Networking, Storage, Architecture, and Production Deployment.
+- **Phases → Modules → Days**: Progress linearly through carefully crafted phases. 
+- **Currently Available Content (v1.0.0 Release)**:
+  - ✅ **Phase 1: Dart Programming Foundation** (Syntax, OOP, Mixins, Async)
+  - ✅ **Phase 2: Flutter Fundamentals** (Widgets, State, Architecture, Navigation)
+  - ✅ **Phase 3: State Management & Architecture** (Built-in Primitives, Provider, Riverpod, GetX, BLoC/Cubit)
+  - *More advanced topics (Networking, Storage, Animations, Firebase) are currently in active development and will be released in future updates.*
 - **Automated Linear Unlock System**: Days and modules unlock automatically as you complete preceding lessons, encouraging disciplined learning.
 - **Offline Persistence**: Lesson completion records (`UserProgressRecord`) are stored locally in Hive NoSQL database.
 
@@ -58,6 +63,9 @@ A production-grade, interactive mobile application designed to guide developers 
 - **App-Lifecycle In-Memory Conversation Continuity**:
   - Ephemeral chat state preserved across screens during the app session via an app-lifecycle `@LazySingleton` BLoC.
   - Bounded windowing (`ConversationContextBuilder`) with a 6-turn / 4,000-character safety budget.
+- **Token-Efficient Context Injection (`CurriculumCacheService`)**:
+  - Automatically parses the 35KB `curriculum_index.json` on app startup into a compact ~3KB textual roadmap skeleton.
+  - Anchors the AI to the exact Phase, Module, and Day structure with near-zero latency and minimal token overhead, eliminating hallucinations.
 - **Throttled Streaming & Interactive Controls**:
   - Immediate first-token emission followed by 80ms chunk throttling.
   - In-flight **Stop**, error **Retry**, and **New Chat** controls.

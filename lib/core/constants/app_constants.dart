@@ -10,5 +10,7 @@ abstract class AppConstants {
   static const int maxHistoricalLessons = 5;
 
   /// Maximum character limit for the assembled system prompt.
-  static const int maxSystemPromptCharacters = 8000;
+  /// Accommodates guardrails, app meta-context, global curriculum roadmap skeleton,
+  /// current lesson theory, relevant roadmap lessons, and dynamic user progress.
+  static const int maxSystemPromptCharacters = 14000;
 }

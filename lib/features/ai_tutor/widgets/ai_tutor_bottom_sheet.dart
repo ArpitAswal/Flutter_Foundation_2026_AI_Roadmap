@@ -709,7 +709,7 @@ class _AiTutorBottomSheetState extends State<AiTutorBottomSheet> {
                     color: colorScheme.primary,
                   ),
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
                     hintText: settingsState.isSelectedModelLocked
                         ? StringConstants.bottomSheetHintLocked
                         : StringConstants.bottomSheetHintAsk,

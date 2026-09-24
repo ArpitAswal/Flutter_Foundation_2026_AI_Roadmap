@@ -84,10 +84,28 @@ void main() {
       expect(prompt, contains('TEACHING DISCLAIMER & ACCURACY GUIDELINES'));
       expect(prompt, contains("In this roadmap"));
       expect(prompt, contains('APPLICATION META-CONTEXT'));
+      expect(prompt, contains('GLOBAL CURRICULUM ROADMAP'));
+      expect(prompt, contains('Phase 1: Dart Basics'));
+      expect(prompt, contains('Module 1: Introduction'));
+      expect(prompt, contains('Day 1: Variables'));
       expect(prompt, contains('CURRENT LESSON CONTEXT'));
       expect(prompt, contains('Variables in Dart are type-safe.'));
       expect(prompt, contains('RELEVANT ROADMAP LESSONS'));
       expect(prompt, contains('Data Types')); // matched tag 'types'
+    });
+
+    test('uses explicitly passed roadmapSkeleton when provided', () {
+      const customSkeleton = 'Phase 99: Custom Phase\n  Module 1: Custom Module\n    Day 1: Custom Day';
+
+      final prompt = builder.buildSystemPrompt(
+        phases: testPhases,
+        roadmapSkeleton: customSkeleton,
+        completedLessonIds: {},
+      );
+
+      expect(prompt, contains('GLOBAL CURRICULUM ROADMAP'));
+      expect(prompt, contains('Phase 99: Custom Phase'));
+      expect(prompt, contains('Day 1: Custom Day'));
     });
   });
 }

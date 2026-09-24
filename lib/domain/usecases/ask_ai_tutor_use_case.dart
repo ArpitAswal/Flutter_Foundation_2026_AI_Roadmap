@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 
 import '../../core/constants/string_constants.dart';
+import '../../core/services/curriculum_cache_service.dart';
 import '../../core/utils/ai_context_builder.dart';
 import '../models/ai_chat_turn.dart';
 import '../models/ai_model.dart';
@@ -10,7 +11,6 @@ import '../repositories/ai_tutor_repository.dart';
 import '../services/conversation_context_builder.dart';
 import '../services/question_scope_policy.dart';
 import 'get_completed_lesson_ids_use_case.dart';
-import 'get_phases_use_case.dart';
 
 /// Orchestrates the process of querying the AI Tutor with deterministic scope evaluation,
 /// prioritized learning context, and bounded conversational continuity.
@@ -20,7 +20,7 @@ class AskAiTutorUseCase {
   final AiContextBuilder _aiContextBuilder;
   final QuestionScopePolicy _scopePolicy;
   final ConversationContextBuilder _conversationContextBuilder;
-  final GetPhasesUseCase _getPhasesUseCase;
+  final CurriculumCacheService _curriculumCacheService;
   final GetCompletedLessonIdsUseCase _getCompletedLessonIdsUseCase;
 
   const AskAiTutorUseCase(
@@ -28,7 +28,7 @@ class AskAiTutorUseCase {
     this._aiContextBuilder,
     this._scopePolicy,
     this._conversationContextBuilder,
-    this._getPhasesUseCase,
+    this._curriculumCacheService,
     this._getCompletedLessonIdsUseCase,
   );
 
@@ -53,15 +53,18 @@ class AskAiTutorUseCase {
       return;
     }
 
-    // 2. Fetch the global roadmap skeleton
-    final phases = await _getPhasesUseCase();
+    // 2. Fetch the cached curriculum phases and pre-built roadmap skeleton (Zero I/O)
+    final phases = await _curriculumCacheService.getOrLoadPhases();
+    final roadmapSkeleton = await _curriculumCacheService
+        .getOrLoadRoadmapSkeleton();
 
     // 3. Fetch user's exact progress state
     final completedIds = _getCompletedLessonIdsUseCase();
 
-    // 4. Assemble prioritized system prompt
+    // 4. Assemble prioritized system prompt with cached skeleton
     final systemPrompt = _aiContextBuilder.buildSystemPrompt(
       phases: phases,
+      roadmapSkeleton: roadmapSkeleton,
       completedLessonIds: completedIds,
       currentLesson: currentLesson,
       currentContent: currentContent,

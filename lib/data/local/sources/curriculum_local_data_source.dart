@@ -12,9 +12,15 @@ import '../../../domain/models/curriculum/phase.dart';
 /// - [getDayContent]: lazily loads heavy lesson content from an individual day JSON file.
 @singleton
 class CurriculumLocalDataSource {
+  List<Phase>? _cachedPhases;
+
   /// Loads and parses `curriculum_index.json`, returning the list of [Phase] objects.
   /// The skeleton does NOT include lesson content — only titles, tags, and asset paths.
+  /// Results are cached in memory after the initial read.
   Future<List<Phase>> getCurriculumIndex() async {
+    if (_cachedPhases != null) {
+      return _cachedPhases!;
+    }
     final jsonString = await rootBundle.loadString(
       'assets/curriculum/curriculum_index.json',
     );
@@ -22,6 +28,7 @@ class CurriculumLocalDataSource {
     final phaseList = (data['phases'] as List)
         .map((p) => Phase.fromJson(p as Map<String, dynamic>))
         .toList();
+    _cachedPhases = phaseList;
     return phaseList;
   }
 
