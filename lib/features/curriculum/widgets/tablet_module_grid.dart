@@ -4,23 +4,22 @@ import '../../../core/utils/curriculum_progress_utils.dart';
 import '../../../domain/models/curriculum/phase.dart';
 import 'module_card_node.dart';
 
-import '../../../core/utils/responsive_extension.dart';
-
 class TabletModuleGrid extends StatelessWidget {
   final Phase phase;
   final Set<String> completed;
+  final int crossAxisCount;
 
   const TabletModuleGrid({
     super.key,
     required this.phase,
     required this.completed,
+    this.crossAxisCount = 2,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Break modules into rows of 1 for portrait tablet or 2 for landscape wide tablet.
+    // Break modules into rows according to crossAxisCount.
     // Using IntrinsicHeight ensures that all cards in a row are perfectly identical in height.
-    final int crossAxisCount = context.isWideTablet ? 2 : 1;
     final List<Widget> rows = [];
     final modulesList = phase.modules;
 

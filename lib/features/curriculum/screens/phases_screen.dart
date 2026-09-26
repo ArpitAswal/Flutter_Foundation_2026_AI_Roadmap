@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_foundation/core/utils/responsive_extension.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/asset_constants.dart';
 import '../../../core/constants/string_constants.dart';
@@ -14,9 +12,12 @@ import '../../../domain/models/curriculum/phase.dart';
 import '../../ai_tutor/widgets/ai_tutor_fab.dart';
 import '../bloc/curriculum_bloc.dart';
 
+import '../widgets/curriculum_header.dart';
+import '../widgets/curriculum_layouts.dart';
+import '../widgets/curriculum_state_views.dart';
 import '../widgets/phase_card_node.dart';
 import '../widgets/search_results_list.dart';
-import '../widgets/tablet_phase_grid.dart';
+// Removed import
 
 class PhasesScreen extends StatefulWidget {
   const PhasesScreen({super.key});
@@ -58,7 +59,6 @@ class _PhasesScreenState extends State<PhasesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return PopScope(
       canPop: false,
@@ -84,10 +84,12 @@ class _PhasesScreenState extends State<PhasesScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: colorScheme.surface, // Matches surface-container-low
+        backgroundColor:
+            theme.colorScheme.surface, // Matches surface-container-low
         appBar: AppBar(
           surfaceTintColor: Colors.transparent,
-          leadingWidth: context.isTablet ? 120.0 : 60.0,
+          toolbarHeight: context.isTablet ? 90 : kToolbarHeight,
+          leadingWidth: context.isTablet ? 90 : kToolbarHeight,
           leading: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
@@ -105,43 +107,33 @@ class _PhasesScreenState extends State<PhasesScreen> {
           title: ValueListenableBuilder(
             valueListenable: isSearching,
             builder: (BuildContext context, value, Widget? child) {
-              return (isSearching.value)
-                  ? TextField(
-                      controller: _searchController,
-                      onChanged: _onSearchChanged,
-                      onSubmitted: _onSearchSubmit,
-                      textInputAction: TextInputAction.done,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12.0,
-                        ),
-                        hintText: 'Search lessons by title or description...',
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  _onSearchChanged('');
-                                  _onSearchSubmit('');
-                                },
-                              )
-                            : null,
-                        filled: true,
-                        fillColor: colorScheme.surfaceContainerHighest
-                            .withValues(alpha: 0.5),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide.none,
+              return isSearching.value
+                  ? Center(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: _onSearchChanged,
+                        onSubmitted: _onSearchSubmit,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 8.0,
+                          ),
+                          hintText: 'Search lessons by title or description...',
+                          suffixIcon: null,
+                          filled: true,
+                          fillColor: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
                     )
                   : Text(
                       StringConstants.appName,
-                      style: context.responsiveTextTheme.headlineMedium
-                          ?.copyWith(
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      style: context.appBarTitleStyle,
                     );
             },
           ),
@@ -149,14 +141,23 @@ class _PhasesScreenState extends State<PhasesScreen> {
             ValueListenableBuilder(
               valueListenable: isSearching,
               builder: (BuildContext context, value, Widget? child) {
-                return (isSearching.value)
-                    ? const SizedBox.shrink()
-                    : IconButton(
-                        onPressed: () {
-                          isSearching.value = !isSearching.value;
-                        },
-                        icon: Icon(Icons.manage_search_outlined),
-                      );
+                return IconButton(
+                  onPressed: () {
+                    if (isSearching.value) {
+                      _searchController.clear();
+                      _onSearchChanged('');
+                      isSearching.value = false;
+                      _onSearchSubmit('');
+                    } else {
+                      isSearching.value = true;
+                    }
+                  },
+                  icon: Icon(
+                    isSearching.value
+                        ? Icons.close_rounded
+                        : Icons.manage_search_outlined,
+                  ),
+                );
               },
             ),
           ],
@@ -164,15 +165,16 @@ class _PhasesScreenState extends State<PhasesScreen> {
         body: BlocBuilder<CurriculumBloc, CurriculumState>(
           builder: (context, state) {
             if (state is CurriculumLoading) {
-              return Center(
-                child: SpinKitCircle(
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 40.0,
-                ),
-              );
+              return const CurriculumLoadingView();
             }
             if (state is CurriculumError) {
-              return Center(child: Text(state.message));
+              return CurriculumErrorView(
+                message: state.message,
+                onRetry: () {
+                  context.read<CurriculumBloc>().add(CurriculumLoadRequested());
+                },
+                showBackButton: true,
+              );
             }
             if (state is CurriculumLoaded) {
               if (_searchQuery.isNotEmpty) {
@@ -196,22 +198,7 @@ class _PhasesScreenState extends State<PhasesScreen> {
             if (state is CurriculumLoaded) {
               String? currentTitle;
               for (final phase in state.phases) {
-                bool isCompleted = true;
-                for (final module in phase.modules) {
-                  for (final day in module.days) {
-                    if (!isDayCompleted(
-                      phase,
-                      module,
-                      day,
-                      state.completedLessonIds,
-                    )) {
-                      isCompleted = false;
-                      break;
-                    }
-                  }
-                  if (!isCompleted) break;
-                }
-                if (!isCompleted) {
+                if (!isPhaseCompleted(phase, state.completedLessonIds)) {
                   currentTitle = phase.title;
                   break;
                 }
@@ -236,94 +223,62 @@ class _PhaseList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return ListView(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.screenWidth * 0.03,
-        vertical: context.screenHeight * 0.03,
+    return CurriculumListLayout(
+      header: const CurriculumHeader(
+        title: StringConstants.phasesTitle,
+        subtitle: StringConstants.phasesSubtitle,
       ),
-      children: [
-        Text(
-          StringConstants.phasesTitle,
-          style: context.responsiveTextTheme.headlineLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          StringConstants.phasesSubtitle,
-          style: context.responsiveTextTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: context.responsiveHeightSpace(0.02)),
-        context.isTablet &&
-                (Orientation.landscape == MediaQuery.of(context).orientation)
-            ? TabletPhaseGrid(phasesList: phases, completed: completedIds)
-            : Stack(
-                children: [
-                  // Vertical timeline line
-                  Positioned(
-                    left: (context.isSmallPhone)
-                        ? context.screenWidth * 0.03
-                        : context.screenWidth * 0.035,
-                    top: 16,
-                    bottom: context.responsiveHeightSpace(0.02),
-                    width: context.isTablet ? 6 : 4,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.outlineVariant.withAlpha(50),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-                  Column(
-                    children: phases.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final phase = entry.value;
-                      final isLocked = isPhaseLockedAt(
-                        index,
-                        phases,
-                        completedIds,
-                      );
-                      final isCompleted = isPhaseCompleted(phase, completedIds);
-                      final completedModules = completedModulesInPhase(
-                        phase,
-                        completedIds,
-                      );
-                      final isCurrent = !isLocked && !isCompleted;
+      buildGrid: (context, columns) {
+        return CurriculumGridBuilder(
+          itemCount: phases.length,
+          crossAxisCount: columns,
+          itemBuilder: (context, index) {
+            final phase = phases[index];
+            final isLocked = isPhaseLockedAt(index, phases, completedIds);
+            return PhaseCardNode(
+              phase: phase,
+              isLocked: isLocked,
+              isCompleted: isPhaseCompleted(phase, completedIds),
+              isCurrent: !isLocked && !isPhaseCompleted(phase, completedIds),
+              completedModules: completedModulesInPhase(phase, completedIds),
+              isGridMode: true,
+            );
+          },
+        );
+      },
+      buildTimeline: (context) {
+        return _buildTimelineList(context);
+      },
+    );
+  }
 
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          bottom: context.responsiveHeightSpace(0.02),
-                        ),
-                        child: GestureDetector(
-                          onTap: () => (isLocked)
-                              ? null
-                              : context.goNamed(
-                                  'modules',
-                                  pathParameters: {'phaseId': '${phase.id}'},
-                                ),
-                          child: PhaseCardNode(
-                            phase: phase,
-                            isLocked: isLocked,
-                            isCompleted: isCompleted,
-                            isCurrent: isCurrent,
-                            completedModules: completedModules,
-                            isGridMode: false,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-      ],
+  Widget _buildTimelineList(BuildContext context) {
+    return CurriculumTimeline(
+      nodeSize: PhaseCardNode.nodeSize,
+      children: phases.asMap().entries.map((entry) {
+        final index = entry.key;
+        final phase = entry.value;
+        final isLocked = isPhaseLockedAt(index, phases, completedIds);
+        final isCompleted = isPhaseCompleted(phase, completedIds);
+        final completedModules = completedModulesInPhase(
+          phase,
+          completedIds,
+        );
+        final isCurrent = !isLocked && !isCompleted;
+        final isLast = index == phases.length - 1;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: isLast ? 0.0 : 16.0),
+          child: PhaseCardNode(
+            phase: phase,
+            isLocked: isLocked,
+            isCompleted: isCompleted,
+            isCurrent: isCurrent,
+            completedModules: completedModules,
+            isGridMode: false,
+          ),
+        );
+      }).toList(),
     );
   }
 }

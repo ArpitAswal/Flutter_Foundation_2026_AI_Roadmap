@@ -958,6 +958,309 @@
           ]
         }
       ]
+    },
+    {
+      "id": 6,
+      "title": "Animations, Micro-Interactions & Custom Graphics",
+      "description": "Master Flutter motion design from declarative implicit animations and surgical micro-interactions to complex explicit AnimationControllers, physics-based simulations, CustomPainter graphics, and vector Rive/Lottie runtimes.",
+      "modules": [
+        {
+          "id": 1,
+          "title": "Implicit & Explicit Animation Architecture",
+          "subtitle": "Master Flutter animation mechanics from zero-boilerplate implicit animated widgets and custom tweens to precision-choreographed AnimationControllers, CurvedAnimations, and staggered transitions.",
+          "days": [
+            {
+              "phase": 6,
+              "module": 1,
+              "day": 42,
+              "title": "Implicit Animations, AnimatedFoo Widgets & TweenAnimationBuilder",
+              "description": "Learn how Flutter simplifies UI transitions through declarative implicit animations. Master the AnimatedFoo family (AnimatedContainer, AnimatedOpacity, AnimatedCrossFade, AnimatedPositioned, AnimatedDefaultTextStyle), understand the internal ImplicitlyAnimatedWidget lifecycle, apply mathematical animation curves, and build bespoke transitions using TweenAnimationBuilder.",
+              "tags": [
+                "Flutter",
+                "Animations",
+                "Implicit Animations",
+                "AnimatedContainer",
+                "AnimatedOpacity",
+                "TweenAnimationBuilder",
+                "Micro-Interactions",
+                "Curves",
+                "UI Motion"
+              ],
+              "content_path": "assets/curriculum/phase6/module1/day42.json",
+              "custom_route": null
+            },
+            {
+              "phase": 6,
+              "module": 1,
+              "day": 43,
+              "title": "Explicit Animations, AnimationController & Staggered Choreography",
+              "description": "Master full programmatic control over animations using explicit controllers. Learn how AnimationController drives timeline progression with Vsync and TickerProvider, decouple animation values from widget rebuilds with AnimatedBuilder and AnimatedWidget, configure CurvedAnimation and Intervals, and orchestrate complex multi-property staggered choreographies.",
+              "tags": [
+                "Flutter",
+                "Animations",
+                "AnimationController",
+                "TickerProvider",
+                "Tween",
+                "AnimatedBuilder",
+                "CurvedAnimation",
+                "Staggered Animations",
+                "Performance"
+              ],
+              "content_path": "assets/curriculum/phase6/module1/day43.json",
+              "custom_route": null
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Custom Graphics, Canvas & Vector Motion",
+          "subtitle": "Direct GPU drawing with CustomPainter, procedural bezier paths, custom clippers, and interactive vector runtime engines with Rive and Lottie.",
+          "days": [
+            {
+              "phase": 6,
+              "module": 2,
+              "day": 44,
+              "title": "CustomPainter, Canvas Primitives & Custom Clippings",
+              "description": "Unlock direct hardware-accelerated 2D graphics rendering with CustomPainter and the Canvas API. Master paint styles, shaders, linear/sweep gradients, quadratic and cubic bezier curves, custom clippers with ClipPath, and the shouldRepaint performance contract.",
+              "tags": [
+                "Flutter",
+                "CustomPainter",
+                "Canvas",
+                "Paint",
+                "Path",
+                "Bezier Curves",
+                "ClipPath",
+                "CustomClipper",
+                "Shaders",
+                "Performance"
+              ],
+              "content_path": "assets/curriculum/phase6/module2/day44.json",
+              "custom_route": null
+            },
+            {
+              "phase": 6,
+              "module": 2,
+              "day": 45,
+              "title": "Interactive Vector Animation Frameworks: Rive & Lottie",
+              "description": "Explore modern vector motion runtimes in Flutter. Compare timeline-driven Adobe After Effects JSON animations via Lottie with real-time interactive state machines, bone rigging, and runtime inputs via Rive.",
+              "tags": [
+                "Flutter",
+                "Vector Motion",
+                "Animations",
+                "Rive",
+                "Lottie",
+                "State Machines",
+                "Timeline Scrubbing",
+                "Interactive Graphics",
+                "Impeller"
+              ],
+              "content_path": "assets/curriculum/phase6/module2/day45.json",
+              "custom_route": [
+                "assets/curriculum/phase6/module2/day45/rive.json",
+                "assets/curriculum/phase6/module2/day45/lottie.json"
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Physics-Based Simulations & Advanced Transitions",
+          "subtitle": "Master physical spring and friction dynamics, velocity-driven gesture flinging, shared element Hero transitions, custom route choreography, and declarative AnimatedSwitcher patterns.",
+          "days": [
+            {
+              "phase": 6,
+              "module": 3,
+              "day": 46,
+              "title": "Physics-Based Simulations & Velocity-Driven Motion",
+              "description": "Bridge direct touch manipulation to natural physical motion. Master SpringDescription, SpringSimulation, friction dynamics, and seamless velocity hand-off from GestureDetector directly into AnimationController.animateWith().",
+              "tags": [
+                "Flutter",
+                "Physics",
+                "Animations",
+                "SpringSimulation",
+                "FrictionSimulation",
+                "Damping",
+                "GestureDetector",
+                "Velocity",
+                "Direct Manipulation"
+              ],
+              "content_path": "assets/curriculum/phase6/module3/day46.json",
+              "custom_route": null
+            },
+            {
+              "phase": 6,
+              "module": 3,
+              "day": 47,
+              "title": "Hero Transitions, Route Choreography & AnimatedSwitcher",
+              "description": "Master advanced screen transitions and real-world UI choreographies. Explore Hero overlay flights, flightShuttleBuilder, radial heroes, custom PageRouteBuilder transitions with secondary animations, and state-driven AnimatedSwitcher transitions.",
+              "tags": [
+                "Flutter",
+                "Animations",
+                "Hero",
+                "PageRouteBuilder",
+                "AnimatedSwitcher",
+                "Route Transitions",
+                "Overlay",
+                "Shared Axis",
+                "Material Motion"
+              ],
+              "content_path": "assets/curriculum/phase6/module3/day47.json",
+              "custom_route": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Testing, Quality Assurance & Test-Driven Development",
+      "description": "Master professional Flutter testing across the entire quality pyramid: pure Dart unit tests and matchers, dependency mocking with mocktail, BLoC state verification, component-level widget testing with WidgetTester, pixel-perfect visual golden regression with golden_toolkit, end-to-end integration testing with Patrol, and CI/CD quality gate enforcement.",
+      "modules": [
+        {
+          "id": 1,
+          "title": "Unit Testing, Business Logic & Mocking Frameworks",
+          "subtitle": "Master unit testing fundamentals in Dart and Flutter: test lifecycles, fluent assertions with package:checks, temporal stream verification with fakeAsync, and isolating business logic using mocktail doubles and bloc_test.",
+          "days": [
+            {
+              "phase": 7,
+              "module": 1,
+              "day": 48,
+              "title": "Pure Dart Unit Testing, Matchers & Concurrency",
+              "description": "Master unit testing foundations in pure Dart using package:test and package:checks. Explore test lifecycles (setUp, tearDown), domain exception handling, testing asynchronous Futures and Streams with expectLater, and deterministic time-travel using fakeAsync.",
+              "tags": [
+                "Dart",
+                "Testing",
+                "Unit Tests",
+                "package:test",
+                "package:checks",
+                "Matchers",
+                "fakeAsync",
+                "Streams",
+                "Async Testing",
+                "TDD"
+              ],
+              "content_path": "assets/curriculum/phase7/module1/day48.json",
+              "custom_route": null
+            },
+            {
+              "phase": 7,
+              "module": 1,
+              "day": 49,
+              "title": "Mocking Dependencies & State Management Testing",
+              "description": "Isolate business logic using modern test double paradigms. Master mocktail for zero-codegen mocking, stubbing contracts with when/thenAnswer, call count verification with verify/verifyNever, and comprehensive BLoC/Cubit state machine testing using blocTest.",
+              "tags": [
+                "Dart",
+                "Flutter",
+                "Testing",
+                "mocktail",
+                "Mocking",
+                "Test Doubles",
+                "BLoC",
+                "bloc_test",
+                "Cubit",
+                "Verification"
+              ],
+              "content_path": "assets/curriculum/phase7/module1/day49.json",
+              "custom_route": null
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Widget Testing & Visual Regression (Goldens)",
+          "subtitle": "Master headless component testing and visual regression suites: mounting widget subtrees with WidgetTester, finding nodes by Key and Type, simulating touch interactions with pumpAndSettle, and automated pixel diffing using golden_toolkit.",
+          "days": [
+            {
+              "phase": 7,
+              "module": 2,
+              "day": 50,
+              "title": "Component-Level Widget Testing & Interaction Verification",
+              "description": "Master component-level widget testing using WidgetTester. Understand pumpWidget, pump, and pumpAndSettle mechanics, locate elements via find.byKey and find.descendant, simulate gestures and text inputs, and verify responsive breakpoints across varying device viewports.",
+              "tags": [
+                "Flutter",
+                "Testing",
+                "Widget Testing",
+                "WidgetTester",
+                "pumpAndSettle",
+                "Finders",
+                "Gestures",
+                "Responsive Testing",
+                "Component Verification"
+              ],
+              "content_path": "assets/curriculum/phase7/module2/day50.json",
+              "custom_route": null
+            },
+            {
+              "phase": 7,
+              "module": 2,
+              "day": 51,
+              "title": "Golden Toolkit & Visual Regression Testing",
+              "description": "Eliminate visual regressions using pixel-accurate golden snapshot tests. Master matchesGoldenFile, multi-device and multi-theme scenario grids with golden_toolkit DeviceBuilder, font rasterization mechanics with Ahem and loadAppFonts, and cross-platform CI image diff workflows.",
+              "tags": [
+                "Flutter",
+                "Testing",
+                "Golden Tests",
+                "Visual Regression",
+                "golden_toolkit",
+                "DeviceBuilder",
+                "matchesGoldenFile",
+                "Ahem Font",
+                "Pixel Diff"
+              ],
+              "content_path": "assets/curriculum/phase7/module2/day51.json",
+              "custom_route": null
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Integration Testing & CI/CD Automation",
+          "subtitle": "Master real-device end-to-end testing and enterprise CI/CD automation: driving complete customer flows on mobile runtimes with package:integration_test and Patrol, measuring code coverage, and gating PR merges with automated quality checks.",
+          "days": [
+            {
+              "phase": 7,
+              "module": 3,
+              "day": 52,
+              "title": "End-to-End Integration Testing with integration_test & Patrol",
+              "description": "Execute automated customer journeys on real hardware and simulators. Master package:integration_test, native OS permission dialog automation with Patrol, performance telemetry benchmarking via traceAction, and flakiness prevention in end-to-end suites.",
+              "tags": [
+                "Flutter",
+                "Testing",
+                "Integration Tests",
+                "E2E Testing",
+                "integration_test",
+                "Patrol",
+                "Native Automation",
+                "Performance Benchmarking",
+                "traceAction"
+              ],
+              "content_path": "assets/curriculum/phase7/module3/day52.json",
+              "custom_route": null
+            },
+            {
+              "phase": 7,
+              "module": 3,
+              "day": 53,
+              "title": "CI/CD Automation, Test Coverage & Quality Gates",
+              "description": "Architect production-grade continuous integration and continuous delivery pipelines for Flutter. Master static analysis enforcement with --fatal-infos, code coverage extraction and generated code filtering via LCOV, 80% coverage threshold gates, GitHub Actions workflow matrices, and automated Fastlane release distribution.",
+              "tags": [
+                "Flutter",
+                "Testing",
+                "CI/CD",
+                "GitHub Actions",
+                "Fastlane",
+                "Code Coverage",
+                "LCOV",
+                "Quality Gates",
+                "flutter analyze",
+                "Automation"
+              ],
+              "content_path": "assets/curriculum/phase7/module3/day53.json",
+              "custom_route": null
+            }
+          ]
+        }
+      ]
     }
   ]
 }

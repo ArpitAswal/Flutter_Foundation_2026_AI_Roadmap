@@ -48,9 +48,8 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
       // Fetch skeleton and content while ensuring a minimum 500ms delay for smooth UI feedback.
       final results = await Future.wait([
         _getLessonDay(phase: event.phase, module: event.module, day: event.day),
-        Future.delayed(Duration(milliseconds: (event.again) ? 1000 : 100)),
+        Future.delayed(Duration(milliseconds: 600)),
       ]);
-
       final lesson = results[0] as LessonDay;
       final content = await _getDayContent(lesson.contentPath);
 

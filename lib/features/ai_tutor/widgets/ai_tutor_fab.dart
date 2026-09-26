@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_foundation/core/utils/responsive_extension.dart';
+
+import '../../../core/utils/responsive_extension.dart';
 import '../../../domain/models/curriculum/lesson_content.dart';
 import '../../../domain/models/curriculum/lesson_day.dart';
 import 'ai_tutor_bottom_sheet.dart';
@@ -19,18 +20,14 @@ class AiTutorFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final fabSize = context.isTablet ? 64.0 : 44.0;
 
     void openBottomSheet() {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        constraints: BoxConstraints(
-          maxWidth:
-              (context.isTablet && context.orientation == Orientation.landscape)
-              ? context.screenWidth * 0.75
-              : double.infinity,
-        ),
+        constraints: const BoxConstraints(maxWidth: 680.0),
         builder: (_) => SafeArea(
           child: AiTutorBottomSheet(
             contextTitle: contextTitle,
@@ -41,27 +38,21 @@ class AiTutorFab extends StatelessWidget {
       );
     }
 
-    double fabSize;
-    if (context.isTablet) {
-      fabSize = (context.screenHeight * 0.1).clamp(60.0, 100.0);
-    } else if (context.isSmallPhone) {
-      fabSize = (context.screenWidth * 0.09).clamp(20.0, 40.0);
-    } else {
-      fabSize = (context.screenWidth * 0.12).clamp(40.0, 60.0);
-    }
-
     return SizedBox(
       width: fabSize,
       height: fabSize,
       child: FloatingActionButton(
+        heroTag: 'aiTutorFab',
         onPressed: openBottomSheet,
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onSecondary,
         elevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(fabSize * 0.25),
+          borderRadius: BorderRadius.circular(
+            context.isTablet ? 18 : 12
+          ),
         ),
-        child: Icon(Icons.smart_toy_outlined, size: fabSize * 0.7),
+        child: Icon(Icons.smart_toy_outlined, size: context.isTablet ? 40 : 28),
       ),
     );
   }

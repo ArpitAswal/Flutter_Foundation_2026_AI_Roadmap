@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../domain/models/curriculum/lesson_day.dart';
 import '../../../domain/models/curriculum/phase.dart';
+import 'curriculum_layouts.dart';
 import 'day_card_node.dart';
 
 class SearchResultItem {
@@ -40,9 +41,9 @@ class SearchResultsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final lowerQuery = query.toLowerCase();
     final List<SearchResultItem> results = [];
-    final size = MediaQuery.of(context).size;
 
-    for (final phase in phases) {
+    for (int pIndex = 0; pIndex < phases.length; pIndex++) {
+      final phase = phases[pIndex];
       for (int mIndex = 0; mIndex < phase.modules.length; mIndex++) {
         final module = phase.modules[mIndex];
         for (int dIndex = 0; dIndex < module.days.length; dIndex++) {
@@ -53,8 +54,9 @@ class SearchResultsList extends StatelessWidget {
             final lessonId = 'p${phase.id}_m${module.id}_d${day.day}';
             final isCompleted = completedIds.contains(lessonId);
 
-            // Use robust progress utilities instead of hardcoded day.day - 1 assumptions
+            // Correctly evaluate if the phase itself is locked first
             bool isLocked =
+                isPhaseLockedAt(pIndex, phases, completedIds) ||
                 isModuleLockedAt(phase, mIndex, completedIds) ||
                 isDayLockedAt(phase, module, dIndex, completedIds);
 
@@ -86,30 +88,18 @@ class SearchResultsList extends StatelessWidget {
       );
     }
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      children: [
-        Stack(
-          children: [
-            // Vertical timeline line
-            Positioned(
-              left: size.width * 0.04,
-              top: 16,
-              bottom: 20,
-              width: 4,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.outlineVariant.withAlpha(50),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            Column(
-              children: results.map((item) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
+    return CurriculumListLayout(
+      maxGridColumns: 3,
+      buildGrid: (context, columns) {
+        final List<Widget> rows = [];
+        for (int i = 0; i < results.length; i += columns) {
+          final List<Widget> rowChildren = [];
+          for (int j = 0; j < columns; j++) {
+            final index = i + j;
+            if (index < results.length) {
+              final item = results[index];
+              rowChildren.add(
+                Expanded(
                   child: DayCardNode(
                     phaseId: item.phaseId,
                     moduleId: item.moduleId,
@@ -117,6 +107,7 @@ class SearchResultsList extends StatelessWidget {
                     isLocked: item.isLocked,
                     isCompleted: item.isCompleted,
                     isCurrent: item.isCurrent,
+                    isGridMode: true,
                     onTap: () {
                       context.pushNamed(
                         'lesson',
@@ -128,12 +119,59 @@ class SearchResultsList extends StatelessWidget {
                       );
                     },
                   ),
-                );
-              }).toList(),
+                ),
+              );
+            } else {
+              rowChildren.add(const Spacer());
+            }
+
+            if (j < columns - 1) {
+              rowChildren.add(const SizedBox(width: 16));
+            }
+          }
+
+          rows.add(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: rowChildren,
+                ),
+              ),
             ),
-          ],
-        ),
-      ],
+          );
+        }
+        return Column(children: rows);
+      },
+      buildTimeline: (context) {
+        return CurriculumTimeline(
+          nodeSize: DayCardNode.nodeSize,
+          children: results.map((item) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: DayCardNode(
+                phaseId: item.phaseId,
+                moduleId: item.moduleId,
+                day: item.day,
+                isLocked: item.isLocked,
+                isCompleted: item.isCompleted,
+                isCurrent: item.isCurrent,
+                onTap: () {
+                  context.pushNamed(
+                    'lesson',
+                    pathParameters: {
+                      'phaseId': '${item.phaseId}',
+                      'moduleId': '${item.moduleId}',
+                      'day': '${item.day.day}',
+                    },
+                  );
+                },
+              ),
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }

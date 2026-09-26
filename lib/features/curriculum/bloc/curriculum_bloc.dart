@@ -18,7 +18,7 @@ class CurriculumBloc extends Bloc<CurriculumEvent, CurriculumState> {
   final GetCompletedLessonIdsUseCase _getCompletedIds;
 
   CurriculumBloc(this._getPhases, this._getCompletedIds)
-      : super(CurriculumInitial()) {
+    : super(CurriculumInitial()) {
     on<CurriculumLoadRequested>(_onLoadRequested);
   }
 
@@ -28,9 +28,13 @@ class CurriculumBloc extends Bloc<CurriculumEvent, CurriculumState> {
   ) async {
     emit(CurriculumLoading());
     try {
-      final phases = await _getPhases();
-      final completedIds = _getCompletedIds();
-      emit(CurriculumLoaded(phases: phases, completedLessonIds: completedIds));
+      await Future.delayed(Duration(milliseconds: 600), () async {
+        final phases = await _getPhases();
+        final completedIds = _getCompletedIds();
+        emit(
+          CurriculumLoaded(phases: phases, completedLessonIds: completedIds),
+        );
+      });
     } catch (e) {
       emit(CurriculumError('Failed to load curriculum: ${e.toString()}'));
     }

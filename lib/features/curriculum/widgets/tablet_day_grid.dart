@@ -5,25 +5,24 @@ import '../../../domain/models/curriculum/lesson_module.dart';
 import '../../../domain/models/curriculum/phase.dart';
 import 'day_card_node.dart';
 
-import '../../../core/utils/responsive_extension.dart';
-
 class TabletDayGrid extends StatelessWidget {
   final Phase phase;
   final LessonModule module;
   final Set<String> completed;
+  final int crossAxisCount;
 
   const TabletDayGrid({
     super.key,
     required this.phase,
     required this.module,
     required this.completed,
+    this.crossAxisCount = 2,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Break modules into rows of 1 for portrait tablet or 2 for landscape wide tablet.
+    // Break days into rows according to crossAxisCount.
     // Using IntrinsicHeight ensures that all cards in a row are perfectly identical in height.
-    final int crossAxisCount = context.isWideTablet ? 2 : 1;
     final List<Widget> rows = [];
     final daysList = module.days;
 

@@ -8,17 +8,18 @@ import 'phase_card_node.dart';
 class TabletPhaseGrid extends StatelessWidget {
   final List<Phase> phasesList;
   final Set<String> completed;
+  final int crossAxisCount;
 
   const TabletPhaseGrid({
     super.key,
     required this.phasesList,
     required this.completed,
+    this.crossAxisCount = 2,
   });
 
   @override
   Widget build(BuildContext context) {
     // Using IntrinsicHeight ensures that all cards in a row are perfectly identical in height.
-    final int crossAxisCount = 2;
     final List<Widget> rows = [];
 
     for (int i = 0; i < phasesList.length; i += crossAxisCount) {
@@ -64,7 +65,7 @@ class TabletPhaseGrid extends StatelessWidget {
 
       rows.add(
         Padding(
-          padding: const EdgeInsets.only(bottom: 32.0),
+          padding: const EdgeInsets.only(bottom: 24.0),
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,

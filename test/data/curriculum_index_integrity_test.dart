@@ -55,8 +55,8 @@ void main() {
         }
       }
 
-      expect(totalDays, equals(41));
-      expect(subLessonDays, equals(5));
+      expect(totalDays, equals(53));
+      expect(subLessonDays, equals(6));
     });
   });
 }

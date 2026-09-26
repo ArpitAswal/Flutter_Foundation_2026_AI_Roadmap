@@ -22,145 +22,139 @@ extension ResponsiveExtension on BuildContext {
   /// Returns the current device orientation
   Orientation get orientation => MediaQuery.of(this).orientation;
 
+  /// Responsive app bar title style
+  TextStyle get appBarTitleStyle {
+    final theme = Theme.of(this);
+
+    return (isTablet
+                ? theme.textTheme.headlineMedium
+                : theme.textTheme.titleMedium)
+            ?.copyWith(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ) ??
+        const TextStyle();
+  }
+
+  /// Responsive body subtitle style
+  TextStyle get subDescriptionStyle {
+    final theme = Theme.of(this);
+
+    return (isTablet ? theme.textTheme.bodyMedium : theme.textTheme.bodySmall)
+            ?.copyWith(color: theme.colorScheme.onSurfaceVariant) ??
+        const TextStyle();
+  }
+
+  /// Provides stable EdgeInsets based on horizontal and vertical values.
+  EdgeInsets responsiveInsets(double horizontal, double vertical) {
+    return EdgeInsets.symmetric(horizontal: horizontal, vertical: vertical);
+  }
+
   /// Provides a scaled Padding based on the current device dimensions.
+  /// Retained for backwards compatibility across existing call sites.
   Padding responsivePadding(double x, double y) {
-    double getResponsiveVerticalPadding(double value) {
-      if (value == 0) {
-        return 0;
-      } else if (isWideTablet) {
-        return value + 4;
-      } else if (isTablet) {
-        return value + 4;
-      } else if (isSmallPhone) {
-        return value;
-      } else {
-        return value;
-      }
-    }
-
-    double getResponsiveHorizontalPadding(value) {
-      if (value == 0) {
-        return 0;
-      }
-      if (isWideTablet) {
-        return value + 10.0;
-      } else if (isTablet) {
-        return value + 6.0;
-      } else if (isSmallPhone) {
-        return value;
-      } else {
-        return value;
-      }
-    }
-
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: getResponsiveHorizontalPadding(x),
-        vertical: getResponsiveVerticalPadding(y),
-      ),
+      padding: EdgeInsets.symmetric(horizontal: x, vertical: y),
     );
   }
 
-  /// Provides a scaled Height based on the current device dimensions.
-  double responsiveHeightSpace(double h) {
-    if (isTablet || isWideTablet) {
-      return screenHeight * (h * 1.4);
-    } else if (isSmallPhone) {
-      return screenHeight * (h * 0.6);
-    } else {
-      return screenHeight * h;
-    }
-  }
+  /// Provides a stable BorderRadius design token across devices.
+  BorderRadiusGeometry get responsiveCircularRadius =>
+      const BorderRadius.all(Radius.circular(16.0));
 
-  /// Provides a scaled BorderRadius based on the current device dimensions.
-  BorderRadiusGeometry get responsiveCircularRadius {
-    double getResponsiveRadius(double base, double tablet, double small) {
-      if (isWideTablet) {
-        return tablet + (tablet / 2);
-      } else if (isTablet) {
-        return tablet;
-      } else if (isSmallPhone) {
-        return small;
-      } else {
-        return base;
-      }
-    }
-
-    return BorderRadiusGeometry.circular(getResponsiveRadius(16, 24, 12));
-  }
-
-  /// Provides a scaled TextTheme based on the current device dimensions.
-  /// Base sizes assume a normal phone.
+  /// Provides stable semantic TextTheme design tokens across viewports.
+  /// Preserves readability and system accessibility scaling.
   TextTheme get responsiveTextTheme {
-    final theme = Theme.of(this).textTheme;
-
-    double getResponsiveSize(
-      double baseSize,
-      double tabletSize,
-      double smallSize,
-    ) {
-      if (isWideTablet) {
-        return tabletSize * 1.1; // Slightly larger on wide screens
-      }
-      if (isTablet) return tabletSize;
-      if (isSmallPhone) return smallSize;
-      return baseSize;
-    }
-
-    return theme.copyWith(
-      // Display
-      displayLarge: theme.displayLarge?.copyWith(
-        fontSize: getResponsiveSize(48, 56, 36),
+    return TextTheme(
+      displayLarge: TextStyle(
+        fontSize: 57,
+        fontWeight: FontWeight.w400,
+        letterSpacing: -0.25,
+        height: 64 / 57,
       ),
-      displayMedium: theme.displayMedium?.copyWith(
-        fontSize: getResponsiveSize(36, 44, 28),
+      displayMedium: TextStyle(
+        fontSize: 45,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.0,
+        height: 52 / 45,
       ),
-      displaySmall: theme.displaySmall?.copyWith(
-        fontSize: getResponsiveSize(32, 40, 24),
+      displaySmall: TextStyle(
+        fontSize: 36,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.0,
+        height: 44 / 36,
       ),
-
-      // Headline
-      headlineLarge: theme.headlineLarge?.copyWith(
-        fontSize: getResponsiveSize(28, 34, 28),
+      headlineLarge: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.0,
+        height: 40 / 32,
       ),
-      headlineMedium: theme.headlineMedium?.copyWith(
-        fontSize: getResponsiveSize(24, 28, 26),
+      headlineMedium: TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.0,
+        height: 36 / 28,
       ),
-      headlineSmall: theme.headlineSmall?.copyWith(
-        fontSize: getResponsiveSize(20, 24, 22),
+      headlineSmall: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.0,
+        height: 32 / 24,
       ),
-
-      // Title
-      titleLarge: theme.titleLarge?.copyWith(
-        fontSize: getResponsiveSize(24, 28, 28),
+      titleLarge: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.0,
+        height: 28 / 22,
       ),
-      titleMedium: theme.titleMedium?.copyWith(
-        fontSize: getResponsiveSize(20, 22, 24),
+      titleMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.15,
+        height: 24 / 16,
       ),
-      titleSmall: theme.titleSmall?.copyWith(
-        fontSize: getResponsiveSize(16, 18, 22),
+      titleSmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.1,
+        height: 20 / 14,
       ),
-
-      // Body
-      bodyLarge: theme.bodyLarge?.copyWith(
-        fontSize: getResponsiveSize(18, 20, 20),
+      bodyLarge: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.5,
+        height: 24 / 16,
       ),
-      bodyMedium: theme.bodyMedium?.copyWith(
-        fontSize: getResponsiveSize(16, 18, 18),
+      bodyMedium: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.25,
+        height: 20 / 14,
       ),
-      bodySmall: theme.bodySmall?.copyWith(
-        fontSize: getResponsiveSize(14, 16, 16),
+      bodySmall: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.4,
+        height: 16 / 12,
       ),
-
-      // Label
-      labelLarge: theme.labelLarge?.copyWith(
-        fontSize: getResponsiveSize(14, 16, 18),
+      labelLarge: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.1,
+        height: 20 / 14,
       ),
-      labelMedium: theme.labelMedium?.copyWith(
-        fontSize: getResponsiveSize(12, 14, 16),
+      labelMedium: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.5,
+        height: 16 / 12,
       ),
-      labelSmall: theme.labelSmall?.copyWith(
-        fontSize: getResponsiveSize(12, 14, 14),
+      labelSmall: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.5,
+        height: 16 / 11,
       ),
     );
   }

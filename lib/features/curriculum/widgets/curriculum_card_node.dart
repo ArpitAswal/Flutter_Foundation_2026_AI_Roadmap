@@ -62,7 +62,7 @@ class CurriculumCard extends StatelessWidget {
         child: Stack(
           children: [
             child,
-            if (isCompleted)
+            if (!isLocked)
               Positioned(
                 left: 0,
                 top: 0,
@@ -70,35 +70,13 @@ class CurriculumCard extends StatelessWidget {
                 width:
                     (context.isTablet &&
                         context.orientation == Orientation.landscape)
-                    ? 12
+                    ? 10
                     : (context.isSmallPhone)
                     ? 4
-                    : 7,
+                    : 6,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(curve),
-                      bottomLeft: Radius.circular(curve),
-                    ),
-                  ),
-                ),
-              ),
-            if (isCurrent)
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width:
-                    (context.isTablet &&
-                        context.orientation == Orientation.landscape)
-                    ? 12
-                    : (context.isSmallPhone)
-                    ? 4
-                    : 7,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: colorScheme.secondaryContainer,
+                    color: (isCurrent) ? colorScheme.secondaryContainer : colorScheme.primary,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(curve),
                       bottomLeft: Radius.circular(curve),

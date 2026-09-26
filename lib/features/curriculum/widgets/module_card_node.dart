@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/string_constants.dart';
 import '../../../domain/models/curriculum/lesson_module.dart';
@@ -30,21 +29,39 @@ class ModuleCardNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CurriculumCard(
-      isLocked: isLocked,
-      isCompleted: isCompleted,
-      isCurrent: isCurrent,
-      onTap: () {
-        context.goNamed(
-          'days',
-          pathParameters: {'phaseId': '$phaseId', 'moduleId': '${module.id}'},
-        );
-      },
-      child: Padding(
-        padding: context.responsivePadding(18, 10).padding,
-        child: isGridMode ? _buildGridChild(context) : _buildListChild(context),
-      ),
-    );
+    return (isGridMode)
+        ? CurriculumCard(
+            isLocked: isLocked,
+            isCompleted: isCompleted,
+            isCurrent: isCurrent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 15),
+              child: _buildGridChild(context),
+            ),
+          )
+        : Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildIconOnly(context),
+              const SizedBox(width: 8),
+              Expanded(
+                child: CurriculumCard(
+                  isLocked: isLocked,
+                  isCompleted: isCompleted,
+                  isCurrent: isCurrent,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: _buildListChild(context),
+                  ),
+                ),
+              ),
+            ],
+          );
   }
 
   Widget _buildListChild(BuildContext context) {
@@ -55,7 +72,7 @@ class ModuleCardNode extends StatelessWidget {
         _buildTitle(context),
         const SizedBox(height: 4),
         _buildDescription(context, null),
-        _buildProgressBar(context),
+        _buildActionButtons(context),
       ],
     );
   }
@@ -69,124 +86,73 @@ class ModuleCardNode extends StatelessWidget {
         const SizedBox(height: 4),
         _buildDescription(context, 6),
         Spacer(),
-        _buildProgressBar(context),
+        _buildActionButtons(context, buildIcon: true),
       ],
     );
   }
 
   Widget _buildIconOnly(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final size = MediaQuery.of(context).size;
-    double width;
-    double height;
-    if (context.isTablet && context.orientation == Orientation.landscape) {
-      width = (size.width * 0.1).clamp(40, 80);
-      height = (size.height * 0.08).clamp(40, 60);
-    } else if (context.isSmallPhone) {
-      width = (size.width * 0.07).clamp(20, 50);
-      height = width;
-    } else {
-      width = (size.width * 0.08).clamp(30.0, 60.0);
-      height = width;
-    }
+    final double size = context.isTablet ? 44.0 : 36.0;
 
     if (isCompleted) {
       return Container(
-        width: width,
-        height: height,
-        alignment: AlignmentGeometry.center,
+        width: size,
+        height: size,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: colorScheme.primary,
-          shape:
-              (context.isTablet && context.orientation == Orientation.landscape)
-              ? BoxShape.rectangle
-              : BoxShape.circle,
-          borderRadius:
-              (context.isTablet && context.orientation == Orientation.landscape)
-              ? BorderRadius.circular(12)
-              : null,
-          border: Border.all(
-            color: colorScheme.onPrimary,
-            width: (context.isSmallPhone) ? 2 : 3,
-          ),
+          shape: BoxShape.circle,
+          border: Border.all(color: colorScheme.onPrimary, width: 2),
           boxShadow: [
             BoxShadow(
               color: colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-        child: Icon(
-          Icons.check_rounded,
-          color: colorScheme.onPrimary,
-          size: width * 0.6,
-        ),
+        child: Icon(Icons.check_rounded, color: colorScheme.onPrimary),
       );
     } else if (isCurrent) {
       return Container(
-        width: width,
-        height: height,
+        width: size,
+        height: size,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: colorScheme.secondaryContainer,
-          shape:
-              (context.isTablet && context.orientation == Orientation.landscape)
-              ? BoxShape.rectangle
-              : BoxShape.circle,
-          borderRadius:
-              (context.isTablet && context.orientation == Orientation.landscape)
-              ? BorderRadius.circular(12)
-              : null,
-          border: Border.all(
-            color: colorScheme.onPrimary,
-            width: (context.isSmallPhone) ? 2 : 3,
-          ),
+          shape: BoxShape.circle,
+          border: Border.all(color: colorScheme.onPrimary, width: 2),
           boxShadow: [
             BoxShadow(
               color: colorScheme.secondaryContainer.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-        child: Icon(
-          Icons.play_arrow_outlined,
-          color: colorScheme.onPrimary,
-          size: width * 0.6,
-        ),
+        child: Icon(Icons.play_arrow_rounded, color: colorScheme.onPrimary),
       );
     } else {
       return Container(
-        width: width,
-        height: height,
-        alignment: AlignmentGeometry.center,
+        width: size,
+        height: size,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
-          shape:
-              (context.isTablet && context.orientation == Orientation.landscape)
-              ? BoxShape.rectangle
-              : BoxShape.circle,
-          borderRadius:
-              (context.isTablet && context.orientation == Orientation.landscape)
-              ? BorderRadius.circular(12)
-              : null,
-          border: Border.all(
-            color: colorScheme.outlineVariant,
-            width: (context.isSmallPhone) ? 2 : 3,
-          ),
+          shape: BoxShape.circle,
+          border: Border.all(color: colorScheme.outlineVariant, width: 2),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.surfaceContainerHighest,
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Icon(
-          Icons.lock_outline,
-          color: colorScheme.outline.withValues(alpha: 0.5),
-          size: width * 0.6,
+          Icons.lock_outline_rounded,
+          color: colorScheme.outline.withValues(alpha: 0.6),
         ),
       );
     }
@@ -196,12 +162,14 @@ class ModuleCardNode extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Container(
-      padding: context.responsivePadding(14, 6).padding,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: isCurrent
             ? colorScheme.secondaryContainer.withValues(alpha: 0.1)
+            : isLocked
+            ? colorScheme.onPrimary
             : colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-        borderRadius: context.responsiveCircularRadius,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         '$completedDays/${module.totalDays}',
@@ -221,19 +189,22 @@ class ModuleCardNode extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '${StringConstants.modulePrefix} ${module.id}',
-          style: context.responsiveTextTheme.labelSmall?.copyWith(
-            color: isCurrent
-                ? colorScheme.secondaryContainer
-                : isLocked
-                ? colorScheme.outline
-                : colorScheme.primary,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
+        Expanded(
+          child: Text(
+            '${StringConstants.modulePrefix} ${module.id}',
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: isCurrent
+                  ? colorScheme.secondaryContainer
+                  : isLocked
+                  ? colorScheme.outline
+                  : colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
-        (!isLocked) ? _buildProgressText(context) : _buildIconOnly(context),
+        SizedBox(width: 4),
+        _buildProgressText(context),
       ],
     );
   }
@@ -243,10 +214,9 @@ class ModuleCardNode extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     return Text(
       module.title,
-      style: context.responsiveTextTheme.titleMedium?.copyWith(
+      style: theme.textTheme.titleMedium?.copyWith(
         fontWeight: FontWeight.bold,
         color: isLocked ? colorScheme.onSurfaceVariant : colorScheme.onSurface,
-        fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
       ),
     );
   }
@@ -258,34 +228,99 @@ class ModuleCardNode extends StatelessWidget {
       module.subtitle,
       maxLines: maxLines,
       overflow: maxLines == null ? null : TextOverflow.ellipsis,
-      style: context.responsiveTextTheme.bodySmall?.copyWith(
+      style: context.subDescriptionStyle.copyWith(
         color: isLocked ? colorScheme.outline : colorScheme.onSurfaceVariant,
       ),
     );
   }
 
-  Widget _buildProgressBar(BuildContext context) {
-    if (!isLocked) {
-      return Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Flexible(
-            flex: 1,
-            child: CurriculumProgressBar(
-              fraction: module.totalDays == 0
-                  ? 0.0
-                  : completedDays / module.totalDays,
-              isCurrent: isCurrent,
-              height: context.responsiveHeightSpace(
-                  context.isSmallPhone ? 0.015 : 0.008
-              ),
+  Widget _buildActionButtons(BuildContext context, {bool buildIcon = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: CurriculumProgressBar(
+            fraction: module.totalDays == 0
+                ? 0.0
+                : completedDays / module.totalDays,
+            isCurrent: isCurrent,
+            height: 6.0,
+          ),
+        ),
+        SizedBox(
+          width: double.infinity,
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              _buildActionButton(context),
+              if (buildIcon) _buildIconOnly(context),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    if (isCompleted) {
+      return SizedBox(
+        height: 40,
+        child: OutlinedButton.icon(
+          onPressed: () => context.goNamed(
+            'days',
+            pathParameters: {'phaseId': '$phaseId', 'moduleId': '${module.id}'},
+          ),
+          style: OutlinedButton.styleFrom(
+            alignment: Alignment.center,
+            foregroundColor: colorScheme.primary,
+            side: BorderSide(color: colorScheme.primary),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
-          SizedBox(width: 12.0),
-          _buildIconOnly(context),
-        ],
+          icon: const Icon(Icons.arrow_forward_rounded),
+          label: Text(
+            StringConstants.reviewModule,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+    } else if (isCurrent) {
+      return SizedBox(
+        height: 40,
+        child: ElevatedButton.icon(
+          onPressed: () => context.goNamed(
+            'days',
+            pathParameters: {'phaseId': '$phaseId', 'moduleId': '${module.id}'},
+          ),
+          icon: const Icon(Icons.arrow_forward_rounded),
+          label: Text(
+            StringConstants.continueLearning,
+            style: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onPrimary,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            alignment: Alignment.center,
+            backgroundColor: colorScheme.secondaryContainer,
+            foregroundColor: colorScheme.onPrimary,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
       );
     } else {
       return SizedBox.shrink();

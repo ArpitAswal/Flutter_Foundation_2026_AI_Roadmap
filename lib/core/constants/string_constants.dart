@@ -11,7 +11,11 @@ class StringConstants {
   static const String phasePrefix = 'PHASE';
   static const String continueLearning = 'Continue Learning';
   static const String reviewPhase = 'Review Phase';
+  static const String reviewModule = 'Review Module';
+  static const String reviewDay = 'Review Day';
   static const String doubleTapToExit = 'Press back again to exit';
+  static const String phaseUnavailable = 'Phase Unavailable';
+  static const String phaseUnavailableMsg = 'We apologise for your experience. The curriculum json parsed failed. Please try again later.';
 
   // Modules Screen
   static const String modulesTitle = 'Modules';
@@ -20,6 +24,8 @@ class StringConstants {
   static const String modulePrefix = 'MODULE';
   static const String currentLabel = 'CURRENT';
   static const String progressLabel = 'PROGRESS';
+  static const String moduleUnavailable = 'Module Unavailable';
+  static const String moduleUnavailableMsg = 'We apologise for your experience. Please read and learn other modules in the remaining time.';
 
   // Days Screen
   static const String daysTitle = 'Lessons';

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_foundation/core/utils/responsive_extension.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,6 +11,7 @@ import '../../../domain/usecases/get_day_content_use_case.dart';
 import '../../../shared/widgets/code_element_builder.dart';
 import '../../../shared/widgets/expandable_widget.dart';
 import '../../ai_tutor/widgets/ai_tutor_fab.dart';
+import '../../curriculum/widgets/curriculum_state_views.dart';
 
 /// Screen for rendering sub-lesson branches (e.g., GetX, Provider, BLoC)
 /// navigated to from a parent lesson that declares a `custom_route` list.
@@ -80,361 +79,293 @@ class _SubLessonScreenState extends State<SubLessonScreen> {
     final label = LessonDay.subLessonLabel(widget.assetPath);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.parentTitle.isNotEmpty
+              ? '$label (${widget.parentTitle})'
+              : label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        leadingWidth: 56.0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.pop(),
+        ),
+      ),
       body: FutureBuilder<LessonContent>(
         future: _contentFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SpinKitThreeBounce(color: colorScheme.primary, size: 36.0),
-                  const SizedBox(height: 20),
-                  Text(
-                    StringConstants.preparingLesson,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
+            return const CurriculumLoadingView(
+              message: StringConstants.preparingLesson,
             );
           }
 
           if (snapshot.hasError || !snapshot.hasData) {
-            return Center(
-              child: Padding(
-                padding: context.responsivePadding(16, 10).padding,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: context.isTablet ? 200 : 100,
-                      height: context.isTablet ? 200 : 100,
-                      decoration: BoxDecoration(
-                        color: colorScheme.errorContainer.withValues(
-                          alpha: 0.4,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.auto_stories_outlined,
-                        color: colorScheme.error,
-                        size: context.isTablet ? 140 : 60,
-                      ),
-                    ),
-                    SizedBox(height: context.responsiveHeightSpace(0.02)),
-                    Text(
-                      StringConstants.lessonUnavailable,
-                      textAlign: TextAlign.center,
-                      style: context.responsiveTextTheme.headlineSmall
-                          ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
-                          ),
-                    ),
-                    SizedBox(height: context.responsiveHeightSpace(0.01)),
-                    Text(
-                      StringConstants.lessonErrorApology,
-                      textAlign: TextAlign.center,
-                      style: context.responsiveTextTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        height: 1.4,
-                      ),
-                    ),
-                    SizedBox(height: context.responsiveHeightSpace(0.02)),
-                    OutlinedButton.icon(
-                      onPressed: () => context.pop(),
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      label: Text(
-                        StringConstants.goBack,
-                        style: context.responsiveTextTheme.bodyLarge?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: context.responsivePadding(16, 12).padding,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: colorScheme.primary),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            return CurriculumErrorView(
+              title: StringConstants.lessonUnavailable,
+              message: StringConstants.lessonErrorApology,
+              showBackButton: true,
+              onRetry: () {
+                setState(() {
+                  _contentFuture = getIt<GetDayContentUseCase>()(widget.assetPath);
+                });
+              },
             );
           }
 
           final content = snapshot.data!;
-          double fabSize;
-          if (context.isTablet) {
-            fabSize = (context.screenHeight * 0.1).clamp(60.0, 120.0);
-          } else if (context.isSmallPhone) {
-            fabSize = (context.screenWidth * 0.09).clamp(20.0, 40.0);
-          } else {
-            fabSize = (context.screenWidth * 0.12).clamp(40.0, 60.0);
-          }
 
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: SafeArea(
-                  child: ListView(
-                    controller: _scrollController,
-                    padding: context.responsivePadding(16, 21).padding,
-                    children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            child: Icon(
-                              Icons.arrow_back_rounded,
-                              size: context.isTablet ? 44 : 28,
-                            ),
-                            onTap: () => context.pop(),
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final availableWidth = constraints.maxWidth;
+              const maxContentWidth = 860.0;
+              final horizontalPadding = availableWidth > maxContentWidth
+                  ? (availableWidth - maxContentWidth) / 2 + 24.0
+                  : 16.0;
+
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Positioned.fill(
+                    child: ListView(
+                      controller: _scrollController,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                        vertical: 20.0,
+                      ),
+                      children: [
+                        Text(
+                          label,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                            fontFamily: GoogleFonts.hankenGrotesk().fontFamily,
                           ),
-                          SizedBox(width: 8.0),
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                style: context.responsiveTextTheme.titleMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: GoogleFonts.hankenGrotesk()
-                                          .fontFamily,
-                                    ),
-                                children: [
-                                  TextSpan(text: label),
-
-                                  TextSpan(text: " "),
-                                  if (widget.parentTitle.isNotEmpty)
-                                    TextSpan(
-                                      text: "(${widget.parentTitle})",
-                                      style: context
-                                          .responsiveTextTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                            color: colorScheme.onSurfaceVariant,
-                                          ),
-                                    ),
-                                ],
-                              ),
+                        ),
+                        if (widget.parentTitle.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.parentTitle,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
-                      ),
-                      SizedBox(height: context.responsiveHeightSpace(0.01)),
+                        const SizedBox(height: 12),
 
-                      // Last Updated Date Metadata
-                      if (content.lastUpdated != null &&
-                          content.lastUpdated!.isNotEmpty) ...[
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.history_rounded,
-                              size: context.isTablet ? 28 : 16,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${StringConstants.lastUpdated} ${content.lastUpdated}',
-                              style: context.responsiveTextTheme.bodyMedium
-                                  ?.copyWith(
+                        // Last Updated Date Metadata
+                        if (content.lastUpdated != null &&
+                            content.lastUpdated!.isNotEmpty) ...[
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.history_rounded,
+                                size: 18,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  '${StringConstants.lastUpdated} ${content.lastUpdated}',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
                                     color: colorScheme.onSurfaceVariant,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // Prerequisites
+                        if (content.prerequisites.isNotEmpty) ...[
+                          _SubLessonPrerequisitesCard(
+                            prerequisites: content.prerequisites,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // Theory (Markdown)
+                        MarkdownBody(
+                          data: content.theory,
+                          styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+                            p: theme.textTheme.bodyMedium?.copyWith(
+                              height: 1.7,
                             ),
-                          ],
+                            h1Padding: const EdgeInsets.only(top: 16),
+                            h1: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: colorScheme.primary,
+                            ),
+                            h2Padding: const EdgeInsets.only(top: 16),
+                            h2: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.primary,
+                            ),
+                            h3Padding: const EdgeInsets.only(top: 16),
+                            h3: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.primary,
+                            ),
+                            blockSpacing: 12,
+                            a: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.primary,
+                              decoration: TextDecoration.underline,
+                            ),
+                            code: TextStyle(
+                              fontSize: theme.textTheme.bodyMedium?.fontSize,
+                              color: Colors.black,
+                              backgroundColor: Colors.grey.shade200,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                          builders: {'pre': CodeElementBuilder(context)},
                         ),
-                        SizedBox(height: context.responsiveHeightSpace(0.02)),
-                      ],
 
-                      // Prerequisites
-                      if (content.prerequisites.isNotEmpty) ...[
-                        _SubLessonPrerequisitesCard(
-                          prerequisites: content.prerequisites,
-                        ),
-                        SizedBox(height: context.responsiveHeightSpace(0.02)),
-                      ],
+                        // Deep Dive Accordions
+                        if (content.hasDeepDives) ...[
+                          const SizedBox(height: 32),
 
-                      // Theory (Markdown)
-                      MarkdownBody(
-                        data: content.theory,
-                        styleSheet: MarkdownStyleSheet.fromTheme(theme)
-                            .copyWith(
-                              p: context.responsiveTextTheme.bodyMedium
-                                  ?.copyWith(height: 1.7),
-                              h1Padding: const EdgeInsets.only(top: 16),
-                              h1: context.responsiveTextTheme.titleLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: colorScheme.primary,
-                                  ),
-                              h2Padding: const EdgeInsets.only(top: 16),
-                              h2: context.responsiveTextTheme.titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: colorScheme.primary,
-                                  ),
-                              h3Padding: const EdgeInsets.only(top: 16),
-                              h3: context.responsiveTextTheme.titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: colorScheme.primary,
-                                  ),
-                              blockSpacing: 12,
-                              a: context.responsiveTextTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: colorScheme.primary,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                              code: TextStyle(
-                                fontSize: context
-                                    .responsiveTextTheme
-                                    .bodyMedium
-                                    ?.fontSize,
-                                color: Colors.black,
-                                backgroundColor: Colors.grey.shade200,
-                                fontFamily: 'monospace',
+                          if (content.implementation != null &&
+                              content.implementation!.isNotEmpty)
+                            ExpandableWidget(
+                              title: 'Practical Implementation',
+                              markdownContent: content.implementation!,
+                              isExpanded:
+                                  _expandedTitle == 'Practical Implementation',
+                              onExpansionChanged: (exp) => _handleExpansion(
+                                'Practical Implementation',
+                                exp,
                               ),
                             ),
-                        builders: {'pre': CodeElementBuilder(context)},
-                      ),
-
-                      // Deep Dive Accordions
-                      if (content.hasDeepDives) ...[
-                        const SizedBox(height: 32),
-
-                        if (content.implementation != null &&
-                            content.implementation!.isNotEmpty)
-                          ExpandableWidget(
-                            title: 'Practical Implementation',
-                            markdownContent: content.implementation!,
-                            isExpanded:
-                                _expandedTitle == 'Practical Implementation',
-                            onExpansionChanged: (exp) => _handleExpansion(
-                              'Practical Implementation',
-                              exp,
+                          if (content.architecture != null &&
+                              content.architecture!.isNotEmpty)
+                            ExpandableWidget(
+                              title: 'Architecture & Mental Model',
+                              markdownContent: content.architecture!,
+                              isExpanded:
+                                  _expandedTitle == 'Architecture & Mental Model',
+                              onExpansionChanged: (exp) => _handleExpansion(
+                                'Architecture & Mental Model',
+                                exp,
+                              ),
                             ),
-                          ),
-                        if (content.architecture != null &&
-                            content.architecture!.isNotEmpty)
-                          ExpandableWidget(
-                            title: 'Architecture & Mental Model',
-                            markdownContent: content.architecture!,
-                            isExpanded:
-                                _expandedTitle == 'Architecture & Mental Model',
-                            onExpansionChanged: (exp) => _handleExpansion(
-                              'Architecture & Mental Model',
-                              exp,
+                          if (content.comparisons != null &&
+                              content.comparisons!.isNotEmpty)
+                            ExpandableWidget(
+                              title: 'Comparisons & Trade-offs',
+                              markdownContent: content.comparisons!,
+                              isExpanded:
+                                  _expandedTitle == 'Comparisons & Trade-offs',
+                              onExpansionChanged: (exp) => _handleExpansion(
+                                'Comparisons & Trade-offs',
+                                exp,
+                              ),
                             ),
-                          ),
-                        if (content.comparisons != null &&
-                            content.comparisons!.isNotEmpty)
-                          ExpandableWidget(
-                            title: 'Comparisons & Trade-offs',
-                            markdownContent: content.comparisons!,
-                            isExpanded:
-                                _expandedTitle == 'Comparisons & Trade-offs',
-                            onExpansionChanged: (exp) => _handleExpansion(
-                              'Comparisons & Trade-offs',
-                              exp,
-                            ),
-                          ),
-                        if (content.optimization != null &&
-                            content.optimization!.isNotEmpty)
-                          ExpandableWidget(
-                            title: 'Optimization & Best Practices',
-                            markdownContent: content.optimization!,
-                            isExpanded:
-                                _expandedTitle ==
+                          if (content.optimization != null &&
+                              content.optimization!.isNotEmpty)
+                            ExpandableWidget(
+                              title: 'Optimization & Best Practices',
+                              markdownContent: content.optimization!,
+                              isExpanded:
+                                  _expandedTitle ==
+                                  'Optimization & Best Practices',
+                              onExpansionChanged: (exp) => _handleExpansion(
                                 'Optimization & Best Practices',
-                            onExpansionChanged: (exp) => _handleExpansion(
-                              'Optimization & Best Practices',
-                              exp,
-                            ),
-                          ),
-                        if (content.commonMistakes != null &&
-                            content.commonMistakes!.isNotEmpty)
-                          ExpandableWidget(
-                            title: 'Common Mistakes & Gotchas',
-                            markdownContent: content.commonMistakes!,
-                            isExpanded:
-                                _expandedTitle == 'Common Mistakes & Gotchas',
-                            onExpansionChanged: (exp) => _handleExpansion(
-                              'Common Mistakes & Gotchas',
-                              exp,
-                            ),
-                          ),
-                        if (content.interviewQuestions != null &&
-                            content.interviewQuestions!.isNotEmpty)
-                          ExpandableWidget(
-                            title: 'Interview Prep: Key Questions',
-                            markdownContent: content.interviewQuestions!,
-                            isExpanded:
-                                _expandedTitle ==
-                                'Interview Prep: Key Questions',
-                            onExpansionChanged: (exp) => _handleExpansion(
-                              'Interview Prep: Key Questions',
-                              exp,
-                            ),
-                          ),
-                      ],
-                      // Extra bottom padding for FAB clearance
-                      const SizedBox(height: 80),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 16,
-                bottom: 16,
-                child: SafeArea(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      AnimatedOpacity(
-                        opacity: _showScrollToTop ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: SizedBox(
-                          width: fabSize,
-                          height: fabSize,
-                          child: FloatingActionButton(
-                            heroTag: 'subLessonScrollToTop',
-                            onPressed: () {
-                              if (_showScrollToTop) {
-                                _scrollController.animateTo(
-                                  0,
-                                  duration: const Duration(milliseconds: 500),
-                                  curve: Curves.easeOutCubic,
-                                );
-                              }
-                            },
-                            backgroundColor: colorScheme.primary,
-                            foregroundColor: colorScheme.onSecondary,
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                fabSize * 0.25,
+                                exp,
                               ),
                             ),
-                            child: Icon(
-                              Icons.arrow_upward_rounded,
-                              size: fabSize * 0.7,
+                          if (content.commonMistakes != null &&
+                              content.commonMistakes!.isNotEmpty)
+                            ExpandableWidget(
+                              title: 'Common Mistakes & Gotchas',
+                              markdownContent: content.commonMistakes!,
+                              isExpanded:
+                                  _expandedTitle == 'Common Mistakes & Gotchas',
+                              onExpansionChanged: (exp) => _handleExpansion(
+                                'Common Mistakes & Gotchas',
+                                exp,
+                              ),
+                            ),
+                          if (content.interviewQuestions != null &&
+                              content.interviewQuestions!.isNotEmpty)
+                            ExpandableWidget(
+                              title: 'Interview Prep: Key Questions',
+                              markdownContent: content.interviewQuestions!,
+                              isExpanded:
+                                  _expandedTitle ==
+                                  'Interview Prep: Key Questions',
+                              onExpansionChanged: (exp) => _handleExpansion(
+                                'Interview Prep: Key Questions',
+                                exp,
+                              ),
+                            ),
+                        ],
+                        // Extra bottom padding for FAB clearance
+                        const SizedBox(height: 80),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    right: 24,
+                    bottom: 24,
+                    child: SafeArea(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          AnimatedOpacity(
+                            opacity: _showScrollToTop ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: SizedBox(
+                              width: 48.0,
+                              height: 48.0,
+                              child: FloatingActionButton(
+                                heroTag: 'subLessonScrollToTop',
+                                onPressed: () {
+                                  if (_showScrollToTop) {
+                                    _scrollController.animateTo(
+                                      0,
+                                      duration: const Duration(milliseconds: 500),
+                                      curve: Curves.easeOutCubic,
+                                    );
+                                  }
+                                },
+                                backgroundColor: colorScheme.primary,
+                                foregroundColor: colorScheme.onSecondary,
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_upward_rounded,
+                                  size: 24.0,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 16),
+                          AiTutorFab(
+                            contextTitle: label,
+                            contextContent: content,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      AiTutorFab(contextTitle: label, contextContent: content),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           );
         },
       ),
@@ -459,7 +390,7 @@ class _SubLessonPrerequisitesCard extends StatelessWidget {
         .toList();
 
     return Container(
-      padding: context.responsivePadding(16, 12).padding,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
@@ -474,13 +405,13 @@ class _SubLessonPrerequisitesCard extends StatelessWidget {
             children: [
               Icon(
                 Icons.school_outlined,
-                size: context.isTablet ? 30 : 20,
+                size: 20,
                 color: colorScheme.primary,
               ),
               const SizedBox(width: 8),
               Text(
                 StringConstants.prerequisites,
-                style: context.responsiveTextTheme.titleSmall?.copyWith(
+                style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.primary,
                 ),
@@ -504,7 +435,7 @@ class _SubLessonPrerequisitesCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item,
-                      style: context.responsiveTextTheme.bodySmall?.copyWith(
+                      style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         height: 1.4,
                       ),

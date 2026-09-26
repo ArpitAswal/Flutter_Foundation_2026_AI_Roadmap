@@ -59,6 +59,7 @@ class _ExpandableWidgetState extends State<ExpandableWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -91,27 +92,53 @@ class _ExpandableWidgetState extends State<ExpandableWidget> {
             MarkdownBody(
               data: widget.markdownContent,
               styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-                p: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
+                p:
+                    (context.isTablet
+                            ? theme.textTheme.bodyLarge
+                            : theme.textTheme.bodySmall)
+                        ?.copyWith(height: 1.7),
+
                 h1Padding: const EdgeInsets.only(top: 16),
-                h1: theme.textTheme.headlineMedium?.copyWith(
+                h1: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.primary,
+                  color: colorScheme.primary,
                 ),
                 h2Padding: const EdgeInsets.only(top: 16),
-                h2: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.primary,
-                ),
+                h2:
+                    (context.isTablet
+                            ? theme.textTheme.titleLarge
+                            : theme.textTheme.titleMedium)
+                        ?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.primary,
+                        ),
                 h3Padding: const EdgeInsets.only(top: 16),
-                h3: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.primary,
-                ),
+                h3:
+                    (context.isTablet
+                            ? theme.textTheme.titleMedium
+                            : theme.textTheme.titleSmall)
+                        ?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.primary,
+                        ),
                 blockSpacing: 12,
                 a: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.primary,
+                  color: colorScheme.primary,
                   decoration: TextDecoration.underline,
                 ),
+                // This targets inline code wrapped in single backticks (e.g., `int`)
+                code:
+                    (context.isTablet
+                            ? theme.textTheme.bodyLarge
+                            : theme.textTheme.bodySmall)
+                        ?.copyWith(
+                          color: Colors.black, // High contrast for Light Theme
+                          backgroundColor: Colors
+                              .grey
+                              .shade200, // Very subtle gray background
+                          fontFamily:
+                              'monospace', // Keeps the developer aesthetic
+                        ),
               ),
               builders: {'pre': CodeElementBuilder(context)},
             ),

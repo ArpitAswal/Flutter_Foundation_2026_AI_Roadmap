@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_foundation/core/utils/responsive_extension.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/constants/app_constants.dart';
@@ -50,26 +51,22 @@ class FlutterAiTutorApp extends StatelessWidget {
         title: 'Flutter AI Tutor',
         theme: ThemeData(
           useMaterial3: true,
+          fontFamily: GoogleFonts.inter().fontFamily,
+          textTheme: GoogleFonts.interTextTheme(context.responsiveTextTheme),
           appBarTheme: AppBarTheme(
             centerTitle: true,
-            backgroundColor: Color(0XFFffffff),
+            backgroundColor: const Color(0XFFffffff),
             elevation: 4,
             shadowColor: Colors.grey.shade200,
-            titleTextStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Color(0xFF005cad),
-              fontWeight: FontWeight.w600,
-            ),
           ),
           iconTheme: IconThemeData(
             color: Color(0xFF005cad),
-            size: context.responsiveTextTheme.headlineMedium?.fontSize,
+            size: context.isTablet ? 36 : 24,
           ),
           iconButtonTheme: IconButtonThemeData(
             style: ButtonStyle(
               foregroundColor: WidgetStatePropertyAll(Color(0xFF005cad)),
-              iconSize: WidgetStatePropertyAll(
-                context.responsiveTextTheme.headlineLarge?.fontSize,
-              ),
+              iconSize: WidgetStatePropertyAll(context.isTablet ? 36 : 24),
             ),
           ),
           colorScheme: const ColorScheme(
@@ -99,26 +96,6 @@ class FlutterAiTutorApp extends StatelessWidget {
           ),
         ),
         routerConfig: getIt<AppRouter>().router,
-        builder: (context, child) {
-          // Calculate responsive text scale factor
-          final mediaQueryData = MediaQuery.of(context);
-          final screenWidth = mediaQueryData.size.width;
-          double textScaleFactor = 0.9;
-
-          if (screenWidth >= 600) {
-            // Tablet portrait or landscape
-            textScaleFactor = 1.5;
-          } else if (screenWidth <= 360) {
-            // Small phones
-            textScaleFactor = 0.6;
-          }
-          return MediaQuery(
-            data: mediaQueryData.copyWith(
-              textScaler: TextScaler.linear(textScaleFactor),
-            ),
-            child: child!,
-          );
-        },
       ),
     );
   }
